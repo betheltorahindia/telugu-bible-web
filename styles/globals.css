@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light/Dark via data-theme on <html> */
+:root { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+
+html { scroll-padding-top: 5rem; } /* match mt-20 above (5rem = 80px) */
+
+
+body { @apply bg-white text-black transition-colors antialiased; }
+[data-theme="dark"] body { @apply bg-black text-white; }
+
+.container { @apply max-w-6xl mx-auto px-4; }
+
+/* --- CARDS & BADGES --- */
+.card { @apply rounded-2xl shadow-sm p-4 border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900; }
+.badge { @apply text-xs px-2 py-0.5 rounded bg-black/10 dark:bg-white/20; }
+
+/* --- BUTTONS (universal) --- */
+.btn {
+  @apply inline-flex items-center justify-center gap-2
+    rounded-xl border border-black/10 dark:border-white/10
+    px-3 py-2 transition-all select-none
+    bg-neutral-100/70 dark:bg-neutral-800/70
+    text-neutral-900 dark:text-neutral-100;
+}
+.btn:hover { @apply bg-neutral-200/80 dark:bg-neutral-700/80; }
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn:focus-visible { @apply outline-none ring-2 ring-black/20 dark:ring-white/20; }
+
+/* Book-chip buttons (wrap Telugu nicely, adapt to long names) */
+
+/* Book-chip buttons (one line, show full Telugu, auto shrink font) */
+.btn-book {
+  @apply inline-flex items-center justify-center
+         rounded-xl border border-black/10 dark:border-white/10
+         transition-all select-none
+         bg-neutral-100/70 dark:bg-neutral-800/70
+         text-neutral-900 dark:text-neutral-100;
+
+  padding: 10px 16px;
+
+  /* keep on one line, but DON’T hide text */
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+
+  /* auto-shrink if needed (tune the min size if still too long) */
+  font-size: clamp(11px, 1.3vw, 16px);
+
+  /* let the pill grow to fit content; no hard max */
+  min-width: auto;
+  max-width: none;
+}
+
+/* Compact numeric chips (chapters, aliyot) */
+.btn-chip {
+  @apply px-3 py-2 text-sm;
+  min-width: 56px;
+  text-align: center;
+}
+
+/* Link look */
+.link { @apply underline underline-offset-4 hover:no-underline; }
+
+/* Auto grid for lists of pills; slightly wider than before */
+.grid-auto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
