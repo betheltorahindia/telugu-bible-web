@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { HOME_SECTIONS, BOOK_NAMES } from '../lib/data/books'
-import Footer from '../components/Footer' // remove this line if you didn't add Footer
+import Footer from '../components/footer' // remove this line if you didn't add Footer
 
 export default function Home() {
   return (
