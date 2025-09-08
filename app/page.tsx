@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { HOME_SECTIONS, BOOK_NAMES } from '../lib/data/books'
 import Footer from '../components/footer' // remove this line if you didn't add Footer
+import InstallFAB from '../components/InstallFAB'  // ← add this line
 
 export default function Home() {
   return (
@@ -25,6 +26,8 @@ export default function Home() {
 
       {/* Footer strip on Home only */}
       <Footer />
+      {/* Mobile-only floating Install button (PWA) */}
+      <InstallFAB />   {/* ← add this */}
     </div>
   )
 }
