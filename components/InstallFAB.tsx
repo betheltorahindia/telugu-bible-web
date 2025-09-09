@@ -19,6 +19,7 @@ function buildAllUrls(base: string) {
   // Books + chapters from bundled bible.json
   const books: any[] = (bible as any).books ?? []
   for (const b of books) {
+    // ⚡ Optional: comment this next line to skip book landing pages (fewer URLs = faster)
     urls.push(`${base}/book/${b.bnumber}`)
     for (const ch of b.chapters ?? []) {
       urls.push(`${base}/book/${b.bnumber}/chapter/${ch.cnumber}`)
@@ -69,23 +70,36 @@ export default function InstallFAB() {
   // Only show the FAB when installable and not installed
   if (installed || !deferred) return null
 
+  // 🔥 FAST parallel precache (concurrency pool)
   async function preCacheAll() {
     setStatus('precaching')
     setDone(0)
     setTotal(allUrls.length)
 
-    for (const url of allUrls) {
-      try {
-        // Go through SW and refresh its cache entries
-        await fetch(url, { cache: 'reload' })
-      } catch {
-        // ignore individual failures; continue
-      } finally {
-        setDone((d) => d + 1)
-        // small yield so UI can update on low-end devices
-        await new Promise((r) => setTimeout(r, 5))
+    const CONCURRENCY = 18 // try 12–24 on fast networks; 8–12 on slower ones
+    let index = 0
+    let completed = 0
+
+    async function worker() {
+      while (index < allUrls.length) {
+        const i = index++
+        const url = allUrls[i]
+        try {
+          await fetch(url, { cache: 'reload' })
+        } catch {
+          // ignore individual failures
+        } finally {
+          completed++
+          // Batch progress updates to reduce re-renders
+          if (completed % 3 === 0 || completed === allUrls.length) {
+            setDone(completed)
+          }
+        }
       }
     }
+
+    const workers = Array.from({ length: CONCURRENCY }, () => worker())
+    await Promise.all(workers)
 
     setStatus('ready')
   }
@@ -105,7 +119,6 @@ export default function InstallFAB() {
         setStatus('done')
       }
     } catch {
-      // If something odd happens, just hide progress and leave button off
       setStatus('idle')
     }
   }
