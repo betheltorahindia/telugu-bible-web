@@ -1,116 +1,131 @@
+/* public/service-worker.js */
 /* eslint-disable no-undef */
-/**
- * Service Worker for Tanach | Telugu
- * - Precache Next.js build assets (injected by Workbox)
- * - Runtime caching for pages, bible.json, static assets, images/fonts
- * - Background “warm up” of all book/chapter routes after activation
- */
 
-import { clientsClaim } from 'workbox-core'
-import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching'
-import { registerRoute } from 'workbox-routing'
-import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies'
-import { ExpirationPlugin } from 'workbox-expiration'
-import { CacheableResponsePlugin } from 'workbox-cacheable-response'
+// --- Basic SW lifecycle ------------------------------------------------------
+self.skipWaiting();
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    // Take control immediately
+    await self.clients.claim();
+    // Warm the cache right after install/activate
+    await warmCache();
+  })());
+});
 
-self.skipWaiting()
-clientsClaim()
+// --- Workbox (injected by @ducanh2912/next-pwa) ------------------------------
+workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || []);
 
-// -------------- Precache Next.js build assets -----------------
-precacheAndRoute(self.__WB_MANIFEST || [])
-cleanupOutdatedCaches()
+// Helpful logs (you can remove later)
+const log = (...a) => console.log('[SW]', ...a);
 
-// -------------- Runtime caching rules -------------------------
+// --- Cache strategies --------------------------------------------------------
 
-// HTML navigations (pages)
-registerRoute(
+// 1) Page navigations (HTML)
+workbox.routing.registerRoute(
   ({ request }) => request.mode === 'navigate',
-  new NetworkFirst({
+  new workbox.strategies.NetworkFirst({
     cacheName: 'pages',
     networkTimeoutSeconds: 3,
     plugins: [
-      new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 7 * 24 * 60 * 60 }) // 7 days
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+      }),
     ],
-  })
-)
+  }),
+);
 
-// Bible JSON (make sure /data/bible.json exists)
-registerRoute(
-  ({ url, request }) =>
-    url.pathname.endsWith('/data/bible.json') ||
-    url.pathname.includes('/data/') && url.pathname.endsWith('.json'),
-  new CacheFirst({
-    cacheName: 'bible-json',
+// 2) Next build assets
+workbox.routing.registerRoute(
+  /\/_next\/static\/.*/i,
+  new workbox.strategies.CacheFirst({
+    cacheName: 'next-static',
     plugins: [
-      new CacheableResponsePlugin({ statuses: [0, 200] }),
-      new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 30 * 24 * 60 * 60 }), // 30 days
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
     ],
-  })
-)
+  }),
+);
 
-// JS & CSS
-registerRoute(
-  ({ request }) => request.destination === 'script' || request.destination === 'style',
-  new StaleWhileRevalidate({ cacheName: 'static-assets' })
-)
+// 3) Images / fonts / media on same origin
+workbox.routing.registerRoute(
+  ({ request, url }) =>
+    url.origin === self.location.origin &&
+    /\.(?:png|gif|jpg|jpeg|webp|svg|ico|mp3|mp4|woff2|woff|ttf)$/.test(url.pathname),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'assets',
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 300,
+        maxAgeSeconds: 60 * 24 * 60 * 60,
+      }),
+    ],
+  }),
+);
 
-// Images & fonts
-registerRoute(
-  ({ request }) => request.destination === 'image' || request.destination === 'font',
-  new StaleWhileRevalidate({
-    cacheName: 'media',
-    plugins: [new ExpirationPlugin({ maxEntries: 300, maxAgeSeconds: 60 * 24 * 60 * 60 })], // 60 days
-  })
-)
+// 4) bible.json
+workbox.routing.registerRoute(
+  ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/data/bible.json'),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'bible-json',
+  }),
+);
 
-// -------------- Background warm-up of all routes ---------------
-/**
- * Fetch bible.json, derive all book + chapter URLs, and add them
- * to the 'pages' cache. This runs AFTER activation so it won't block
- * the SW install. It makes the whole app available offline.
- */
-async function warmAllContent () {
+// --- Warm the cache with all book/chapter routes -----------------------------
+
+async function buildAllUrls() {
+  // Fetch your bundled bible.json to know how many chapters exist
+  const res = await fetch(new URL('/data/bible.json', self.location.origin), { cache: 'reload' });
+  const data = await res.json();
+
+  const urls = new Set();
+  urls.add('/');          // home
+  urls.add('/search');    // search page (optional)
+
+  const books = data?.books || [];
+  for (const b of books) {
+    urls.add(`/book/${b.bnumber}`);
+    for (const ch of (b.chapters || [])) {
+      urls.add(`/book/${b.bnumber}/chapter/${ch.cnumber}`);
+    }
+  }
+
+  // Convert to absolute URLs for caching
+  return Array.from(urls).map((p) => new URL(p, self.location.origin).toString());
+}
+
+async function warmCache() {
   try {
-    const scope = self.registration.scope // e.g. https://yourdomain.com/
-    const base = scope.endsWith('/') ? scope : scope + '/'
-    const bibleRes = await fetch(base + 'data/bible.json', { cache: 'reload' })
-    const bible = await bibleRes.json()
+    log('Warming cache…');
+    const cache = await caches.open('pages');
+    const urls = await buildAllUrls();
 
-    // Build route list
-    const urls = new Set()
-    urls.add(base)              // home
-    urls.add(base + 'search')   // search (optional)
+    // Fetch with {cache:'reload'} to ensure the SW actually stores fresh responses
+    await Promise.allSettled(
+      urls.map((u) => fetch(u, { cache: 'reload' }).then((r) => r.ok && cache.put(u, r.clone()))),
+    );
 
-    const books = bible?.books || []
-    for (const b of books) {
-      const bn = b.bnumber
-      urls.add(`${base}book/${bn}`)
-      for (const ch of (b.chapters || [])) {
-        urls.add(`${base}book/${bn}/chapter/${ch.cnumber}`)
+    // Also keep bible.json itself
+    const bibleUrl = new URL('/data/bible.json', self.location.origin).toString();
+    try {
+      const r = await fetch(bibleUrl, { cache: 'reload' });
+      if (r.ok) {
+        const bj = await caches.open('bible-json');
+        await bj.put(bibleUrl, r.clone());
       }
-    }
+    } catch {}
 
-    const cache = await caches.open('pages')
-    // Add in batches to avoid request burst limits on some devices
-    const all = Array.from(urls)
-    const chunkSize = 40
-    for (let i = 0; i < all.length; i += chunkSize) {
-      const chunk = all.slice(i, i + chunkSize)
-      await Promise.allSettled(chunk.map(u => cache.add(u).catch(() => null)))
-    }
+    log('Cache warm complete.');
   } catch (e) {
-    // Swallow errors — offline warm-up is best-effort
+    log('Warm cache failed:', e);
   }
 }
 
-// Warm cache after activation (doesn't block activation)
-self.addEventListener('activate', (event) => {
-  event.waitUntil((async () => { await warmAllContent() })())
-})
-
-// Optional: allow the UI to trigger a warm-up manually
+// Optional: allow the UI to trigger warming again
 self.addEventListener('message', (event) => {
   if (event.data === 'warm-cache') {
-    event.waitUntil(warmAllContent())
+    event.waitUntil(warmCache());
   }
-})
+});
