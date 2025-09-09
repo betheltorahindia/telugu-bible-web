@@ -1,15 +1,17 @@
 'use client'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import bible from '../../../data/bible.json'
 import { BOOK_NAMES, DIVISION_BOOKS } from '../../../lib/data/books'
 import { PARASHIYOT } from '../../../lib/data/parashiyot'
-import { useMemo, useState } from 'react'
-import { PSALM_CATEGORIES } from '../../../lib/data/psalmCategories' // ← NEW
+import { useMemo, useState, useEffect } from 'react'
+import { PSALM_CATEGORIES } from '../../../lib/data/psalmCategories'
 
 export default function BookPage() {
   // Keep this simple & robust
   const params = useParams() as { [key: string]: string }
+  const search = useSearchParams()
+
   const bnum = Number(params.bnumber)
   const book = (bible as any).books?.find((b: any) => b.bnumber === bnum)
 
@@ -17,7 +19,14 @@ export default function BookPage() {
   // - 'parashot' is only used/shown for Torah
   // - 'categories' is only used/shown for Psalms (book 19)
   type Mode = 'chapters' | 'parashot' | 'categories'
+
+  // Read mode from URL (so back button can return to the same tab)
+  const urlMode = (search?.get('mode') as Mode) || 'chapters'
   const [mode, setMode] = useState<Mode>('chapters')
+
+  useEffect(() => {
+    setMode(urlMode)
+  }, [urlMode])
 
   const isTorah = DIVISION_BOOKS['Torah'].includes(bnum)
   const isPsalms = bnum === 19
@@ -63,7 +72,6 @@ export default function BookPage() {
         {/* Psalms toggle */}
         {isPsalms && (
           <div className="flex items-center gap-2 overflow-x-auto flex-nowrap -mx-1 px-1">
-            
             <div className="btn shrink-0">
               <button
                 onClick={() => setMode('chapters')}
@@ -117,7 +125,7 @@ export default function BookPage() {
                   <Link
                     key={idx}
                     className="btn btn-chip"
-                    href={`/book/${a.b}/chapter/${a.c}#v${a.v}`}
+                    href={`/book/${a.b}/chapter/${a.c}?mode=parashot#v${a.v}`}
                   >
                     {idx + 1} అలియా
                   </Link>
@@ -139,7 +147,7 @@ export default function BookPage() {
                   <Link
                     key={psalm}
                     className="btn btn-chip"
-                    href={`/book/19/chapter/${psalm}?cat=${cat.key}`}
+                    href={`/book/19/chapter/${psalm}?mode=categories&cat=${cat.key}`}
                     title={`${cat.label} → కీర్తన ${psalm}`}
                   >
                     {psalm}

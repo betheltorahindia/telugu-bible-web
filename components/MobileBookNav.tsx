@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import bible from '../data/bible.json'
 import { BOOK_ORDER_DROPDOWN, BOOK_NAMES, combinedBookLabel } from '../lib/data/books'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getPsalmCategoryOrder } from '../lib/data/psalmCategories' // ← NEW
+import { getPsalmCategoryOrder } from '../lib/data/psalmCategories'
 
 export default function MobileBookNav() {
   const router = useRouter()
@@ -17,7 +17,10 @@ export default function MobileBookNav() {
 
   const b = params?.bnumber ? Number(params.bnumber) : undefined
   const c = params?.cnumber ? Number(params.cnumber) : undefined
-  const cat = search?.get('cat') || null // only relevant for Psalms
+
+  // Preserve context from URL
+  const mode = search?.get('mode') || null            // 'parashot' | 'categories' | null
+  const cat  = search?.get('cat')  || null            // only when mode === 'categories'
 
   const allBooks = (bible as any).books ?? []
   const order = useMemo(
@@ -28,35 +31,41 @@ export default function MobileBookNav() {
   const currentBook = allBooks.find((x:any) => x.bnumber === b)
   const chapterCount = currentBook?.chapters?.length ?? 0
 
-  // ---- Psalms category context (book 19 only) ----
-  const categoryOrder = b === 19 ? getPsalmCategoryOrder(cat) : null
+  // ---- Psalms category context (book 19 only and mode === 'categories') ----
+  const categoryOrder = (b === 19 && mode === 'categories') ? getPsalmCategoryOrder(cat) : null
   const catIndex = categoryOrder && typeof c === 'number' ? categoryOrder.indexOf(c) : -1
   const hasPrev = categoryOrder ? catIndex > 0 : (typeof c === 'number' && c > 1)
   const hasNext = categoryOrder
     ? (catIndex >= 0 && catIndex < categoryOrder.length - 1)
     : (typeof c === 'number' && c < chapterCount)
 
+  // Build suffix to preserve context
+  const buildSuffix = () => {
+    if (mode === 'parashot') return '?mode=parashot'
+    if (mode === 'categories' && cat) return `?mode=categories&cat=${encodeURIComponent(cat)}`
+    return ''
+  }
+
   const changeBook = (bnStr: string) => {
     const bn = Number(bnStr)
     if (!bn) return
-    // Changing book clears category context
+    // Changing book clears special context
     router.push(`/book/${bn}${typeof c === 'number' ? `/chapter/1` : ''}`)
   }
 
   const changeChapter = (cnStr: string) => {
     const cn = Number(cnStr)
     if (!b || !cn) return
-    const suffix = cat ? `?cat=${cat}` : ''
-    router.push(`/book/${b}/chapter/${cn}${suffix}`)
+    router.push(`/book/${b}/chapter/${cn}${buildSuffix()}`)
   }
 
   const prev = () => {
     if (!b || !c) return
     if (categoryOrder && catIndex > 0) {
       const target = categoryOrder[catIndex - 1]
-      router.push(`/book/${b}/chapter/${target}?cat=${cat}`)
+      router.push(`/book/${b}/chapter/${target}${buildSuffix()}`)
     } else if (c > 1) {
-      router.push(`/book/${b}/chapter/${c-1}`)
+      router.push(`/book/${b}/chapter/${c-1}${buildSuffix()}`)
     }
   }
 
@@ -64,9 +73,9 @@ export default function MobileBookNav() {
     if (!b || !c) return
     if (categoryOrder && catIndex >= 0 && catIndex < categoryOrder.length - 1) {
       const target = categoryOrder[catIndex + 1]
-      router.push(`/book/${b}/chapter/${target}?cat=${cat}`)
+      router.push(`/book/${b}/chapter/${target}${buildSuffix()}`)
     } else if (chapterCount && c < chapterCount) {
-      router.push(`/book/${b}/chapter/${c+1}`)
+      router.push(`/book/${b}/chapter/${c+1}${buildSuffix()}`)
     }
   }
 

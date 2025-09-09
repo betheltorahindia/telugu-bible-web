@@ -18,11 +18,9 @@ function useFixedMenuPosition(btnRef: React.RefObject<HTMLElement>, open: boolea
       const el = btnRef.current
       if (!el) return
       const rect = el.getBoundingClientRect()
-      // 8px margin below button
       const top = rect.bottom + 8
-      // Keep left within viewport if possible
       let left = rect.left
-      const width = Math.min(Math.max(rect.width, 240), 420) // sensible min/max
+      const width = Math.min(Math.max(rect.width, 240), 420)
       const maxLeft = Math.max(0, window.innerWidth - width - 8)
       left = Math.min(left, maxLeft)
       setPos({ top, left, width })
@@ -55,7 +53,10 @@ export default function BookChapterNav() {
 
   const b = params?.bnumber ? Number(params.bnumber) : undefined
   const c = params?.cnumber ? Number(params.cnumber) : undefined
-  const cat = search?.get('cat') || null // only relevant for Psalms
+
+  // Preserve context from URL
+  const mode = search?.get('mode') || null            // 'parashot' | 'categories' | null
+  const cat  = search?.get('cat')  || null            // only when mode === 'categories'
 
   const allBooks: B[] = (bible as any).books ?? []
   const order = BOOK_ORDER_DROPDOWN.filter(bn => allBooks.some(x => x.bnumber === bn))
@@ -63,13 +64,25 @@ export default function BookChapterNav() {
   const currentBook = allBooks.find(x => x.bnumber === b)
   const chapterCount = currentBook?.chapters?.length ?? 0
 
-  // --- Psalms category logic ---
-  const categoryOrder = b === 19 ? getPsalmCategoryOrder(cat) : null
+  // --- Psalms category logic (only b === 19 and mode === 'categories') ---
+  const categoryOrder = (b === 19 && mode === 'categories') ? getPsalmCategoryOrder(cat) : null
   const catIndex = categoryOrder && typeof c === 'number' ? categoryOrder.indexOf(c) : -1
   const hasPrev = categoryOrder ? catIndex > 0 : (typeof c === 'number' && c > 1)
   const hasNext = categoryOrder
     ? (catIndex >= 0 && catIndex < categoryOrder.length - 1)
     : (typeof c === 'number' && c < chapterCount)
+
+  // Build suffix to preserve context on chapter routes
+  const buildSuffix = (overrideChapter?: number) => {
+    // keep parashot mode (Torah) OR categories mode (Psalms + cat)
+    if (mode === 'parashot') {
+      return '?mode=parashot'
+    }
+    if (mode === 'categories' && cat) {
+      return `?mode=categories&cat=${encodeURIComponent(cat)}`
+    }
+    return ''
+  }
 
   // Book dropdown
   const [bookOpen, setBookOpen] = useState(false)
@@ -90,7 +103,8 @@ export default function BookChapterNav() {
 
   const goBook = (bn: number) => {
     setBookOpen(false)
-    router.push(`/book/${bn}`) // changing book clears category context
+    // When changing book, clear special context
+    router.push(`/book/${bn}`)
   }
 
   // Chapter dropdown
@@ -113,7 +127,7 @@ export default function BookChapterNav() {
   const goChapter = (cn: number) => {
     setChapOpen(false)
     if (!b) return
-    const suffix = cat ? `?cat=${cat}` : ''
+    const suffix = buildSuffix(cn)
     router.push(`/book/${b}/chapter/${cn}${suffix}`)
   }
 
@@ -121,9 +135,9 @@ export default function BookChapterNav() {
     if (!b || !c) return
     if (categoryOrder && catIndex > 0) {
       const target = categoryOrder[catIndex - 1]
-      router.push(`/book/${b}/chapter/${target}?cat=${cat}`)
+      router.push(`/book/${b}/chapter/${target}${buildSuffix(target)}`)
     } else if (c > 1) {
-      router.push(`/book/${b}/chapter/${c - 1}`)
+      router.push(`/book/${b}/chapter/${c - 1}${buildSuffix(c - 1)}`)
     }
   }
 
@@ -131,14 +145,13 @@ export default function BookChapterNav() {
     if (!b || !c) return
     if (categoryOrder && catIndex >= 0 && catIndex < categoryOrder.length - 1) {
       const target = categoryOrder[catIndex + 1]
-      router.push(`/book/${b}/chapter/${target}?cat=${cat}`)
+      router.push(`/book/${b}/chapter/${target}${buildSuffix(target)}`)
     } else if (chapterCount && c < chapterCount) {
-      router.push(`/book/${b}/chapter/${c + 1}`)
+      router.push(`/book/${b}/chapter/${c + 1}${buildSuffix(c + 1)}`)
     }
   }
 
   return (
-    // Keep horizontal scroll for narrow screens, but allow menus to escape (we use fixed menus anyway)
     <div className="flex items-center gap-2 overflow-x-auto flex-nowrap max-w-full py-1 px-1 md:justify-center">
       {/* Book dropdown trigger */}
       <div className="relative shrink-0">
