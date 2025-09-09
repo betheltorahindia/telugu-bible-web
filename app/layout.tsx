@@ -9,15 +9,15 @@ const notoTelugu = Noto_Sans_Telugu({
 })
 
 export const metadata = {
-  title: "తెలుగు తనాఖ్",
-  description: "Telugu Tanakh Bible",
+  title: 'తెలుగు తనాఖ్',
+  description: 'Telugu Tanakh Bible',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="te" className={notoTelugu.className}>
       <head>
-        {/* Apple icons */}
+        {/* Apple icons (optional but fine to keep) */}
         <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
         <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
         <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
@@ -33,16 +33,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        {/* Generic shortcut icon (optional) */}
+        <link rel="shortcut icon" href="/favicon.ico" />
 
-        {/* Manifest for PWA */}
+        {/* Web App Manifest (critical for install) */}
         <link rel="manifest" href="/manifest.json" />
 
-        {/* Windows tiles */}
+        {/* Windows tiles (optional) */}
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
 
-        {/* Theme color */}
-        <meta name="theme-color" content="#ffffff" />
+        {/* Theme color — match manifest (#000000) for consistent UI on Android */}
+        <meta name="theme-color" content="#000000" />
       </head>
       <body>
         <Header />
