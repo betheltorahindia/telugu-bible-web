@@ -1,11 +1,17 @@
 import Link from 'next/link'
 import { HOME_SECTIONS, BOOK_NAMES } from '../lib/data/books'
-import Footer from '../components/footer' // remove this line if you didn't add Footer
-import InstallFAB from '../components/InstallFAB'  // ← add this line
+import Footer from '../components/footer'
+import InstallFAB from '../components/InstallFAB'
+
+// NEW
+import ParashaTeaser from '../components/ParashaTeaser'
 
 export default function Home() {
   return (
     <div className="space-y-8 pb-12">
+      {/* Weekly Parasha / Haftarah teaser */}
+      <ParashaTeaser />
+
       {HOME_SECTIONS.map((sec) => (
         <section key={sec.key} id={sec.label}>
           <div className="flex items-center justify-between mb-3">
@@ -24,10 +30,8 @@ export default function Home() {
         </section>
       ))}
 
-      {/* Footer strip on Home only */}
       <Footer />
-      {/* Mobile-only floating Install button (PWA) */}
-      <InstallFAB />   {/* ← add this */}
+      <InstallFAB />
     </div>
   )
 }
