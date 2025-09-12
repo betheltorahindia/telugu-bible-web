@@ -35,7 +35,7 @@ export default function AliyahToolbar({
 
           {/* Aliyah / Haftarah picker */}
           <select
-            className="px-2 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent"
+            className="btn-solid rounded-xl px-3 py-2"
             value={value}
             onChange={onChange}
           >

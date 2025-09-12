@@ -20,10 +20,10 @@ body { @apply bg-white text-black transition-colors antialiased; }
   .badge { @apply text-xs px-2 py-0.5 rounded bg-black/10 dark:bg-white/20; }
 .badge-aliyah {
   @apply text-xs px-2 py-0.5 rounded font-medium
-         bg-violet-100 text-violet-900
-         dark:bg-violet-700/60 dark:text-violet-100;}
-
-
+         bg-rose-100 text-rose-900
+         dark:bg-rose-700/60 dark:text-rose-100;
+}
+         
   /* Variants for leyning cards */
   .card-shabbat { @apply bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-300; }
   .card-festival { @apply bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-400; }
@@ -88,9 +88,5 @@ body { @apply bg-white text-black transition-colors antialiased; }
   }
 
 /* Aliyah start marker badge color */
-.badge-aliyah {
-  @apply text-xs px-2 py-0.5 rounded font-medium
-         bg-violet-100 text-violet-900
-         dark:bg-violet-700/60 dark:text-violet-100;
-  }
+/* .badge-aliyah duplicate removed */
 }
