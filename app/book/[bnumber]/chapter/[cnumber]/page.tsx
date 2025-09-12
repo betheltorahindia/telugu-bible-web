@@ -83,7 +83,7 @@ export default function ChapterPage() {
                 <div className="leading-relaxed">
                   <span>{v.text}</span>
                   {isAliyahStart && (
-                    <span className="ml-2 badge">
+                    <span className="ml-2 badge-aliyah">
                       ▸ అలియా {aliyahNumber}
                     </span>
                   )}

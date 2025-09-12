@@ -29,7 +29,7 @@ export default function AliyahToolbar({
       <div className="container">
         <div className="inline-flex gap-2">
           {/* Back (icon-only as requested) */}
-          <Link href={backHref} className="btn btn-chip" title="Back to Parasha">
+          <Link href={backHref} className="btn-solid rounded-xl px-3 py-2" title="Back to Parasha">
             ⟵
           </Link>
 
@@ -49,14 +49,14 @@ export default function AliyahToolbar({
           {/* Prev / Next */}
           <Link
             href={prev ? `/parasha/${iso}/aliyah/${prev}` : '#'}
-            className={`btn btn-chip ${prev ? '' : 'opacity-50 pointer-events-none'}`}
+            className={`btn-solid rounded-xl px-3 py-2 ${prev ? '' : 'opacity-50 pointer-events-none'}`}
             title="Previous"
           >
             ‹
           </Link>
           <Link
             href={next ? `/parasha/${iso}/aliyah/${next}` : '#'}
-            className={`btn btn-chip ${next ? '' : 'opacity-50 pointer-events-none'}`}
+            className={`btn-solid rounded-xl px-3 py-2 ${next ? '' : 'opacity-50 pointer-events-none'}`}
             title="Next"
           >
             ›

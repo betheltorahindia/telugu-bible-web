@@ -18,6 +18,11 @@ body { @apply bg-white text-black transition-colors antialiased; }
   /* --- CARDS & BADGES --- */
   .card { @apply rounded-2xl shadow-sm p-4 border border-black/10 dark:border-white/10 bg-white dark:bg-neutral-900; }
   .badge { @apply text-xs px-2 py-0.5 rounded bg-black/10 dark:bg-white/20; }
+.badge-aliyah {
+  @apply text-xs px-2 py-0.5 rounded font-medium
+         bg-violet-100 text-violet-900
+         dark:bg-violet-700/60 dark:text-violet-100;}
+
 
   /* Variants for leyning cards */
   .card-shabbat { @apply bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-300; }
@@ -33,6 +38,14 @@ body { @apply bg-white text-black transition-colors antialiased; }
   }
   .btn:hover { @apply bg-neutral-200/80 dark:bg-neutral-700/80; }
   .btn:focus-visible { @apply outline-none ring-2 ring-black/20 dark:ring-white/20; }
+
+  /* Solid buttons (for Aliyah toolbar prev/next/back) */
+  .btn-solid {
+    @apply bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100;
+  }
+  .btn-solid:hover {
+    @apply bg-neutral-200 dark:bg-neutral-700;
+  }
 
   /* Book-chip buttons (one line, show full Telugu, auto-shrink font) */
   .btn-book {
@@ -72,5 +85,12 @@ body { @apply bg-white text-black transition-colors antialiased; }
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+/* Aliyah start marker badge color */
+.badge-aliyah {
+  @apply text-xs px-2 py-0.5 rounded font-medium
+         bg-violet-100 text-violet-900
+         dark:bg-violet-700/60 dark:text-violet-100;
   }
 }
