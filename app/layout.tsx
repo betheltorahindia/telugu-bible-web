@@ -8,9 +8,56 @@ const notoTelugu = Noto_Sans_Telugu({
   display: 'swap',
 })
 
+// app/layout.tsx (add/replace this metadata export)
 export const metadata = {
-  title: 'తెలుగు తనాఖ్',
-  description: 'Telugu Tanakh Bible',
+  metadataBase: new URL('https://telugu-bible-web.vercel.app/'), // ← change to your real domain once deployed
+  title: {
+    default: 'తెలుగు తనాఖ్ (Telugu Tanakh) – Bethel Torah India',
+    template: '%s – Bethel Torah India',
+  },
+  description:
+    'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings. పరిశుద్ధ గ్రంథం – Bethel Torah India.',
+  keywords: [
+    'Telugu Bible',
+    'Telugu Tanakh',
+    'పరిశుద్ధ గ్రంథం',
+    'Holy Bible',
+    'Tanach',
+    'Torah',
+    'Parasha',
+    'Haftarah',
+    'Bethel Torah India',
+    'Jewish Bible Telugu',
+  ],
+  applicationName: 'Bethel Torah India',
+  openGraph: {
+    type: 'website',
+    locale: 'te_IN',
+    url: 'https://<YOUR_DOMAIN_HERE>/',
+    siteName: 'Bethel Torah India',
+    title: 'తెలుగు తనాఖ్ (Telugu Tanakh) – Bethel Torah India',
+    description:
+      'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Telugu Tanakh' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'తెలుగు తనాఖ్ (Telugu Tanakh)',
+    description:
+      'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
+    images: ['/og-image.png'],
+  },
+  alternates: { canonical: '/' },
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon-180x180.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
