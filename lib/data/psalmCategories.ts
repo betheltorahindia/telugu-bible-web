@@ -14,10 +14,10 @@ export type PsalmCategoryKey =
   | 'grave'
   | 'livelihood'
   | 'journey'
-  | 'israel'
-  | 'jerusalem'
+  | 'israel & jerusalem'
   | 'peace'
   | 'success'
+  | 'elul'
 
 export type PsalmCategory = {
   key: PsalmCategoryKey
