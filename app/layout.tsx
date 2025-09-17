@@ -35,14 +35,14 @@ export const metadata = {
     locale: 'te_IN',
     url: 'https://<YOUR_DOMAIN_HERE>/',
     siteName: 'Bethel Torah India',
-    title: 'తెలుగు తనాఖ్ (Telugu Tanakh) – Bethel Torah India',
+    title: 'Tanach-Telugu',
     description:
       'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Telugu Tanakh' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'తెలుగు తనాఖ్ (Telugu Tanakh)',
+    title: 'Tanach-Telugu',
     description:
       'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
     images: ['/og-image.png'],
