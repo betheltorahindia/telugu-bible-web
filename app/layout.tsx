@@ -33,7 +33,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'te_IN',
-    url: 'https://<YOUR_DOMAIN_HERE>/',
+    url: 'https://<https://bethel-telugu-bible.vercel.app/>/',
     siteName: 'Bethel Torah India',
     title: 'Tanach-Telugu',
     description:
