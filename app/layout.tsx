@@ -10,7 +10,7 @@ const notoTelugu = Noto_Sans_Telugu({
 
 // app/layout.tsx (add/replace this metadata export)
 export const metadata = {
-  metadataBase: new URL('https://telugu-bible-web.vercel.app/'), // ← change to your real domain once deployed
+  metadataBase: new URL('https://bethel-telugu-bible.vercel.app/'), // ← change to your real domain once deployed
   title: {
     default: 'తెలుగు తనాఖ్ (Telugu Tanakh) – Bethel Torah India',
     template: '%s – Bethel Torah India',

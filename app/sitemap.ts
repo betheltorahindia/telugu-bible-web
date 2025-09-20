@@ -5,7 +5,7 @@ import bible from '../data/bible.json' assert { type: 'json' }
 // Public site URL (no trailing slash). Set this in Vercel → Settings → Environment Variables.
 const SITE =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ||
-  'https://telugu-bible-web.vercel.app/' // fallback (please set the env var!)
+  'https://bethel-telugu-bible.vercel.app/' // fallback (please set the env var!)
 
 function toISO(d: Date) {
   const y = d.getFullYear()
