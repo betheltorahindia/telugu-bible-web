@@ -13,10 +13,10 @@ export default function AliyahToolbar({
   next,
 }: {
   iso: string
-  value: string              // current value: "1".."7" or "H"
+  value: string              // current value: "1".."7" or "M"/"H"
   options: Option[]          // dropdown options
   backHref: string           // link back to /parasha/[iso]
-  prev?: string | null       // "1".."7" or "H" | null
+  prev?: string | null       // "1".."7" or "M"/"H" | null
   next?: string | null
 }) {
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

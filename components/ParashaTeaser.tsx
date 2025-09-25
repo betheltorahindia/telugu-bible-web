@@ -21,6 +21,7 @@ export default async function ParashaTeaser() {
 
         // Use our Tailwind classes defined in globals.css
         const variant = it.kind === 'festival' ? 'card-festival' : 'card-shabbat'
+        const hasHaftarah = Boolean(it.haftara) || Boolean(it.haftaraSegments?.length)
 
         return (
           <section key={`${it.isoDate}-${idx}`} className={`card ${variant}`}>
@@ -29,7 +30,7 @@ export default async function ParashaTeaser() {
               <div className="flex-1 space-y-1">
                 <div className="text-sm opacity-70">
                   {dateLabel}
-                  {it.hebDate ? ` • ${it.hebDate}` : ''}
+                  {it.hebDate ? ` - ${it.hebDate}` : ''}
                 </div>
 
                 <h3 className="text-lg font-semibold">
@@ -49,11 +50,24 @@ export default async function ParashaTeaser() {
                     </a>
                   ))}
 
-                  {it.haftara && (
+                  {it.maftir && (
+                    <a
+                      className="btn btn-chip"
+                      href={`/parasha/${it.isoDate}/aliyah/M`}
+                      title={it.maftir.label}
+                    >
+                      Maftir
+                    </a>
+                  )}
+                  {hasHaftarah && (
                     <a
                       className="btn btn-chip"
                       href={`/parasha/${it.isoDate}/aliyah/H`}
-                      title={it.haftara.label}
+                      title={
+                        it.haftaraSegments && it.haftaraSegments.length > 1
+                          ? it.haftaraSegments.map((seg) => seg.label).join(' + ')
+                          : it.haftara?.label ?? 'Haftarah'
+                      }
                     >
                       Haftarah
                     </a>

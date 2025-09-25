@@ -1,4 +1,4 @@
-// lib/api/hebcal.ts
+﻿// lib/api/hebcal.ts
 // Server-safe helpers to fetch Parasha/Haftarah from Hebcal Leyning API
 // (Diaspora; triennial OFF)
 
@@ -9,9 +9,12 @@ export type LeyningItem = {
   name?: { en?: string; he?: string };
   summary?: string;
   fullkriyah?: Record<string, Aliyah>;
-  haft?: { k: string; b: string; e: string; v?: number };
+  haft?: { k: string; b: string; e: string; v?: number } | Array<{ k: string; b: string; e: string; v?: number }>;
   haftara?: string;
+  reason?: Record<string, string>;
 };
+
+type HaftaraSegment = { k: string; b: string; e: string; label: string };
 
 export type UpcomingShabbat = {
   shabbatDateISO: string;
@@ -19,7 +22,9 @@ export type UpcomingShabbat = {
   parashaEn?: string;
   parashaHe?: string;
   aliyot: { n: string; k: string; b: string; e: string }[];
-  haftara?: { k: string; b: string; e: string; label: string };
+  haftara?: HaftaraSegment;
+  haftaraSegments?: HaftaraSegment[];
+  maftir?: { k: string; b: string; e: string; label: string };
   // debug fields for surfacing issues
   _url?: string;
   _status?: number;
@@ -34,7 +39,9 @@ export type WeeklyItem = {
   titleEn?: string;
   titleHe?: string;
   aliyot: { n: string; k: string; b: string; e: string }[]; // 1..7
-  haftara?: { k: string; b: string; e: string; label: string };
+  haftara?: HaftaraSegment;
+  haftaraSegments?: HaftaraSegment[];
+  maftir?: { k: string; b: string; e: string; label: string };
 };
 
 // ---------------- date helpers ----------------
@@ -61,21 +68,49 @@ function nextSaturday(from = new Date()) {
 }
 
 // --------------- mappers ---------------
+function normalizeHaftSegments(haft: LeyningItem['haft'], fallbackLabel?: string): HaftaraSegment[] {
+  if (!haft) return [];
+  const entries = Array.isArray(haft) ? haft : [haft];
+  const segments: HaftaraSegment[] = [];
+  entries.forEach((entry, idx) => {
+    if (!entry || !entry.k || !entry.b || !entry.e) return;
+    segments.push({
+      k: entry.k,
+      b: entry.b,
+      e: entry.e,
+      label: idx === 0 && fallbackLabel ? fallbackLabel : `${entry.k} ${entry.b}-${entry.e}`,
+    });
+  });
+  return segments;
+}
+
+function normalizeHaft(haft: LeyningItem['haft'], fallbackLabel?: string): HaftaraSegment | undefined {
+  return normalizeHaftSegments(haft, fallbackLabel)[0];
+}
+
 function mapItemToWeekly(it: LeyningItem, kind: 'festival'|'shabbat'): WeeklyItem | null {
   if (!it.fullkriyah) return null;
 
   const aliyahKeys = ['1','2','3','4','5','6','7'];
   const aliyot = aliyahKeys
-    .map(n => it.fullkriyah![n])
+    .map((n) => it.fullkriyah![n])
     .filter(Boolean)
     .map((a, idx) => ({ n: String(idx + 1), k: a.k, b: a.b, e: a.e }));
 
-  const haftara = it.haft
+  if (aliyot.length === 0) return null;
+
+  const haftaraSegments = normalizeHaftSegments(it.haft, it.haftara);
+  const haftara = haftaraSegments[0];
+
+  const maftirAliyah = it.fullkriyah?.M || it.fullkriyah?.maftir || it.fullkriyah?.maf;
+  const maftir = maftirAliyah
     ? {
-        k: it.haft.k,
-        b: it.haft.b,
-        e: it.haft.e,
-        label: it.haftara || `${it.haft.k} ${it.haft.b}-${it.haft.e}`,
+        k: maftirAliyah.k,
+        b: maftirAliyah.b,
+        e: maftirAliyah.e,
+        label: it.reason?.M
+          ? `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e} (${it.reason.M})`
+          : `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e}`,
       }
     : undefined;
 
@@ -87,6 +122,8 @@ function mapItemToWeekly(it: LeyningItem, kind: 'festival'|'shabbat'): WeeklyIte
     titleHe: it.name?.he,
     aliyot,
     haftara,
+    haftaraSegments,
+    maftir,
   };
 }
 
@@ -95,10 +132,10 @@ const PARASHA_NAMES = new Set([
   'Bereshit','Noach','Lech-Lecha','Vayera','Chayei Sara','Toldot','Vayetzei','Vayishlach','Vayeshev',
   'Miketz','Vayigash','Vayechi','Shemot','Vaera','Bo','Beshalach','Yitro','Mishpatim','Terumah','Tetzaveh',
   'Ki Tisa','Vayakhel','Pekudei','Vayikra','Tzav','Shemini','Tazria','Metzora','Achrei Mot','Kedoshim',
-  'Emor','Behar','Bechukotai','Bamidbar','Nasso','Beha’alotcha','Sh’lach','Korach','Chukat','Balak',
-  'Pinchas','Matot','Masei','Devarim','Vaetchanan','Eikev','Re’eh','Shoftim','Ki Teitzei','Ki Tavo',
-  'Nitzavim','Vayeilech','Ha’Azinu','V’Zot HaBerachah'
-].map(s => s.toLowerCase()));
+  'Emor','Behar','Bechukotai','Bamidbar','Nasso','Beha\'alotcha','Sh\'lach','Korach','Chukat','Balak',
+  'Pinchas','Matot','Masei','Devarim','Vaetchanan','Eikev','Re\'eh','Shoftim','Ki Teitzei','Ki Tavo',
+  'Nitzavim','Vayeilech','Ha\'Azinu','V\'Zot HaBerachah'
+].map((s) => s.toLowerCase()));
 
 // --------------- public API ---------------
 
@@ -118,7 +155,9 @@ export async function getUpcomingShabbatLeyning(): Promise<UpcomingShabbat | nul
     }
 
     const data = (await res.json()) as { items?: LeyningItem[] };
-    const item = (data.items || []).find(it => it.fullkriyah);
+    const item = (data.items || [])
+      .filter((it) => !(it.name?.en || '').toLowerCase().includes('(mincha)'))
+      .find((it) => it.fullkriyah);
     if (!item || !item.fullkriyah) {
       return { shabbatDateISO: start, aliyot: [], _url: url, _status: 204, _error: 'No fullkriyah in response' };
     }
@@ -133,6 +172,8 @@ export async function getUpcomingShabbatLeyning(): Promise<UpcomingShabbat | nul
       parashaHe: mapped.titleHe,
       aliyot: mapped.aliyot,
       haftara: mapped.haftara,
+      haftaraSegments: mapped.haftaraSegments,
+      maftir: mapped.maftir,
       _url: url,
       _status: 200,
     };
@@ -156,23 +197,29 @@ export async function getLeyningForDate(isoDate: string): Promise<UpcomingShabba
     }
 
     const data = (await res.json()) as { items?: LeyningItem[] };
-    const item = (data.items || []).find(it => it.fullkriyah);
+    const item = (data.items || []).find((it) => it.fullkriyah);
     if (!item || !item.fullkriyah) {
       return { shabbatDateISO: start, aliyot: [], _url: url, _status: 204, _error: 'No fullkriyah in response' };
     }
 
     const aliyahKeys = ['1','2','3','4','5','6','7'];
     const aliyot = aliyahKeys
-      .map(n => item.fullkriyah![n])
+      .map((n) => item.fullkriyah![n])
       .filter(Boolean)
       .map((a, idx) => ({ n: String(idx + 1), k: a.k, b: a.b, e: a.e }));
 
-    const haft = item.haft
+    const haftaraSegments = normalizeHaftSegments(item.haft, item.haftara);
+    const haft = haftaraSegments[0];
+
+    const maftirAliyah = item.fullkriyah?.M || item.fullkriyah?.maftir || item.fullkriyah?.maf;
+    const maftir = maftirAliyah
       ? {
-          k: item.haft.k,
-          b: item.haft.b,
-          e: item.haft.e,
-          label: item.haftara || `${item.haft.k} ${item.haft.b}-${item.haft.e}`,
+          k: maftirAliyah.k,
+          b: maftirAliyah.b,
+          e: maftirAliyah.e,
+          label: item.reason?.M
+            ? `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e} (${item.reason.M})`
+            : `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e}`,
         }
       : undefined;
 
@@ -183,6 +230,8 @@ export async function getLeyningForDate(isoDate: string): Promise<UpcomingShabba
       parashaHe: item.name?.he,
       aliyot,
       haftara: haft,
+      haftaraSegments,
+      maftir,
       _url: url,
       _status: 200,
     };
@@ -206,11 +255,12 @@ export async function getWeeklyLeyning(): Promise<WeeklyItem[]> {
     if (!res.ok) return [];
 
     const data = (await res.json()) as { items?: LeyningItem[] };
-    const items = (data.items || []);
+    const items = (data.items || [])
+      .filter((it) => !(it.name?.en || '').toLowerCase().includes('(mincha)'))
+      .filter((it) => it.fullkriyah);
 
     const out = items
-      .filter(it => it.fullkriyah)
-      .map(it => {
+      .map((it) => {
         const en = (it.name?.en || '').toLowerCase().trim();
         const kind: 'festival' | 'shabbat' = PARASHA_NAMES.has(en) ? 'shabbat' : 'festival';
         return mapItemToWeekly(it, kind);

@@ -5,12 +5,17 @@
 /* Light/Dark via data-theme on <html> */
 :root { color-scheme: light; }
 [data-theme="dark"] { color-scheme: dark; }
+[data-theme="rain"] { color-scheme: light; }
 
 /* Keep anchored scroll below sticky header (mt-20 ~= 5rem) */
 html { scroll-padding-top: 5rem; }
 
 body { @apply bg-white text-black transition-colors antialiased; }
 [data-theme="dark"] body { @apply bg-black text-white; }
+[data-theme="rain"] body {
+  background-color: #afdde5;
+  color: #003135;
+}
 
 @layer components {
   .container { @apply max-w-6xl mx-auto px-4; }
@@ -89,4 +94,77 @@ body { @apply bg-white text-black transition-colors antialiased; }
 
 /* Aliyah start marker badge color */
 /* .badge-aliyah duplicate removed */
+}
+
+[data-theme="rain"] .card {
+  background-color: #e6f7f9;
+  border-color: #0fa4af;
+  color: #003135;
+  box-shadow: 0 16px 32px -18px rgba(2, 73, 80, 0.35);
+}
+
+[data-theme="rain"] .card-shabbat {
+  background-color: #0fa4af;
+  border-color: #024950;
+  color: #f1feff;
+}
+
+[data-theme="rain"] .card-festival {
+  background-color: #964734;
+  border-color: #702c24;
+  color: #fffaf6;
+}
+
+[data-theme="rain"] .badge {
+  background-color: rgba(2, 73, 80, 0.12);
+  color: #024950;
+}
+
+[data-theme="rain"] .badge-aliyah {
+  background-color: #024950;
+  color: #f1feff;
+}
+
+[data-theme="rain"] .btn {
+  background-color: #0fa4af;
+  border-color: #024950;
+  color: #f1feff;
+  box-shadow: 0 10px 20px -12px rgba(0, 49, 53, 0.45);
+}
+
+[data-theme="rain"] .btn:hover {
+  background-color: #024950;
+  color: #f1feff;
+}
+
+[data-theme="rain"] .btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 164, 175, 0.35);
+}
+
+[data-theme="rain"] .btn-solid {
+  background-color: #024950;
+  color: #f1feff;
+  border-color: #024950;
+}
+
+[data-theme="rain"] .btn-solid:hover {
+  background-color: #003135;
+}
+
+[data-theme="rain"] .btn-chip {
+  min-width: 56px;
+  background-color: #0fa4af;
+  color: #f1feff;
+  border-color: #024950;
+}
+
+[data-theme="rain"] .btn-book {
+  background-color: #024950;
+  border-color: #003135;
+  color: #f1feff;
+}
+
+[data-theme="rain"] .btn-book:hover {
+  background-color: #003135;
 }

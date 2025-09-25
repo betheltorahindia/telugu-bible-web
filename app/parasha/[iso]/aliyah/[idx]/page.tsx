@@ -12,11 +12,12 @@ const AliyahToolbar = dynamic(
 
 type Ref = { bnum: number; c: number; v: number }
 type Range = { start: Ref; end: Ref; label: string }
+type Verse = { c: number; v: number; text: string }
 
 // Map Hebcal English book -> bnumber
 function enToBnum(en: string): number {
-  const norm = (s: string) =>
-    s
+  const norm = (s: string | null | undefined) =>
+    (s ?? '')
       .toLowerCase()
       .replace(/\b(i{1,3}|iv|v|vi|vii|viii|ix|x|1|2|3)\b/g, (m) =>
         (
@@ -74,44 +75,57 @@ function enToBnum(en: string): number {
     'ii samuel': 9,
     'i kings': 10,
     'ii kings': 11,
+    '1 samuel': 8,
+    '2 samuel': 9,
+    '1 kings': 10,
+    '2 kings': 11,
   }
 
   return rev[target] ?? fallback[target] ?? 0
 }
 
-function parseCV(cv: string): { c: number; v: number } {
+function parseCV(cv?: string | null): { c: number; v: number } {
+  if (!cv) return { c: 0, v: 0 }
   const [c, v] = cv.split(':').map(Number)
   return { c, v }
 }
 
-function toRange(enBook: string, b: string, e: string): Range {
+function toRange(enBook: string, b: string, e: string, label?: string): Range {
   const bnum = enToBnum(enBook)
   const bs = parseCV(b)
   const es = parseCV(e)
   return {
     start: { bnum, c: bs.c, v: bs.v },
     end: { bnum, c: es.c, v: es.v },
-    label: `${enBook} ${b}–${e}`,
+    label: label ?? `${enBook} ${b} - ${e}`,
   }
 }
 
-function sliceVerses(r: Range) {
+function sliceVerses(r: Range): Verse[] {
   const book = (bible as any).books.find((x: any) => x.bnumber === r.start.bnum)
-  if (!book) return [] as { v: number; text: string }[]
-  const out: { v: number; text: string }[] = []
-  for (let c = r.start.c; c <= r.end.c; c++) {
+  if (!book) return []
+
+  const out: Verse[] = []
+
+  const startChapter = Math.max(r.start.c, 1)
+  const requestedEndChapter = r.end.c || r.start.c
+  const endChapter = Math.max(requestedEndChapter, startChapter)
+
+  for (let c = startChapter; c <= endChapter; c++) {
     const chap = book.chapters.find((ch: any) => ch.cnumber === c)
     if (!chap) continue
-    const vStart = c === r.start.c ? r.start.v : 1
-    const vEnd =
-      c === r.end.c
-        ? r.end.v
-        : (chap.verses.at(-1)?.vnumber ?? Number.MAX_SAFE_INTEGER)
+
+    const chapterLast = chap.verses.at(-1)?.vnumber ?? Number.MAX_SAFE_INTEGER
+    const vStart = c === startChapter ? Math.max(r.start.v || 1, 1) : 1
+    const requestedEnd = c === endChapter && r.end.v ? r.end.v : chapterLast
+    const vEnd = Math.min(requestedEnd || chapterLast, chapterLast)
+
     for (const v of chap.verses) {
       if (v.vnumber >= vStart && v.vnumber <= vEnd)
-        out.push({ v: v.vnumber, text: v.text })
+        out.push({ c, v: v.vnumber, text: v.text })
     }
   }
+
   return out
 }
 
@@ -122,6 +136,7 @@ export default async function AliyahPage({
 }) {
   const iso = decodeURIComponent(params.iso)
   const idxStr = params.idx // "1".."7" or "H"
+  const upperIdx = idxStr.toUpperCase()
   const data = await getLeyningForDate(iso)
 
   if (!data || !data.aliyot.length) {
@@ -129,30 +144,51 @@ export default async function AliyahPage({
   }
 
   const aliyot = data.aliyot
-  const isHaft = idxStr.toUpperCase() === 'H'
-  const idx = isHaft ? -1 : Number(idxStr)
+  const isHaft = upperIdx === 'H'
+  const isMaftir = upperIdx === 'M'
+  const idxNum = Number(upperIdx)
 
-  let range: Range | null = null
-  if (isHaft && data.haftara) {
-    range = toRange(data.haftara.k, data.haftara.b, data.haftara.e)
-  } else if (idx >= 1 && idx <= aliyot.length) {
-    const a = aliyot[idx - 1]
-    range = toRange(a.k, a.b, a.e)
+  const aliyahLabel = Number.isNaN(idxNum) ? idxStr : idxNum
+
+  type Section = { range: Range; verses: Verse[] }
+
+  const sections: Section[] = []
+
+  if (isHaft) {
+    const segments = (data.haftaraSegments && data.haftaraSegments.length)
+      ? data.haftaraSegments
+      : data.haftara
+        ? [data.haftara]
+        : []
+
+    for (const seg of segments) {
+      if (!seg) continue
+      const range = toRange(seg.k, seg.b, seg.e, seg.label)
+      if (!range.start.bnum) continue
+      sections.push({ range, verses: sliceVerses(range) })
+    }
+  } else if (isMaftir && data.maftir) {
+    const range = toRange(data.maftir.k, data.maftir.b, data.maftir.e, data.maftir.label)
+    if (range.start.bnum) sections.push({ range, verses: sliceVerses(range) })
+  } else if (!Number.isNaN(idxNum) && idxNum >= 1 && idxNum <= aliyot.length) {
+    const a = aliyot[idxNum - 1]
+    const range = toRange(a.k, a.b, a.e)
+    if (range.start.bnum) sections.push({ range, verses: sliceVerses(range) })
   }
-  if (!range || !range.start.bnum) return <div className="card">Invalid aliyah.</div>
 
-  const title = isHaft
-    ? `Haftarah — ${range.label}`
-    : `అలియా ${idx} — ${range.label}`
+  if (!sections.length) return <div className="card">Invalid aliyah.</div>
 
-  const verses = sliceVerses(range)
+  const baseTitle = isHaft ? 'Haftarah' : isMaftir ? 'Maftir' : `Aliyah ${aliyahLabel}`
+  const rangeSummary = sections.map((s) => s.range.label).filter(Boolean).join(' + ')
+  const title = rangeSummary ? `${baseTitle} - ${rangeSummary}` : baseTitle
 
-  // order: 1..7 then H (if exists)
+  // order: 1..7 then M/H (if exists)
   const order: string[] = [
     ...aliyot.map((_, i) => String(i + 1)),
+    ...(data.maftir ? ['M'] : []),
     ...(data.haftara ? ['H'] : []),
   ]
-  const pos = order.indexOf(idxStr.toUpperCase())
+  const pos = order.indexOf(upperIdx)
   const prev = pos > 0 ? order[pos - 1] : null
   const next = pos < order.length - 1 ? order[pos + 1] : null
 
@@ -160,6 +196,7 @@ export default async function AliyahPage({
 
   const options = [
     ...aliyot.map((_, i) => ({ value: String(i + 1), label: `Aliyah ${i + 1}` })),
+    ...(data.maftir ? [{ value: 'M', label: 'Maftir' }] : []),
     ...(data.haftara ? [{ value: 'H', label: 'Haftarah' }] : []),
   ]
 
@@ -168,7 +205,7 @@ export default async function AliyahPage({
       {/* Client toolbar (no server onChange errors) */}
       <AliyahToolbar
         iso={data.shabbatDateISO}
-        value={idxStr.toUpperCase()}
+        value={upperIdx}
         options={options}
         backHref={backHref}
         prev={prev}
@@ -177,16 +214,38 @@ export default async function AliyahPage({
 
       <h1 className="text-xl font-semibold">{title}</h1>
 
-      <div className="space-y-2">
-        {verses.map((v) => (
-          <div key={v.v} className="card">
-            <div className="flex items-start gap-3">
-              <span className="badge">{v.v}</span>
-              <div className="leading-relaxed">{v.text}</div>
+      <div className="space-y-4">
+        {sections.map((section, sectionIdx) => {
+          const multipleChapters = new Set(section.verses.map((v) => v.c)).size > 1
+          const badgeLabel = (v: Verse) => (multipleChapters ? `${v.c}:${v.v}` : `${v.v}`)
+
+          return (
+            <div key={`${section.range.start.bnum}-${sectionIdx}`} className="space-y-2">
+              {sections.length > 1 && (
+                <div className="text-sm font-semibold opacity-80">
+                  {section.range.label}
+                </div>
+              )}
+
+              {section.verses.length ? (
+                section.verses.map((v, verseIdx) => (
+                  <div key={`${sectionIdx}-${verseIdx}`} className="card">
+                    <div className="flex items-start gap-3">
+                      <span className="badge">{badgeLabel(v)}</span>
+                      <div className="leading-relaxed">{v.text}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="card text-sm opacity-70">
+                  Verses unavailable in local text for this segment.
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
 }
+
