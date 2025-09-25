@@ -159,6 +159,12 @@ body { @apply bg-white text-black transition-colors antialiased; }
   border-color: #024950;
 }
 
+[data-theme="rain"] .card-shabbat .btn-chip {
+  background-color: #003135;
+  border-color: #002025;
+  color: #f1feff;
+}
+
 [data-theme="rain"] .btn-book {
   background-color: #024950;
   border-color: #003135;
