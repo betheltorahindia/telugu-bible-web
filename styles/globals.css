@@ -110,10 +110,45 @@ body { @apply bg-white text-black transition-colors antialiased; }
 }
 
 [data-theme="rain"] .card-festival {
-  background-color: #964734;
-  border-color: #702c24;
+  background-color: #f1786a;
+  border-color: #c75347;
   color: #fffaf6;
 }
+
+[data-theme="rain"] .card-festival .btn {
+  background-color: #024950;
+  border-color: #01363b;
+  color: #f1feff;
+  box-shadow: 0 10px 20px -12px rgba(1, 54, 59, 0.45);
+}
+
+[data-theme="rain"] .card-festival .btn:hover {
+  background-color: #0fa4af;
+  border-color: #0b7f87;
+  color: #003135;
+}
+
+[data-theme="rain"] .card-festival .btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 164, 175, 0.4);
+}
+
+[data-theme="rain"] .card-festival .btn-solid {
+  background-color: #0fa4af;
+  border-color: #0fa4af;
+  color: #003135;
+}
+
+[data-theme="rain"] .card-festival .btn-solid:hover {
+  background-color: #13b7c7;
+}
+
+[data-theme="rain"] .card-festival .btn-chip {
+  background-color: #046a74;
+  border-color: #024950;
+  color: #f1feff;
+}
+
 
 [data-theme="rain"] .badge {
   background-color: rgba(2, 73, 80, 0.12);
@@ -174,3 +209,6 @@ body { @apply bg-white text-black transition-colors antialiased; }
 [data-theme="rain"] .btn-book:hover {
   background-color: #003135;
 }
+
+
+

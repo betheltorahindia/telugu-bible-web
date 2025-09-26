@@ -7,6 +7,13 @@ const isProd = process.env.NODE_ENV === 'production'
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  webpack(config, { dev }) {
+    if (dev) {
+      // Avoid eval-based source maps so CSP stays strict during local dev
+      config.devtool = 'source-map'
+    }
+    return config
+  },
 }
 
 export default withPWA({
@@ -18,7 +25,7 @@ export default withPWA({
   register: true,                 // auto-register SW
   skipWaiting: true,              // replace old SW immediately
   cacheStartUrl: true,            // cache "/" start URL
-  swSrc: 'service-worker.js',     // custom SW (we’ll create this file in /public)
+  swSrc: 'service-worker.js',     // custom SW (we'll create this file in /public)
   maximumFileSizeToCacheInBytes: 30 * 1024 * 1024, // raise limit (~30MB)
 
   // No runtimeCaching here (all logic goes in service-worker.js)
