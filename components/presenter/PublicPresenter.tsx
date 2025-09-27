@@ -1,6 +1,12 @@
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { formatReference, getVerseText } from '../../lib/presenter/bible'
 import { normalizeTheme } from '../../lib/presenter/theme'
 import type { ThemeSettings } from '../../lib/supabase/types'
@@ -26,21 +32,30 @@ interface PresenterItem {
 const HIDE_CURSOR_DELAY = 3000
 const SWIPE_THRESHOLD = 40
 
+function classNames(...parts: Array<string | false | null | undefined>) {
+  return parts.filter(Boolean).join(' ')
+}
+
 export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
   const baseTheme = useMemo(() => normalizeTheme(initialMeta.settings), [initialMeta.settings])
+
   const [items, setItems] = useState<PresenterItem[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTheme, setActiveTheme] = useState<ThemeSettings>(baseTheme)
   const [projectTitle, setProjectTitle] = useState(initialMeta.title)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showCursor, setShowCursor] = useState(true)
+
   const hideCursorTimer = useRef<NodeJS.Timeout | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const textContainerRef = useRef<HTMLDivElement>(null)
+  const verseTextRef = useRef<HTMLDivElement>(null)
   const pointerStartX = useRef<number | null>(null)
 
   const currentItem = items[currentIndex]
+
   const verseText = useMemo(() => {
     if (!currentItem) return ''
     return getVerseText(currentItem.book, currentItem.chapter, currentItem.verse)
@@ -51,8 +66,6 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
     return formatReference(currentItem.book, currentItem.chapter, currentItem.verse)
   }, [currentItem])
 
-  const textContainerRef = useRef<HTMLDivElement>(null)
-  const verseTextRef = useRef<HTMLDivElement>(null)
   const slideLineHeight = 1.35
   const verseFontSize = useAutoFitText({
     text: verseText,
@@ -62,10 +75,34 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
     minSize: 32,
     lineHeight: slideLineHeight,
   })
+
   const note = currentItem?.note?.trim() ?? ''
   const slidePosition = items.length ? `${currentIndex + 1} / ${items.length}` : null
   const cursorClass = showCursor ? '' : 'cursor-none'
   const chromeVisible = !isFullscreen || showCursor
+
+  const resetCursorTimer = useCallback(() => {
+    if (hideCursorTimer.current) {
+      clearTimeout(hideCursorTimer.current)
+    }
+    hideCursorTimer.current = setTimeout(() => {
+      setShowCursor(false)
+    }, HIDE_CURSOR_DELAY)
+  }, [])
+
+  const handleUserInteraction = useCallback(() => {
+    setShowCursor(true)
+    resetCursorTimer()
+  }, [resetCursorTimer])
+
+  useEffect(() => {
+    resetCursorTimer()
+    return () => {
+      if (hideCursorTimer.current) {
+        clearTimeout(hideCursorTimer.current)
+      }
+    }
+  }, [resetCursorTimer])
 
   useEffect(() => {
     setActiveTheme(baseTheme)
@@ -110,8 +147,11 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
         const body = await response.json().catch(() => ({}))
         throw new Error(body.error ?? 'Failed to load presenter')
       }
-      const result = await response.json()
-      const project = result.project ?? null
+      const payload = await response.json()
+      const project = payload.project ?? null
+      const nextItems: PresenterItem[] = Array.isArray(payload.items) ? payload.items : []
+      setItems(nextItems)
+      setCurrentIndex(0)
       if (project?.settings) {
         setActiveTheme(normalizeTheme(project.settings))
       } else {
@@ -120,65 +160,41 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
       if (project?.title) {
         setProjectTitle(project.title)
       }
-      const loadedItems: PresenterItem[] = Array.isArray(result.items) ? result.items : []
-      setItems(loadedItems)
-      setCurrentIndex(0)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load presenter')
     } finally {
       setLoading(false)
     }
-  }, [initialMeta.slug, baseTheme])
+  }, [baseTheme, initialMeta.slug])
 
   useEffect(() => {
     fetchItems()
   }, [fetchItems])
 
-  useEffect(() => {
-    if (!items.length) return
-    const resetCursor = () => {
-      setShowCursor(true)
-      if (hideCursorTimer.current) clearTimeout(hideCursorTimer.current)
-      hideCursorTimer.current = setTimeout(() => setShowCursor(false), HIDE_CURSOR_DELAY)
-    }
-    resetCursor()
-    const handleMove = () => resetCursor()
-    const handleKey = () => resetCursor()
-    window.addEventListener('mousemove', handleMove)
-    window.addEventListener('keydown', handleKey)
-    return () => {
-      window.removeEventListener('mousemove', handleMove)
-      window.removeEventListener('keydown', handleKey)
-      if (hideCursorTimer.current) {
-        clearTimeout(hideCursorTimer.current)
-        hideCursorTimer.current = null
-      }
-    }
-  }, [items.length])
-
   const handleNext = useCallback(() => {
-    setCurrentIndex((index) => {
-      if (items.length === 0) return index
-      return (index + 1) % items.length
+    setCurrentIndex((previous) => {
+      if (items.length === 0) return previous
+      return previous === items.length - 1 ? previous : previous + 1
     })
   }, [items.length])
 
   const handlePrevious = useCallback(() => {
-    setCurrentIndex((index) => {
-      if (items.length === 0) return index
-      return (index - 1 + items.length) % items.length
+    setCurrentIndex((previous) => {
+      if (items.length === 0) return previous
+      return previous === 0 ? 0 : previous - 1
     })
   }, [items.length])
 
   useEffect(() => {
-    if (!items.length) return
     const handleKey = (event: KeyboardEvent) => {
-      if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
+      if (event.key === 'ArrowRight') {
         event.preventDefault()
+        handleUserInteraction()
         handleNext()
       }
-      if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+      if (event.key === 'ArrowLeft') {
         event.preventDefault()
+        handleUserInteraction()
         handlePrevious()
       }
       if (event.key === 'Escape' && document.fullscreenElement) {
@@ -188,51 +204,34 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [handleNext, handlePrevious, items.length])
+  }, [handleNext, handlePrevious, handleUserInteraction])
 
   const handlePointerDown = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return
     pointerStartX.current = event.clientX
-    setShowCursor(true)
     event.currentTarget.setPointerCapture?.(event.pointerId)
-  }, [])
+    handleUserInteraction()
+  }, [handleUserInteraction])
 
-  const handlePointerUp = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return
-      const selection = window.getSelection()
-      if (selection && selection.toString().length > 0) {
-        pointerStartX.current = null
-        return
-      }
-      const startX = pointerStartX.current ?? event.clientX
-      pointerStartX.current = null
-      const endX = event.clientX
-      const delta = startX - endX
-      if (Math.abs(delta) > SWIPE_THRESHOLD) {
-        if (delta > 0) {
-          handleNext()
-        } else {
-          handlePrevious()
-        }
-        return
-      }
-      const rect = event.currentTarget.getBoundingClientRect()
-      const relative = endX - rect.left
-      if (relative < rect.width / 2) {
-        handlePrevious()
-      } else {
-        handleNext()
-      }
-    },
-    [handleNext, handlePrevious],
-  )
+  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const start = pointerStartX.current
+    pointerStartX.current = null
+    if (start === null) return
+    const delta = event.clientX - start
+    if (delta > SWIPE_THRESHOLD) {
+      handleUserInteraction()
+      handlePrevious()
+    } else if (delta < -SWIPE_THRESHOLD) {
+      handleUserInteraction()
+      handleNext()
+    }
+  }, [handleNext, handlePrevious, handleUserInteraction])
 
   const handlePointerCancel = useCallback(() => {
     pointerStartX.current = null
   }, [])
 
-  const toggleFullscreen = async () => {
+  const toggleFullscreen = useCallback(async () => {
     if (document.fullscreenElement || isFullscreen) {
       await document.exitFullscreen?.()
       setIsFullscreen(false)
@@ -241,9 +240,9 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
     const target = containerRef.current ?? document.documentElement
     if (target.requestFullscreen) {
       await target.requestFullscreen()
+      setIsFullscreen(true)
     }
-    setIsFullscreen(true)
-  }
+  }, [isFullscreen])
 
   const backgroundStyle = useMemo(() => {
     if (activeTheme.gradient.style === 'radial') {
@@ -255,6 +254,37 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
       background: `linear-gradient(${activeTheme.gradient.angle}deg, ${activeTheme.gradient.colors.join(', ')})`,
     }
   }, [activeTheme])
+
+  const mainClass = classNames(
+    'presenter-main flex-1 flex justify-center w-full',
+    isFullscreen ? 'items-stretch' : 'items-center px-4 py-8 sm:px-8',
+  )
+
+  const slideClass = classNames(
+    'presenter-slide',
+    isFullscreen
+      ? 'relative w-full h-full overflow-hidden bg-black'
+      : 'relative aspect-[16/9] w-full max-w-6xl overflow-hidden rounded-[36px] border border-white/10 bg-black shadow-2xl',
+  )
+
+  const slideContentClass = classNames(
+    'presenter-slide-content relative z-10 flex h-full flex-col text-white',
+    isFullscreen ? 'px-[max(5vw,24px)] py-[max(6vh,48px)]' : 'px-6 sm:px-12 pt-10 pb-16',
+  )
+
+  const noteClass = classNames(
+    'presenter-note mx-auto rounded-xl bg-black/35 text-center text-white/90',
+    isFullscreen
+      ? 'mt-[max(3vh,16px)] max-w-[min(70vw,960px)] px-[max(4vw,24px)] py-3 text-base'
+      : 'mt-3 max-w-2xl px-4 py-2 text-sm',
+  )
+
+  const referenceClass = classNames(
+    'presenter-reference uppercase tracking-wide font-semibold text-white/90',
+    isFullscreen
+      ? 'absolute bottom-[max(4vh,32px)] left-1/2 -translate-x-1/2 text-sm sm:text-base lg:text-lg'
+      : 'absolute bottom-6 left-1/2 -translate-x-1/2 text-xs sm:text-sm md:text-base',
+  )
 
   if (loading && items.length === 0) {
     return (
@@ -289,32 +319,36 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen bg-black text-white flex flex-col transition-colors ${cursorClass}`}
+      data-presenter-root
+      className={classNames('min-h-screen w-full bg-black text-white flex flex-col transition-colors', cursorClass)}
+      onMouseMove={handleUserInteraction}
+      onTouchStart={handleUserInteraction}
     >
       <header
-        className={`flex items-center justify-between gap-4 px-6 py-4 text-sm text-neutral-300 transition-opacity duration-300 ${
-          chromeVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        className={classNames(
+          'presenter-header flex items-center justify-between gap-4 px-6 py-4 text-sm text-neutral-300 transition-opacity duration-300',
+          chromeVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}
       >
         <div className="flex flex-col">
           <span className="font-medium text-white/90">{projectTitle}</span>
           {slidePosition ? <span className="text-xs text-neutral-400">Slide {slidePosition}</span> : null}
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" className="btn" onClick={handlePrevious}>
+          <button type="button" className="btn" onClick={() => { handleUserInteraction(); handlePrevious() }}>
             Prev
           </button>
-          <button type="button" className="btn" onClick={handleNext}>
+          <button type="button" className="btn" onClick={() => { handleUserInteraction(); handleNext() }}>
             Next
           </button>
-          <button type="button" className="btn" onClick={toggleFullscreen}>
+          <button type="button" className="btn" onClick={() => { handleUserInteraction(); toggleFullscreen() }}>
             {isFullscreen ? 'Exit full screen' : 'Full screen'}
           </button>
         </div>
       </header>
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:px-8">
+      <main className={mainClass}>
         <div
-          className="relative aspect-[16/9] w-full max-w-6xl rounded-[36px] overflow-hidden border border-white/10 bg-black shadow-2xl"
+          className={slideClass}
           style={backgroundStyle}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
@@ -323,7 +357,7 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
           role="presentation"
         >
           <div className="absolute inset-0 bg-black/15" />
-          <div className="relative z-10 flex h-full flex-col px-6 sm:px-12 pt-10 pb-16">
+          <div className={slideContentClass}>
             <div ref={textContainerRef} className="flex-1 flex items-center justify-center w-full">
               <div
                 ref={verseTextRef}
@@ -333,23 +367,11 @@ export function PublicPresenter({ initialMeta }: PublicPresenterProps) {
                 {verseText}
               </div>
             </div>
-            {note ? (
-              <div className="mx-auto mt-3 max-w-2xl rounded-xl bg-black/35 px-4 py-2 text-center text-sm text-white/90">
-                {note}
-              </div>
-            ) : null}
+            {note ? <div className={noteClass}>{note}</div> : null}
           </div>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs sm:text-sm md:text-base uppercase tracking-wide font-semibold text-white/90">
-            {reference}
-          </div>
+          <div className={referenceClass}>{reference}</div>
         </div>
       </main>
     </div>
   )
 }
-
-
-
-
-
-

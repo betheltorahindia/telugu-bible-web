@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -62,7 +62,7 @@ body { @apply bg-white text-black transition-colors antialiased; }
 
     padding: 10px 16px;
 
-    /* keep on one line, but DONâ€™T hide text */
+    /* keep on one line, but DON’T hide text */
     white-space: nowrap;
     overflow: visible;
     text-overflow: clip;
@@ -234,3 +234,78 @@ body.presenter-mode .container {
   padding-right: 0;
 }
 
+
+[data-presenter-root] {
+  width: 100%;
+}
+
+[data-presenter-root] main {
+  width: 100%;
+}
+
+[data-presenter-root]:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+}
+
+[data-presenter-root]:fullscreen .presenter-header {
+  display: none;
+}
+
+[data-presenter-root]:fullscreen .presenter-main {
+  padding: 0 !important;
+}
+
+[data-presenter-root]:fullscreen .presenter-slide {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-presenter-root]:fullscreen .presenter-slide-content {
+  padding: max(6vh, 48px) max(5vw, 24px) !important;
+}
+
+[data-presenter-root]:fullscreen .presenter-note {
+  max-width: min(70vw, 960px) !important;
+  padding: 12px max(4vw, 24px) !important;
+  font-size: clamp(1rem, 2.2vw, 1.5rem) !important;
+}
+
+[data-presenter-root]:fullscreen .presenter-reference {
+  bottom: max(4vh, 32px) !important;
+  font-size: clamp(0.9rem, 1.8vw, 1.4rem) !important;
+}
+
+[data-presenter-preview] {
+  width: 100%;
+}
+
+[data-presenter-preview]:fullscreen {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  background: #000;
+}
+
+[data-presenter-preview]:fullscreen .presenter-preview-slide {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-presenter-preview]:fullscreen .presenter-preview-content {
+  padding: max(6vh, 48px) max(5vw, 24px) !important;
+}
+
+[data-presenter-preview]:fullscreen .presenter-preview-reference {
+  bottom: max(4vh, 32px) !important;
+  font-size: clamp(0.9rem, 1.8vw, 1.4rem) !important;
+}

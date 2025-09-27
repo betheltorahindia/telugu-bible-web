@@ -597,7 +597,7 @@ const openShareModal = () => {
             </label>
           </div>
 
-          <div ref={previewRef} className="relative flex items-center justify-center">
+          \1 data-presenter-preview className="relative flex items-center justify-center">
             <div
               className="relative aspect-[16/9] w-full max-w-4xl rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 shadow-xl"
               style={{
@@ -608,7 +608,7 @@ const openShareModal = () => {
               }}
             >
               <div className="absolute inset-0 bg-black/20" />
-              <div className="relative z-10 flex h-full flex-col px-6 sm:px-10 pt-8 pb-14 text-white">
+              <div className="presenter-preview-content relative z-10 flex h-full flex-col px-6 sm:px-10 pt-8 pb-14 text-white">
                 <div ref={previewTextContainerRef} className="flex-1 flex items-center justify-center w-full">
                   <div
                     ref={previewTextRef}
@@ -624,7 +624,7 @@ const openShareModal = () => {
                   </div>
                 ) : null}
               </div>
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs sm:text-sm uppercase tracking-wide font-semibold text-white/90">
+              <div className="presenter-preview-reference absolute bottom-6 left-1/2 -translate-x-1/2 text-xs sm:text-sm uppercase tracking-wide font-semibold text-white/90">
                 {currentReference}
               </div>
             </div>
@@ -841,9 +841,9 @@ const openShareModal = () => {
       </div>
       {isFullscreen ? (
         <div className="fixed inset-0 z-40 flex flex-col bg-black text-white" role="presentation">
-          <div className="flex-1 flex items-center justify-center px-6 py-10 md:px-12">
+          <div className="flex-1 flex items-stretch justify-center">
             <div
-              className="relative aspect-[16/9] w-full max-w-6xl rounded-[36px] overflow-hidden border border-white/10 shadow-2xl"
+              className="presenter-preview-slide relative w-full h-full overflow-hidden"
               style={{
                 background:
                   theme.gradient.style === 'radial'
@@ -852,7 +852,7 @@ const openShareModal = () => {
               }}
             >
               <div className="absolute inset-0 bg-black/20" />
-              <div className="relative z-10 flex h-full flex-col px-8 md:px-16 pt-10 pb-16">
+              <div className="presenter-preview-content relative z-10 flex h-full flex-col px-[max(5vw,24px)] py-[max(6vh,48px)]">
                 <div className="flex-1 flex items-center justify-center w-full">
                   <div
                     className="w-full text-center font-semibold drop-shadow-2xl whitespace-pre-wrap"
@@ -862,12 +862,12 @@ const openShareModal = () => {
                   </div>
                 </div>
                 {noteDraft ? (
-                  <div className="mx-auto mt-4 max-w-3xl rounded-xl bg-black/35 px-6 py-3 text-center text-base text-white/90">
+                  <div className="mx-auto mt-4 max-w-3xl rounded-xl bg-black/35 px-[max(4vw,24px)] py-3 text-center text-base text-white/90">
                     {noteDraft}
                   </div>
                 ) : null}
               </div>
-              <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-sm md:text-base uppercase tracking-wide font-semibold text-white/90">
+              <div className="absolute bottom-[max(4vh,32px)] left-1/2 -translate-x-1/2 text-sm sm:text-base lg:text-lg uppercase tracking-wide font-semibold text-white/90">
                 {currentReference}
               </div>
             </div>
@@ -1015,6 +1015,12 @@ const openShareModal = () => {
     </div>
   )
 }
+
+
+
+
+
+
 
 
 
