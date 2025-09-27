@@ -1,5 +1,5 @@
-// next.config.mjs
-import withPWA from '@ducanh2912/next-pwa'
+﻿// next.config.mjs
+import withPWAInit from '@ducanh2912/next-pwa'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -16,18 +16,21 @@ const nextConfig = {
   },
 }
 
-export default withPWA({
-  ...nextConfig,
-
-  // PWA settings
+const withPWA = withPWAInit({
   dest: 'public',
-  disable: !isProd,               // only enable PWA in production
-  register: true,                 // auto-register SW
-  skipWaiting: true,              // replace old SW immediately
-  cacheStartUrl: true,            // cache "/" start URL
-  swSrc: 'service-worker.js',     // custom SW (we'll create this file in /public)
-  maximumFileSizeToCacheInBytes: 30 * 1024 * 1024, // raise limit (~30MB)
-
-  // No runtimeCaching here (all logic goes in service-worker.js)
-  workboxOptions: {},
+  disable: !isProd,
+  register: true,
+  skipWaiting: true,
+  cacheStartUrl: true,
+  swSrc: 'service-worker.js',
+  buildExcludes: [
+    /middleware-manifest\.json$/,
+    /_next\/static\/chunks\/app\/search\//,
+    /_next\/static\/chunks\/906-/,
+  ],
+  workboxOptions: {
+    maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
+  },
 })
+
+export default withPWA(nextConfig)

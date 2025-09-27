@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -62,7 +62,7 @@ body { @apply bg-white text-black transition-colors antialiased; }
 
     padding: 10px 16px;
 
-    /* keep on one line, but DON’T hide text */
+    /* keep on one line, but DONâ€™T hide text */
     white-space: nowrap;
     overflow: visible;
     text-overflow: clip;
@@ -211,4 +211,26 @@ body { @apply bg-white text-black transition-colors antialiased; }
 }
 
 
+
+body.presenter-mode {
+  overflow: hidden;
+  background-color: #000;
+}
+
+body.presenter-mode [data-site-header] {
+  display: none;
+}
+
+body.presenter-mode main {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+body.presenter-mode .container {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
 

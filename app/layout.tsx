@@ -1,50 +1,45 @@
-import '../styles/globals.css'
+﻿import '../styles/globals.css'
 import Header from '../components/Header'
+import { SupabaseProvider } from '../components/providers/SupabaseProvider'
+import { QueryProvider } from '../components/providers/QueryProvider'
+import { createSupabaseServerClient, hasSupabaseEnv } from '../lib/supabase/server'
 import { Noto_Sans_Telugu } from 'next/font/google'
+import type { ReactNode } from 'react'
+import type { Session } from '@supabase/supabase-js'
 
-const notoTelugu = Noto_Sans_Telugu({
-  subsets: ['telugu'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-})
-
-// app/layout.tsx (add/replace this metadata export)
 export const metadata = {
-  metadataBase: new URL('https://bethel-telugu-bible.vercel.app/'), // ← change to your real domain once deployed
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bethel-telugu-bible.vercel.app/'),
   title: {
-    default: 'తెలుగు తనాఖ్ (Telugu Tanakh) – Bethel Torah India',
-    template: '%s – Bethel Torah India',
+    default: 'Telugu Tanakh - Bethel Torah India',
+    template: '%s - Bethel Torah India',
   },
   description:
-    'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings. పరిశుద్ధ గ్రంథం – Bethel Torah India.',
+    'Read the Holy Bible / Tanakh in Telugu: Torah, Prophets, Writings, Psalms, plus weekly Parasha and Haftarah readings.',
   keywords: [
     'Telugu Bible',
     'Telugu Tanakh',
-    'పరిశుద్ధ గ్రంథం',
-    'Holy Bible',
-    'Tanach',
+    'Tanakh',
     'Torah',
     'Parasha',
     'Haftarah',
     'Bethel Torah India',
-    'Jewish Bible Telugu',
   ],
   applicationName: 'Bethel Torah India',
   openGraph: {
     type: 'website',
     locale: 'te_IN',
-    url: 'https://<https://bethel-telugu-bible.vercel.app/>/',
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bethel-telugu-bible.vercel.app/',
     siteName: 'Bethel Torah India',
-    title: 'Tanach-Telugu',
+    title: 'Telugu Tanakh',
     description:
-      'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
+      'Read the Holy Bible / Tanakh in Telugu: Torah, Prophets, Writings, Psalms, plus weekly Parasha and Haftarah readings.',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Telugu Tanakh' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tanach-Telugu',
+    title: 'Telugu Tanakh',
     description:
-      'Read the Holy Bible / Tanakh in Telugu. Torah, Prophets, Writings, Psalms, weekly Parasha & Haftarah readings.',
+      'Read the Holy Bible / Tanakh in Telugu: Torah, Prophets, Writings, Psalms, plus weekly Parasha and Haftarah readings.',
     images: ['/og-image.png'],
   },
   alternates: { canonical: '/' },
@@ -53,14 +48,31 @@ export const metadata = {
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: [
-      { url: '/apple-icon-180x180.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-icon-180x180.png', sizes: '180x180', type: 'image/png' }],
   },
-  themeColor: '#ffffff',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport = {
+  themeColor: '#000000',
+}
+
+const notoTelugu = Noto_Sans_Telugu({
+  subsets: ['telugu'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+})
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  let initialSession: Session | null = null
+
+  if (hasSupabaseEnv) {
+    const supabase = createSupabaseServerClient()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+    initialSession = session
+  }
+
   return (
     <html lang="te" className={notoTelugu.className}>
       <head>
@@ -90,16 +102,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google-site-verification" content="Qch3vbS6pWUtPJ887_ypRFKjFxfUas7mDoSkUy6A-4Q" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
-
-
-        {/* Theme color — match manifest (#000000) for consistent UI on Android */}
-        <meta name="theme-color" content="#000000" />
       </head>
       <body>
-        <Header />
-        {/* keep content below the fixed header */}
-        <main className="container mt-20 pb-6">{children}</main>
+        <SupabaseProvider initialSession={initialSession}>
+          <QueryProvider>
+            <Header />
+            {/* keep content below the fixed header */}
+            <main className="container mt-20 pb-6">{children}</main>
+          </QueryProvider>
+        </SupabaseProvider>
       </body>
     </html>
   )
 }
+
