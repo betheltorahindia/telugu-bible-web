@@ -8,18 +8,14 @@ import ThemeToggle from './ThemeToggle'
 import BookChapterNav from './BookChapterNav'
 import MobileBookNav from './MobileBookNav'
 import { Home, Search, MonitorPlay, Menu, X } from 'lucide-react'
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export default function Header() {
   const pathname = usePathname() || '/'
   const showBookNav = pathname.startsWith('/book')
   const isHome = pathname === '/'
-  const session = useSession()
-  const supabase = useSupabaseClient()
   const router = useRouter()
-
-  const [signingOut, setSigningOut] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  
 
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuPanelRef = useRef<HTMLDivElement | null>(null)
@@ -64,21 +60,7 @@ export default function Header() {
     setMobileMenuOpen((prev) => !prev)
   }
 
-  const handleSignOut = async () => {
-    if (signingOut) return
-    setSigningOut(true)
-    try {
-      await supabase.auth.signOut()
-      router.refresh()
-    } finally {
-      setSigningOut(false)
-    }
-  }
-
-  const handleMobileSignOut = async () => {
-    await handleSignOut()
-    closeMobileMenu()
-  }
+  // Sign in/out removed from header per request
 
   return (
     <header
@@ -138,15 +120,6 @@ export default function Header() {
               <MonitorPlay className="w-5 h-5" />
               <span className="font-medium">Presenter</span>
             </Link>
-            {session ? (
-              <button type="button" className="btn" onClick={handleSignOut} disabled={signingOut}>
-                {signingOut ? 'Signing out...' : 'Sign out'}
-              </button>
-            ) : (
-              <Link href="/presenter" className="btn" title="Sign in">
-                Sign in
-              </Link>
-            )}
             <ThemeToggle />
           </div>
 
@@ -177,28 +150,6 @@ export default function Header() {
                 <MonitorPlay className="w-5 h-5" />
                 <span>Presenter</span>
               </Link>
-
-              {session ? (
-                <>
-                  <button
-                    type="button"
-                    className="btn w-full justify-start"
-                    onClick={handleMobileSignOut}
-                    disabled={signingOut}
-                  >
-                    {signingOut ? 'Signing out...' : 'Sign out'}
-                  </button>
-
-                </>
-              ) : (
-                <Link
-                  href="/presenter"
-                  className="btn w-full justify-start"
-                  onClick={closeMobileMenu}
-                >
-                  Sign in
-                </Link>
-              )}
 
               <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
               <div className="flex justify-start">

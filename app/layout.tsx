@@ -2,13 +2,12 @@
 import Header from '../components/Header'
 import { SupabaseProvider } from '../components/providers/SupabaseProvider'
 import { QueryProvider } from '../components/providers/QueryProvider'
-import { createSupabaseServerClient, hasSupabaseEnv } from '../lib/supabase/server'
 import { Noto_Sans_Telugu } from 'next/font/google'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bethel-telugu-bible.vercel.app/'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/'),
   title: {
     default: 'Telugu Tanakh - Bethel Torah India',
     template: '%s - Bethel Torah India',
@@ -28,7 +27,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'te_IN',
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bethel-telugu-bible.vercel.app/',
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/',
     siteName: 'Bethel Torah India',
     title: 'Telugu Tanakh',
     description:
@@ -63,15 +62,7 @@ const notoTelugu = Noto_Sans_Telugu({
 })
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  let initialSession: Session | null = null
-
-  if (hasSupabaseEnv) {
-    const supabase = createSupabaseServerClient()
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-    initialSession = session
-  }
+  const initialSession: Session | null = null
 
   return (
     <html lang="te" className={notoTelugu.className}>
@@ -115,4 +106,3 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     </html>
   )
 }
-

@@ -1,53 +1,27 @@
-# Verse Presenter Setup
+﻿# Verse Presenter Guide
 
-## 1. Supabase tables and policies
+The presenter no longer connects to Supabase or stores projects. Everything lives in the browser while the page is open.
 
-1. Open the Supabase SQL editor for your project.
-2. Paste the contents of `supabase/presenter.sql` and run it once. This creates:
-   - `admin_users`, `premium_users`
-   - `projects`, `project_items` with indexes
-   - triggers for `updated_at` and quota enforcement
-   - RLS policies that restrict access to owners (service role bypass only)
+## What it can do
+- Pick any Book → Chapter → Verse combination.
+- Build a local set list (playlist) of verses, reorder them, remove them, or clear the list.
+- Adjust the background gradient, gradient angle, font size, and line-height.
+- Step through slides with Prev/Next or use the arrow keys while in fullscreen.
+- Enter fullscreen; the non-essential UI hides automatically and you can exit with Escape or the on-screen button.
 
-## 2. Seed admin and premium users
+## Tips
+- The note field is optional and can be used for cues or reminders. Notes appear under the verse during presentation.
+- "New slide" clears the current selection so you can queue another verse quickly. The set list is not saved after a refresh.
+- Everything works without signing in. Authentication in the header only affects other signed-in features on the site.
 
-Run the following SQL statements (replace the emails with yours):
-
-```sql
--- Add an admin (unlimited projects, full access in app UI)
-insert into public.admin_users (email) values ('you@example.com')
-  on conflict (email) do nothing;
-
--- Add a premium user (unlimited projects)
-insert into public.premium_users (email) values ('premium@example.com')
-  on conflict (email) do nothing;
-```
-
-You can rerun or delete rows later to change quotas.
-
-## 3. Environment variables
-
-Set the following in your `.env.local` (and hosting platform):
+## Environment variables
+Only the client-side Supabase keys are required if you keep email sign-in elsewhere in the app:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_SITE_URL=https://your-domain.example
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is only used by Next.js API routes and never sent to the browser.
-
-## 4. Local development
-
-1. Install dependencies: `npm install`
-2. Start dev server: `npm run dev`
-3. Visit `/presenter` to sign in and create projects.
-4. Share links use `/present/<slug>`; viewers can navigate with arrow keys or tap zones in the public presenter.
-
-## 5. Production checklist
-
-- Run `npm run build` (requires the Supabase env vars above).
-- Deploy after confirming `/presenter` workflows and `/present/<slug>` navigation.
-- Keep `supabase/presenter.sql` handy for future environments (staging, production).
+You can remove `SUPABASE_SERVICE_ROLE_KEY`; it is no longer used.
 

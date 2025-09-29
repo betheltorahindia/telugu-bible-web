@@ -2,10 +2,10 @@
 import type { MetadataRoute } from 'next'
 import bible from '../data/bible.json' assert { type: 'json' }
 
-// Public site URL (no trailing slash). Set this in Vercel → Settings → Environment Variables.
+// Public site URL (no trailing slash). Set this in Vercel > Settings > Environment Variables.
 const SITE =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ||
-  'https://bethel-telugu-bible.vercel.app/' // fallback (please set the env var!)
+  'https://betheltelugubible.org/' // fallback (please set the env var!)
 
 function toISO(d: Date) {
   const y = d.getFullYear()
@@ -64,7 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Parasha: next 52 Shabbat dates (week page + aliyot 1..7 + Haftarah “H”)
+  // Parasha: next 52 Shabbat dates (week page + aliyot 1..7 + Haftarah "H")
   let shabbat = nextSaturday()
   for (let i = 0; i < 52; i++) {
     const iso = toISO(shabbat)

@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next'
 
 const SITE =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, '') ||
-  'https://bethel-telugu-bible.vercel.app/'
+  'https://betheltelugubible.org/'
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -11,10 +11,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/'],
-        disallow: ['/present/'],
       },
     ],
     sitemap: `${SITE}/sitemap.xml`,
   }
 }
-
