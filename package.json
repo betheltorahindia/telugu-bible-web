@@ -5,6 +5,7 @@
     "scripts": {
         "dev": "next dev",
         "warm": "node scripts/generate_warm_urls.mjs",
+        "convert-fonts": "node scripts/convert_font.mjs",
         "build": "npm run warm && next build",
         "start": "next start"
     },
@@ -34,6 +35,8 @@
         "autoprefixer": "10.4.19",
         "postcss": "8.4.38",
         "tailwindcss": "3.4.10",
+        "ttf2woff": "^3.0.0",
+        "ttf2woff2": "^8.0.0",
         "typescript": "5.5.4"
     }
 }

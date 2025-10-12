@@ -196,8 +196,9 @@ export function PresenterBuilder() {
     text: previewVerse.text,
     containerRef: previewTextContainerRef,
     contentRef: previewTextRef,
-    baseSize: previewTheme.fontSize,
-    minSize: 32,
+    // prefer a large max size but cap to 48px so very short verses don't get huge
+    baseSize: Math.min(previewTheme.fontSize ?? 48, 48),
+    minSize: 20,
     lineHeight: previewTheme.lineHeight,
   })
 
@@ -333,6 +334,7 @@ export function PresenterBuilder() {
     enterFullscreen(host)
   }, [])
 
+
   const handleExitFullscreen = useCallback(() => {
     exitFullscreen()
   }, [])
@@ -350,6 +352,83 @@ export function PresenterBuilder() {
     },
     [playlist],
   )
+
+  // Export/import list (clipboard-based, no DB)
+  const handleExportList = useCallback(async () => {
+    try {
+      if (!playlist || playlist.length === 0) {
+        alert('No slides to export')
+        return
+      }
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        playlist,
+      }
+      const text = JSON.stringify(payload, null, 2)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text)
+        alert('Playlist copied to clipboard. Paste it into Import list when needed.')
+      } else {
+        // fallback: show in prompt so user can copy manually
+        window.prompt('Copy the exported playlist JSON below', text)
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Failed to export playlist')
+    }
+  }, [playlist])
+
+  const handleImportList = useCallback(() => {
+    try {
+      const pasted = window.prompt('Paste exported playlist JSON here')
+      if (!pasted) return
+      let parsed: any
+      try {
+        parsed = JSON.parse(pasted)
+      } catch (e) {
+        // perhaps user pasted raw array
+        alert('Invalid JSON')
+        return
+      }
+      let items: any[] | undefined
+      if (Array.isArray(parsed)) items = parsed
+      else if (parsed && Array.isArray(parsed.playlist)) items = parsed.playlist
+      else {
+        alert('Invalid playlist format')
+        return
+      }
+      const normalized: PlaylistItem[] = items
+        .map((it) => {
+          // accept either {book,chapter,verse} or legacy keys
+          const book = Number(it.book ?? it.bnumber)
+          const chapter = Number(it.chapter ?? it.chapter ?? it.cnumber)
+          const verse = Number(it.verse ?? it.verse ?? it.vnumber)
+          if (!book || !chapter || !verse) return null
+          return {
+            id: it.id ?? crypto.randomUUID(),
+            book,
+            chapter,
+            verse,
+            note: it.note ?? null,
+          } as PlaylistItem
+        })
+        .filter(Boolean) as PlaylistItem[]
+      if (!normalized || normalized.length === 0) {
+        alert('No valid slides found in pasted data')
+        return
+      }
+      setPlaylist(normalized)
+      setSelectedId(normalized[0].id)
+      setCurrentBook(normalized[0].book)
+      setCurrentChapter(normalized[0].chapter)
+      setCurrentVerse(normalized[0].verse)
+      alert('Playlist imported')
+    } catch (err) {
+      console.error(err)
+      alert('Failed to import playlist')
+    }
+  }, [setPlaylist])
 
   const handleGradientColorChange = useCallback(
     (index: number, value: string) => {
@@ -482,31 +561,24 @@ export function PresenterBuilder() {
         >
           <div className="absolute inset-0 bg-black/20" />
           <div className="relative z-10 flex h-full w-full flex-col px-6 pt-8 pb-14 sm:px-10 text-white">
-            <div ref={previewTextContainerRef} className="flex-1 flex items-center justify-center w-full">
+            <div ref={previewTextContainerRef} className="flex-1 flex items-center justify-center w-full presenter-preview-content">
               <div
                 ref={previewTextRef}
                 className={classNames(
-                  'w-full font-semibold drop-shadow-xl whitespace-pre-wrap',
+                  'w-full font-semibold drop-shadow-xl whitespace-pre-wrap presenter-preview-card',
                   normalizeTheme(theme).textAlign === 'center' ? 'text-center' :
                   normalizeTheme(theme).textAlign === 'right' ? 'text-right' : 'text-left',
                 )}
-                style={{ fontSize: `${previewFontSize}px`, lineHeight: normalizeTheme(theme).lineHeight }}
+                style={{ fontSize: `${previewFontSize}px`, lineHeight: normalizeTheme(theme).lineHeight, fontFamily: "Dhurjati, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }}
               >
                 {previewVerse.text || 'Select a verse to preview'}
               </div>
             </div>
             {previewVerse.note ? <p className="mt-4 text-sm opacity-80">{previewVerse.note}</p> : null}
-            <div
-              className={classNames(
-                'mt-6 text-xs tracking-wide uppercase opacity-80',
-                normalizeTheme(theme).referenceAlign === 'center'
-                  ? 'text-center'
-                  : normalizeTheme(theme).referenceAlign === 'right'
-                    ? 'text-right'
-                    : 'text-left',
-              )}
-            >
-              {activeReference}
+            <div className="presenter-preview-reference" style={{ textAlign: normalizeTheme(theme).referenceAlign === 'center' ? 'center' : normalizeTheme(theme).referenceAlign === 'right' ? 'right' : 'left' }}>
+              <div style={{ background: '#fff3c4', color: '#000', display: 'inline-block', padding: '8px 24px', borderRadius: 6, boxShadow: '0 6px 0 rgba(0,0,0,0.2)', fontWeight: 600 }}>
+                {activeReference}
+              </div>
             </div>
           </div>
           {/* Fullscreen floating controls removed per request */}
@@ -584,28 +656,7 @@ export function PresenterBuilder() {
                 />
               </label>
 
-              <label className="flex flex-col gap-1 text-sm">
-                <span className="font-medium">Font size ({Math.round(previewFontSize)}px)</span>
-                <input
-                  type="range"
-                  min={32}
-                  max={96}
-                  value={normalizeTheme(theme).fontSize}
-                  onChange={(e) => setTheme((prev) => normalizeTheme({ ...prev, fontSize: Number(e.target.value) }))}
-                />
-              </label>
-
-              <label className="flex flex-col gap-1 text-sm">
-                <span className="font-medium">Line height ({normalizeTheme(theme).lineHeight.toFixed(2)})</span>
-                <input
-                  type="range"
-                  min={1}
-                  max={2}
-                  step={0.05}
-                  value={normalizeTheme(theme).lineHeight}
-                  onChange={(e) => setTheme((prev) => normalizeTheme({ ...prev, lineHeight: Number(e.target.value) }))}
-                />
-              </label>
+              {/* Font size and line-height controls removed: presenter uses auto-fit sizing */}
             </div>
           </aside>
         ) : null}
@@ -615,7 +666,11 @@ export function PresenterBuilder() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Set list</h2>
-            {slidePosition ? <p className="text-sm text-neutral-600 dark:text-neutral-300">Slide {slidePosition}</p> : null}
+            <div className="flex items-center gap-2">
+              <button type="button" className="btn" onClick={handleImportList}>Import list</button>
+              <button type="button" className="btn" onClick={handleExportList}>Export list</button>
+              {slidePosition ? <p className="text-sm text-neutral-600 dark:text-neutral-300">Slide {slidePosition}</p> : null}
+            </div>
           </div>
           {playlist.length === 0 ? (
             <>
@@ -673,9 +728,9 @@ export function PresenterBuilder() {
               <button type="button" className="btn" onClick={handlePrevSlide}>Prev</button>
               <button type="button" className="btn" onClick={handleNextSlide}>Next</button>
             </div>
-            <div className="flex gap-3">
-              <button type="button" className="btn" onClick={handleEnterFullscreen}>Full screen</button>
-            </div>
+      <div className="flex gap-3">
+        <button type="button" className="btn" onClick={handleEnterFullscreen}>Full screen</button>
+      </div>
           </div>
         </div>
       ) : null}

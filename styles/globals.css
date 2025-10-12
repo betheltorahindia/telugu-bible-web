@@ -1,6 +1,20 @@
+/* stylelint-disable at-rule-no-unknown */
+/* Tailwind directives (allowed by stylelint for this file) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom font: Dhurjati (placed in public/fonts/dhurjati/) */
+@font-face {
+  font-family: 'Dhurjati';
+  /* prefer woff2, then woff, then ttf (place these files in public/fonts/) */
+  src: url('/fonts/Dhurjati-Regular.woff2') format('woff2'),
+       url('/fonts/Dhurjati-Regular.woff') format('woff'),
+       url('/fonts/Dhurjati-Regular.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Light/Dark via data-theme on <html> */
 :root { color-scheme: light; }
@@ -308,4 +322,25 @@ body.presenter-mode .container {
 [data-presenter-preview]:fullscreen .presenter-preview-reference {
   bottom: max(4vh, 32px) !important;
   font-size: clamp(0.9rem, 1.8vw, 1.4rem) !important;
+}
+
+/* Presenter preview card styles */
+.presenter-preview-content { width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; }
+.presenter-preview-card {
+  background: rgba(0,0,0,0.55);
+  padding: clamp(20px, 4vh, 48px);
+  border-radius: 18px;
+  max-width: min(90%, 1400px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  padding-inline: clamp(40px, 10vw, 160px);
+}
+
+/* Keep reference block below the card and not overlapped */
+.presenter-reference { position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); }
+
+/* Popout button styling next to full screen button */
+.btn-popout { 
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 12px; border: 1px solid rgba(0,0,0,0.08);
+  padding: 8px 12px; background: rgba(255,255,255,0.85); color: #111;
 }
