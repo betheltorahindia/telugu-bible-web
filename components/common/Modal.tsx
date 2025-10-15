@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { Component, ReactNode, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 interface ModalProps {
@@ -10,6 +10,36 @@ interface ModalProps {
   children: React.ReactNode
   footer?: React.ReactNode
   widthClassName?: string
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    console.error('Error caught by ErrorBoundary:', error, info)
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong. Please try again later.</h1>
+    }
+    return this.props.children
+  }
 }
 
 export function Modal({ open, onClose, title, children, footer, widthClassName }: ModalProps) {

@@ -5,6 +5,7 @@ import { QueryProvider } from '../components/providers/QueryProvider'
 import { Noto_Sans_Telugu } from 'next/font/google'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/'),

@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { HOME_SECTIONS, BOOK_NAMES } from '../lib/data/books'
 import Footer from '../components/footer'
 import InstallFAB from '../components/InstallFAB'
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 
 // ✅ Weekly Parasha teaser
 import ParashaTeaser from '../components/ParashaTeaser'
