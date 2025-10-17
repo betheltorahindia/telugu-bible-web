@@ -6,6 +6,7 @@ import { Noto_Sans_Telugu } from 'next/font/google'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/'),
@@ -104,6 +105,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </QueryProvider>
         </SupabaseProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
