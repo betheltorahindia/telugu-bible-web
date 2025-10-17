@@ -103,6 +103,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <main className="container mt-20 pb-6">{children}</main>
           </QueryProvider>
         </SupabaseProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
