@@ -196,8 +196,8 @@ export function PresenterBuilder() {
     text: previewVerse.text,
     containerRef: previewTextContainerRef,
     contentRef: previewTextRef,
-    // prefer a large max size but cap to 48px so very short verses don't get huge
-    baseSize: Math.min(previewTheme.fontSize ?? 48, 48),
+  // prefer a large max size but cap to 50px so very short verses don't get huge (increased by 2px)
+  baseSize: Math.min(previewTheme.fontSize ?? 50, 50),
     minSize: 20,
     lineHeight: previewTheme.lineHeight,
   })
@@ -531,16 +531,7 @@ export function PresenterBuilder() {
             </label>
           </div>
 
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Notes (optional)</span>
-            <textarea
-              rows={2}
-              value={noteDraft}
-              onChange={(e) => setNoteDraft(e.target.value)}
-              className="rounded-xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-neutral-900/80 px-3 py-2"
-              placeholder="Add supporting notes or cues for this verse"
-            />
-          </label>
+          {/* Notes input removed from presenter page UI per request. Notes remain supported on slides but cannot be edited here. */}
         </div>
       ) : null}
       <div className={classNames('grid gap-6', isFullscreen ? '' : 'lg:grid-cols-[minmax(0,1fr)_320px]')}>
@@ -575,8 +566,11 @@ export function PresenterBuilder() {
               </div>
             </div>
             {previewVerse.note ? <p className="mt-4 text-sm opacity-80">{previewVerse.note}</p> : null}
-            <div className="presenter-preview-reference" style={{ textAlign: normalizeTheme(theme).referenceAlign === 'center' ? 'center' : normalizeTheme(theme).referenceAlign === 'right' ? 'right' : 'left' }}>
-              <div style={{ background: '#fff3c4', color: '#000', display: 'inline-block', padding: '8px 24px', borderRadius: 6, boxShadow: '0 6px 0 rgba(0,0,0,0.2)', fontWeight: 600 }}>
+            <div
+              className="presenter-preview-reference"
+              style={{ textAlign: normalizeTheme(theme).referenceAlign === 'center' ? 'center' : normalizeTheme(theme).referenceAlign === 'right' ? 'right' : 'left' }}
+            >
+              <div className="inline-block bg-amber-100 text-amber-900 dark:bg-amber-700 dark:text-amber-100 font-semibold shadow-[0_6px_0_rgba(0,0,0,0.2)] rounded-md px-4 py-1 text-sm sm:text-base max-w-[90%] truncate">
                 {activeReference}
               </div>
             </div>
@@ -664,6 +658,19 @@ export function PresenterBuilder() {
 
       {!isFullscreen ? (
         <div className="space-y-4">
+          {/* Controls reordered: Previous / Next / Full screen now appear above Set list */}
+          <div className="mt-0 rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/70 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex gap-3">
+                <button type="button" className="btn" onClick={handlePrevSlide}>Prev</button>
+                <button type="button" className="btn" onClick={handleNextSlide}>Next</button>
+              </div>
+              <div className="flex gap-3">
+                <button type="button" className="btn" onClick={handleEnterFullscreen}>Full screen</button>
+              </div>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Set list</h2>
             <div className="flex items-center gap-2">
@@ -720,20 +727,7 @@ export function PresenterBuilder() {
         </div>
       ) : null}
 
-      {/* Footer controls */}
-      {!isFullscreen ? (
-        <div className="mt-6 rounded-2xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-neutral-900/70 p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-3">
-              <button type="button" className="btn" onClick={handlePrevSlide}>Prev</button>
-              <button type="button" className="btn" onClick={handleNextSlide}>Next</button>
-            </div>
-      <div className="flex gap-3">
-        <button type="button" className="btn" onClick={handleEnterFullscreen}>Full screen</button>
-      </div>
-          </div>
-        </div>
-      ) : null}
+      {/* Footer controls removed from bottom; controls moved above Set list per request */}
     </div>
   )
 }
