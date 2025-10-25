@@ -11,6 +11,9 @@ export type LeyningItem = {
   fullkriyah?: Record<string, Aliyah>;
   haft?: { k: string; b: string; e: string; v?: number } | Array<{ k: string; b: string; e: string; v?: number }>;
   haftara?: string;
+  seph?: { k: string; b: string; e: string; v?: number };
+  sephardic?: string;
+  sephardicNumV?: number;
   reason?: Record<string, string>;
 };
 
@@ -68,8 +71,20 @@ function nextSaturday(from = new Date()) {
 }
 
 // --------------- mappers ---------------
-function normalizeHaftSegments(haft: LeyningItem['haft'], fallbackLabel?: string): HaftaraSegment[] {
+function normalizeHaftSegments(haft: LeyningItem['haft'], fallbackLabel?: string, item?: LeyningItem): HaftaraSegment[] {
   if (!haft) return [];
+
+  // First try to get Sephardic reading from the root level
+  if (item?.seph && item.seph.k && item.seph.b && item.seph.e) {
+    return [{
+      k: item.seph.k,
+      b: item.seph.b,
+      e: item.seph.e,
+      label: item.sephardic || `${item.seph.k} ${item.seph.b}-${item.seph.e}`,
+    }];
+  }
+  
+  // Fallback to regular haft if no Sephardic reading
   const entries = Array.isArray(haft) ? haft : [haft];
   const segments: HaftaraSegment[] = [];
   entries.forEach((entry, idx) => {
@@ -99,7 +114,7 @@ function mapItemToWeekly(it: LeyningItem, kind: 'festival'|'shabbat'): WeeklyIte
 
   if (aliyot.length === 0) return null;
 
-  const haftaraSegments = normalizeHaftSegments(it.haft, it.haftara);
+  const haftaraSegments = normalizeHaftSegments(it.haft, it.haftara, it);
   const haftara = haftaraSegments[0];
 
   const maftirAliyah = it.fullkriyah?.M || it.fullkriyah?.maftir || it.fullkriyah?.maf;
@@ -146,10 +161,10 @@ const PARASHA_NAMES = new Set([
 export async function getUpcomingShabbatLeyning(): Promise<UpcomingShabbat | null> {
   const sat = nextSaturday();
   const start = toLocalISODate(sat);
-  const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${start}&i=off&triennial=off`;
+  const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${start}&i=off&triennial=off&custom=seph`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } });
+    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } } as NextFetchOptions);
     if (!res.ok) {
       return { shabbatDateISO: start, aliyot: [], _url: url, _status: res.status, _error: 'HTTP not OK' };
     }
@@ -188,10 +203,10 @@ export async function getUpcomingShabbatLeyning(): Promise<UpcomingShabbat | nul
  */
 export async function getLeyningForDate(isoDate: string): Promise<UpcomingShabbat | null> {
   const start = isoDate.slice(0, 10);
-  const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${start}&i=off&triennial=off`;
+  const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${start}&i=off&triennial=off&custom=seph`;
 
   try {
-    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } });
+    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } } as NextFetchOptions);
     if (!res.ok) {
       return { shabbatDateISO: start, aliyot: [], _url: url, _status: res.status, _error: 'HTTP not OK' };
     }
@@ -208,7 +223,7 @@ export async function getLeyningForDate(isoDate: string): Promise<UpcomingShabba
       .filter(Boolean)
       .map((a, idx) => ({ n: String(idx + 1), k: a.k, b: a.b, e: a.e }));
 
-    const haftaraSegments = normalizeHaftSegments(item.haft, item.haftara);
+    const haftaraSegments = normalizeHaftSegments(item.haft, item.haftara, item);
     const haft = haftaraSegments[0];
 
     const maftirAliyah = item.fullkriyah?.M || item.fullkriyah?.maftir || item.fullkriyah?.maf;
@@ -240,6 +255,14 @@ export async function getLeyningForDate(isoDate: string): Promise<UpcomingShabba
   }
 }
 
+// Next.js fetch options type
+type NextFetchOptions = RequestInit & {
+  next?: {
+    revalidate?: number | false
+    tags?: string[]
+  }
+}
+
 /**
  * NEW: Fetch all leyning items in the next 7 days (festivals + shabbat).
  * Use this to show multiple cards on Home (e.g., a festival midweek and Shabbat after).
@@ -249,9 +272,9 @@ export async function getWeeklyLeyning(): Promise<WeeklyItem[]> {
     const today = new Date();
     const start = toLocalISODate(today);
     const end = toLocalISODate(addDays(today, 7));
-    const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${end}&i=off&triennial=off`;
+    const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${end}&i=off&triennial=off&custom=seph`;
 
-    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } });
+    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } } as NextFetchOptions);
     if (!res.ok) return [];
 
     const data = (await res.json()) as { items?: LeyningItem[] };
