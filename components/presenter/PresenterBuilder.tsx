@@ -17,6 +17,7 @@ import {
 import { DEFAULT_THEME, GRADIENT_PRESETS, normalizeTheme } from '../../lib/presenter/theme'
 import type { ThemeSettings } from '../../lib/supabase/types'
 import { useAutoFitText } from './useAutoFitText'
+import ReadPresenter from './ReadPresenter'
 
 /* --- helper to accept both legacy and new verse-ref shapes --- */
 type VerseRef = { book: number; chapter: number; verse: number }
@@ -113,6 +114,7 @@ export function PresenterBuilder() {
   const [currentVerse, setCurrentVerse] = useState<number>(1)
   const [noteDraft, setNoteDraft] = useState('')
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [isReadMode, setIsReadMode] = useState(false)
   
 
   const presenterRef = useRef<HTMLDivElement>(null)
@@ -163,7 +165,14 @@ export function PresenterBuilder() {
   useEffect(() => {
     const handleFullscreenChange = () => {
       const activeElement = document.fullscreenElement || (document as any).webkitFullscreenElement
-      setIsFullscreen(Boolean(activeElement))
+      const isActive = Boolean(activeElement)
+      setIsFullscreen(isActive)
+      try {
+        if (isActive) document.body.classList.add('presenter-mode')
+        else document.body.classList.remove('presenter-mode')
+      } catch (e) {
+        // ignore (server-side or restricted environments)
+      }
     }
     document.addEventListener('fullscreenchange', handleFullscreenChange)
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange as any)
@@ -196,11 +205,51 @@ export function PresenterBuilder() {
     text: previewVerse.text,
     containerRef: previewTextContainerRef,
     contentRef: previewTextRef,
-  // prefer a large max size but cap to 50px so very short verses don't get huge (increased by 2px)
-  baseSize: Math.min(previewTheme.fontSize ?? 50, 50),
-    minSize: 20,
+    // prefer a large max size (80) and never go below 32
+    // Always try the intended max size of 80 first so very short verses can be large
+    baseSize: 80,
+    minSize: 32,
     lineHeight: previewTheme.lineHeight,
   })
+
+  // Popout / controller session state
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [popoutChannel, setPopoutChannel] = useState<BroadcastChannel | null>(null)
+  const [popoutWindows, setPopoutWindows] = useState<{display?: Window | null; controller?: Window | null}>({})
+  const [toast, setToast] = useState<string | null>(null)
+
+  // helper: create or return a channel-like wrapper with fallback
+  type ChannelLike = {
+    postMessage: (data: unknown) => void
+    onmessage?: ((ev: MessageEvent) => void) | null
+    close?: () => void
+  }
+
+  function createChannelForSession(sid: string): ChannelLike | BroadcastChannel {
+    const name = `presenter-session-${sid}`
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        return new BroadcastChannel(name)
+      } catch (e) {
+        // fallthrough to localStorage fallback
+      }
+    }
+    // fallback: emulate BroadcastChannel with localStorage
+    const fake: ChannelLike = {
+      postMessage(data: unknown) {
+        try {
+          localStorage.setItem(`__bc__${name}`, JSON.stringify({ t: Date.now(), data }))
+        } catch (e) {
+          // ignore
+        }
+      },
+      onmessage: null,
+      close() {
+        // noop
+      },
+    }
+    return fake
+  }
 
   const handleAddSlide = useCallback(() => {
     const id = crypto.randomUUID()
@@ -333,6 +382,146 @@ export function PresenterBuilder() {
     // enter fullscreen
     enterFullscreen(host)
   }, [])
+
+  const handlePopout = useCallback(() => {
+    const sid = crypto.randomUUID()
+    setSessionId(sid)
+    const channel = createChannelForSession(sid)
+    setPopoutChannel(channel as BroadcastChannel)
+    const urlBase = `${window.location.origin}/presenter/popout?sessionId=${sid}`
+    // open controller first then display — opening both synchronously improves popup success rate
+    const controller = window.open(`${urlBase}&role=controller`, '_blank', 'noopener')
+    const display = window.open(`${urlBase}&role=display`, '_blank', 'noopener')
+    setPopoutWindows({ display, controller })
+
+    if (!display || !controller) {
+      setToast('Popup blocked — allow popups for this site to use Pop out')
+      setTimeout(() => setToast(null), 4000)
+    }
+
+    const sendStateInit = () => {
+      const payload = {
+        playlist,
+        selectedId,
+        theme,
+        previewTheme,
+        fontSize: previewFontSize,
+        lineHeight: previewTheme.lineHeight,
+      }
+      try {
+        channel.postMessage?.({ type: 'state:init', payload })
+      } catch (e) {
+        // ignore
+      }
+    }
+
+  // broadcast initial state immediately and then on every change (see effects below)
+  // Give a tiny tick so popout windows have a chance to attach listeners, then send
+  setTimeout(sendStateInit, 50)
+
+    // listen for control messages (nav)
+    const onMessage = (ev: MessageEvent) => {
+      const data = ev?.data
+      if (!data || typeof data !== 'object') return
+      if (!data.type) return
+      switch (data.type) {
+        case 'nav:next':
+          handleNextSlide()
+          break
+        case 'nav:prev':
+          handlePrevSlide()
+          break
+        case 'nav:stop':
+          setPopoutWindows({})
+          try { channel.close?.() } catch (e) {}
+          setPopoutChannel(null)
+          setToast('Presentation windows closed')
+          setTimeout(() => setToast(null), 3000)
+          break
+        case 'request:init':
+          sendStateInit()
+          break
+        default:
+          break
+      }
+    }
+
+    // attach listener both to channel and fallback storage events
+    if (channel) {
+      try {
+        ;(channel as ChannelLike).onmessage = onMessage
+      } catch (e) {
+        // ignore
+      }
+      try {
+        ;(channel as BroadcastChannel).onmessage = onMessage
+      } catch (e) {
+        // ignore
+      }
+    }
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key) return
+      if (!e.key.startsWith(`__bc__presenter-session-${sid}`)) return
+      try {
+        const parsed: unknown = JSON.parse(e.newValue || '')
+        if (parsed && typeof parsed === 'object') {
+          const obj = parsed as Record<string, unknown>
+          if ('data' in obj) {
+            onMessage({ data: obj['data'] } as MessageEvent)
+          }
+        }
+      } catch (err) {}
+    }
+    window.addEventListener('storage', onStorage)
+
+    // watch popout windows close
+    const interval = window.setInterval(() => {
+      if (display && display.closed) {
+        setToast('Presentation window closed')
+        setTimeout(() => setToast(null), 3000)
+      }
+      if (controller && controller.closed) {
+        setToast('Controller window closed')
+        setTimeout(() => setToast(null), 3000)
+      }
+      if ((display && display.closed) && (controller && controller.closed)) {
+        clearInterval(interval)
+      }
+    }, 500)
+
+  }, [playlist, selectedId, theme, previewTheme, previewFontSize, handleNextSlide, handlePrevSlide])
+
+  const handleRead = useCallback(() => {
+    document.documentElement.requestFullscreen().then(() => {
+      setIsReadMode(true)
+    }).catch(err => {
+      console.error('Failed to enter fullscreen:', err)
+      setToast('Failed to enter fullscreen mode')
+    })
+  }, [])
+
+  // Broadcast updates when popout channel exists
+  useEffect(() => {
+    if (!popoutChannel || !sessionId) return
+    const ch = popoutChannel
+    const sendUpdate = () => {
+      try {
+        ch.postMessage({ type: 'state:update', payload: { playlist, selectedId, theme: previewTheme, previewTheme, previewVerse, fontSize: previewFontSize, lineHeight: previewTheme.lineHeight, sessionId } })
+      } catch (e) {}
+    }
+    // send initial ack
+    sendUpdate()
+    // send on changes (debounced)
+    const id = window.setTimeout(sendUpdate, 50)
+    return () => { window.clearTimeout(id) }
+  }, [popoutChannel, sessionId, playlist, selectedId, previewTheme, previewFontSize])
+
+  // cleanup popout channel on unmount
+  useEffect(() => {
+    return () => {
+      try { popoutChannel?.close?.() } catch (e) {}
+    }
+  }, [popoutChannel])
 
 
   const handleExitFullscreen = useCallback(() => {
@@ -473,6 +662,18 @@ export function PresenterBuilder() {
   // identifier (was `playlistSelectedIndex` before). This prevents a
   // duplicate binding error during build/transpile.
   const slidePosition = selectedIndex >= 0 ? `${selectedIndex + 1} / ${slideCount}` : null
+
+  if (isReadMode) {
+    return (
+      <ReadPresenter
+        book={currentBook}
+        chapter={currentChapter}
+        theme={theme}
+        fontSize={65}
+        onRequestClose={() => setIsReadMode(false)}
+      />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -728,6 +929,11 @@ export function PresenterBuilder() {
       ) : null}
 
       {/* Footer controls removed from bottom; controls moved above Set list per request */}
+      {toast ? (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="rounded-md bg-black/80 text-white px-4 py-2 shadow">{toast}</div>
+        </div>
+      ) : null}
     </div>
   )
 }
