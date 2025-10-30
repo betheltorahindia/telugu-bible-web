@@ -1,4 +1,5 @@
 import React from 'react'
+import { useLanguage } from '../providers/LanguageProvider'
 import type { ThemeSettings } from '../../lib/supabase/types'
 
 type ReadSlideProps = {
@@ -13,6 +14,7 @@ type ReadSlideProps = {
 }
 
 export default function ReadSlide({ verses, bookName, chapterNumber, theme, fontSize = 65 }: ReadSlideProps) {
+  const { lang } = useLanguage()
   return (
     <div
       style={{
@@ -101,10 +103,10 @@ export default function ReadSlide({ verses, bookName, chapterNumber, theme, font
               </div>
 
               {/* Verse Text */}
-                <div style={{
+              <div style={{
                 fontSize: `${fontSize}px`,
                 lineHeight: theme.lineHeight ?? 1.35,
-                fontFamily: "Dhurjati, system-ui, -apple-system",
+                fontFamily: lang === 'te' ? 'Dhurjati, system-ui, -apple-system' : undefined,
                 fontWeight: 600,
                 filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))',
                 textAlign: theme.textAlign ?? 'left',

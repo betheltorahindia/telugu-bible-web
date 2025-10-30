@@ -7,20 +7,31 @@ import Image from 'next/image'
 import ThemeToggle from './ThemeToggle'
 import BookChapterNav from './BookChapterNav'
 import MobileBookNav from './MobileBookNav'
-import { Home, Search, MonitorPlay, Menu, X } from 'lucide-react'
+import { Home, Search, MonitorPlay, Menu, X, Search as Magnify } from 'lucide-react'
+import { uiStrings } from '../lib/i18n'
+import { useLanguage } from './providers/LanguageProvider'
+import { LANG_LABELS } from '../lib/lang'
+import { useZoom } from './providers/ZoomProvider'
 
 export default function Header() {
   const pathname = usePathname() || '/'
   const showBookNav = pathname.startsWith('/book')
+  const isChapter = /^\/book\/\d+\/chapter\//.test(pathname || '')
+  const isParasha = (pathname || '').startsWith('/parasha')
+  const showZoom = isChapter || isParasha
   const isHome = pathname === '/'
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const { lang, setLang } = useLanguage()
+  const UI = uiStrings(lang)
   
 
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuPanelRef = useRef<HTMLDivElement | null>(null)
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
+  const closeMenu = () => setMenuOpen(false)
 
   useEffect(() => {
     closeMobileMenu()
@@ -59,6 +70,8 @@ export default function Header() {
   const toggleMobileMenu = () => {
     setMobileMenuOpen((prev) => !prev)
   }
+
+  const toggleMenu = () => setMenuOpen((o) => !o)
 
   // Sign in/out removed from header per request
 
@@ -104,23 +117,68 @@ export default function Header() {
         </div>
 
         <nav className="relative ml-auto flex items-center gap-2 md:gap-3">
-          <Link href="/" className="btn" title="Home">
+          <Link href="/" className="btn" title={UI.home ?? 'Home'}>
             <Home className="w-5 h-5" />
           </Link>
-          <Link href="/search" className="btn" title="Search">
+          <Link href="/search" className="btn" title={UI.search ?? 'Search'}>
             <Search className="w-5 h-5" />
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2 md:gap-3">
-            <Link
-              href="/presenter"
-              className="btn inline-flex items-center gap-2"
-              title="Build a verse presenter"
+          {/* Single menu button for all actions (desktop + mobile) */}
+          <div className="relative hidden sm:block">
+            <button
+              className="btn"
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+              onClick={toggleMenu}
+              title="Menu"
             >
-              <MonitorPlay className="w-5 h-5" />
-              <span className="font-medium">Presenter</span>
-            </Link>
-            <ThemeToggle />
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {menuOpen ? (
+              <div
+                className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95 shadow-xl p-3 flex flex-col gap-2 z-50"
+                role="menu"
+              >
+                <button
+                  className="btn w-full justify-start gap-2"
+                  onClick={() => { closeMenu(); router.push('/presenter') }}
+                >
+                  <MonitorPlay className="w-5 h-5" />
+                  <span>{UI.presenter}</span>
+                </button>
+
+                <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
+
+                {/* Language selector */}
+                <div className="px-1 pb-1 text-sm opacity-70">{UI.language}</div>
+                <div className="grid grid-cols-5 gap-1">
+                  {(['te','hi','ta','en','he'] as const).map(code => (
+                    <button
+                      key={code}
+                      className={`btn ${lang===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''}`}
+                      onClick={() => { setLang(code); closeMenu() }}
+                      title={LANG_LABELS[code].name}
+                    >
+                      {LANG_LABELS[code].glyph}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
+                <div className="flex justify-start">
+                  <ThemeToggle />
+                </div>
+
+                {/* Zoom slider (desktop menu, chapter pages only) */}
+                {showZoom && (
+                  <div className="mt-2">
+                    <ZoomSlider />
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
 
           <button
@@ -151,10 +209,33 @@ export default function Header() {
                 <span>Presenter</span>
               </Link>
 
+              {/* Language selector on mobile */}
+              <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
+                <div className="px-1 pb-1 text-sm opacity-70">{UI.language}</div>
+              <div className="grid grid-cols-5 gap-1">
+                {(['te','hi','ta','en','he'] as const).map(code => (
+                  <button
+                    key={code}
+                    className={`btn ${lang===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''}`}
+                    onClick={() => { setLang(code); closeMobileMenu() }}
+                    title={LANG_LABELS[code].name}
+                  >
+                    {LANG_LABELS[code].glyph}
+                  </button>
+                ))}
+              </div>
+
               <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
               <div className="flex justify-start">
                 <ThemeToggle />
               </div>
+
+              {/* Zoom slider (mobile menu, chapter pages only) */}
+              {showZoom && (
+                <div className="mt-2">
+                  <ZoomSlider />
+                </div>
+              )}
             </div>
           ) : null}
         </nav>
@@ -162,6 +243,64 @@ export default function Header() {
 
       {showBookNav && <MobileBookNav />}
     </header>
+  )
+}
+
+function ZoomSlider() {
+  const { level, setLevel } = useZoom()
+  // 5 positions: -2..+2
+  const idx = level + 2
+
+  const onTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const pos = Math.round((x / rect.width) * 4)
+    setLevel(pos - 2)
+  }
+
+  const onDrag = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const track = (e.currentTarget.parentElement as HTMLElement)
+    const rect = track.getBoundingClientRect()
+    const handler = (ev: PointerEvent) => {
+      const x = Math.max(0, Math.min(rect.width, ev.clientX - rect.left))
+      const pos = Math.round((x / rect.width) * 4)
+      setLevel(pos - 2)
+    }
+    const up = () => {
+      window.removeEventListener('pointermove', handler)
+      window.removeEventListener('pointerup', up)
+    }
+    window.addEventListener('pointermove', handler)
+    window.addEventListener('pointerup', up)
+  }
+
+  const percent = (idx / 4) * 100
+
+  return (
+    <div className="space-y-2">
+      <div className="text-sm opacity-70 mb-1">Zoom</div>
+      <div className="relative h-6 select-none">
+        {/* track */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 rounded-full bg-black/10 dark:bg-white/10" onClick={onTrackClick} />
+        {/* fill */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 h-2 rounded-full bg-amber-400" style={{ width: `${percent}%` }} />
+        {/* knob */}
+        <button
+          type="button"
+          onPointerDown={onDrag}
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10 shadow flex items-center justify-center active:scale-95"
+          style={{ left: `${percent}%` }}
+          aria-label="Zoom"
+        >
+          <Magnify className="w-3.5 h-3.5" />
+        </button>
+        {/* ticks */}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="absolute top-1/2 -translate-y-1/2 w-1 h-3 bg-black/20 dark:bg-white/20" style={{ left: `${(i / 4) * 100}%` }} />
+        ))}
+      </div>
+      <div className="text-xs opacity-70 text-center">{level > 0 ? `+${level}` : level}</div>
+    </div>
   )
 }
 

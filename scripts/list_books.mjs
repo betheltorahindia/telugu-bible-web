@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 
-const file = process.argv[2] || 'data/bible.json';
+const file = process.argv[2] || 'data/te.json';
 const bible = JSON.parse(await fs.readFile(file, 'utf8'));
 
 console.log('bnumber  |  bname');

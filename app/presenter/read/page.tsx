@@ -3,11 +3,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import SlideStage from '../../../components/presenter/SlideStage'
 import { normalizeTheme } from '../../../lib/presenter/theme'
-import { listVerses, getVerseText } from '../../../lib/presenter/bible'
 import { BOOK_NAMES } from '../../../lib/data/books'
-import { formatReference } from '../../../lib/presenter/bible'
+import { usePresenterBible } from '../../../components/presenter/usePresenterBible'
+import { useLanguage } from '../../../components/providers/LanguageProvider'
 
 export default function ReadPage() {
+  const bible = usePresenterBible()
+  const { lang } = useLanguage()
   const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
   const book = Number(params.get('book') ?? 1)
   const chapter = Number(params.get('chapter') ?? 1)
@@ -15,7 +17,7 @@ export default function ReadPage() {
   const themeParam = params.get('theme')
   const theme = normalizeTheme(themeParam ? JSON.parse(decodeURIComponent(themeParam)) : undefined)
 
-  const verses = useMemo(() => listVerses(book, chapter), [book, chapter])
+  const verses = useMemo(() => bible.listVerses(book, chapter), [bible, book, chapter])
 
   // slides will be array of { text, reference }
   const [slides, setSlides] = useState<Array<{text: string; reference: string}>>([])
@@ -53,8 +55,8 @@ export default function ReadPage() {
       }
 
       for (const v of verses) {
-        const verseText = getVerseText(book, chapter, v)
-    const reference = formatReference(book, chapter, v)
+        const verseText = bible.getVerseText(book, chapter, v)
+        const reference = bible.formatReference(book, chapter, v)
         // try full verse
         if (fits(verseText)) {
           results.push({ text: verseText, reference })
@@ -145,7 +147,7 @@ export default function ReadPage() {
       <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
         <div style={{ position: 'absolute', left: -9999, top: -9999 }}>
           <div style={{ width: 1920, height: 1080, padding: '32px 24px 56px 24px' }} ref={measureContainerRef}>
-            <div ref={measureContentRef} style={{ width: '100%', fontWeight: 600, whiteSpace: 'pre-wrap', fontSize: `${requestedFontSize}px`, lineHeight: theme.lineHeight ?? 1.35, fontFamily: "Dhurjati, system-ui, -apple-system" }} />
+            <div ref={measureContentRef} style={{ width: '100%', fontWeight: 600, whiteSpace: 'pre-wrap', fontSize: `${requestedFontSize}px`, lineHeight: theme.lineHeight ?? 1.35, fontFamily: lang === 'te' ? "Dhurjati, system-ui, -apple-system" : undefined }} />
           </div>
         </div>
         <div className="flex items-center justify-center h-screen">
@@ -159,7 +161,7 @@ export default function ReadPage() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: theme.gradient.style === 'radial' ? `radial-gradient(circle, ${theme.gradient.colors.join(', ')})` : `linear-gradient(${theme.gradient.angle}deg, ${theme.gradient.colors.join(', ')})` }}>
-      <div style={{ position: 'absolute', left: 24, top: 24, color: 'white', fontWeight: 600, fontSize: 20 }}>{`${BOOK_NAMES[book] ?? 'Book'} ${chapter}`}</div>
+      <div style={{ position: 'absolute', left: 24, top: 24, color: 'white', fontWeight: 600, fontSize: 20 }} dir={lang==='he'?'rtl':undefined}>{`${(bible.getBook(book)?.bname ?? BOOK_NAMES[book] ?? 'Book')} ${chapter}`}</div>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: 1920 * scale, height: 1080 * scale }}>
           <div style={{ width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: 'top left' }}>

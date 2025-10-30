@@ -5,15 +5,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { BOOK_NAMES, BOOK_ORDER_DROPDOWN, combinedBookLabel } from '../../lib/data/books'
-import {
-  formatReference,
-  getNextVerse,
-  getPreviousVerse,
-  getVerseText,
-  listChapters,
-  listVerses,
-} from '../../lib/presenter/bible'
+import { BOOK_NAMES, BOOK_ORDER_DROPDOWN, combinedBookLabel, getLocalizedBookName } from '../../lib/data/books'
+import { usePresenterBible } from './usePresenterBible'
+import { useLanguage } from '../providers/LanguageProvider'
 import { DEFAULT_THEME, GRADIENT_PRESETS, normalizeTheme } from '../../lib/presenter/theme'
 import type { ThemeSettings } from '../../lib/supabase/types'
 import { useAutoFitText } from './useAutoFitText'
@@ -46,11 +40,13 @@ function SortablePlaylistItem({
   active,
   onSelect,
   onRemove,
+  formatRef,
 }: {
   item: PlaylistItem
   active: boolean
   onSelect: () => void
   onRemove: () => void
+  formatRef: (b: number, c: number, v: number) => string
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
 
@@ -73,7 +69,7 @@ function SortablePlaylistItem({
       {...listeners}
     >
       <button type="button" onClick={onSelect} className="flex-1 text-left text-sm">
-        {formatReference(item.book, item.chapter, item.verse)}
+        {formatRef(item.book, item.chapter, item.verse)}
       </button>
       <button type="button" className="btn px-2 py-1" onClick={onRemove} aria-label="Remove from set">
         Remove
@@ -106,6 +102,8 @@ function exitFullscreen() {
 }
 
 export function PresenterBuilder() {
+  const bible = usePresenterBible()
+  const { lang } = useLanguage()
   const [theme, setTheme] = useState<ThemeSettings>(DEFAULT_THEME)
   const [playlist, setPlaylist] = useState<PlaylistItem[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -126,8 +124,8 @@ export function PresenterBuilder() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  const chapters = useMemo(() => listChapters(currentBook), [currentBook])
-  const verses = useMemo(() => listVerses(currentBook, currentChapter), [currentBook, currentChapter])
+  const chapters = useMemo(() => bible.listChapters(currentBook), [bible, currentBook])
+  const verses = useMemo(() => bible.listVerses(currentBook, currentChapter), [bible, currentBook, currentChapter])
 
   useEffect(() => {
     if (!chapters.includes(currentChapter)) {
@@ -193,21 +191,20 @@ export function PresenterBuilder() {
       verse: currentVerse,
       note: noteDraft.trim() ? noteDraft : null,
     }
-    const text = getVerseText(source.book, source.chapter, source.verse)
+    const text = bible.getVerseText(source.book, source.chapter, source.verse)
     return {
       ...source,
       text,
-      reference: formatReference(source.book, source.chapter, source.verse),
+      reference: bible.formatReference(source.book, source.chapter, source.verse),
     }
-  }, [activeSlide, currentBook, currentChapter, currentVerse, noteDraft])
+  }, [bible, activeSlide, currentBook, currentChapter, currentVerse, noteDraft])
 
   const previewFontSize = useAutoFitText({
     text: previewVerse.text,
     containerRef: previewTextContainerRef,
     contentRef: previewTextRef,
-    // prefer a large max size (80) and never go below 32
-    // Always try the intended max size of 80 first so very short verses can be large
-    baseSize: 80,
+    // Use smaller base size in preview; keep fullscreen at 80
+    baseSize: isFullscreen ? 80 : 20,
     minSize: 32,
     lineHeight: previewTheme.lineHeight,
   })
@@ -295,11 +292,11 @@ export function PresenterBuilder() {
   const handleNewSlide = useCallback(() => {
     let next: VerseRef = { book: currentBook, chapter: currentChapter, verse: currentVerse }
     if (activeSlide) {
-      const n = normalizeRef(getNextVerse(activeSlide.book, activeSlide.chapter, activeSlide.verse))
+      const n = normalizeRef(bible.getNextVerse(activeSlide.book, activeSlide.chapter, activeSlide.verse))
       if (n) next = n
     } else if (playlist.length > 0) {
       const last = playlist[playlist.length - 1]
-      const n = normalizeRef(getNextVerse(last.book, last.chapter, last.verse))
+      const n = normalizeRef(bible.getNextVerse(last.book, last.chapter, last.verse))
       if (n) next = n
     }
     setCurrentBook(next.book)
@@ -324,7 +321,7 @@ export function PresenterBuilder() {
     }
 
     // no playlist: step to previous verse
-    const prev = normalizeRef(getPreviousVerse(currentBook, currentChapter, currentVerse))
+    const prev = normalizeRef(bible.getPreviousVerse(currentBook, currentChapter, currentVerse))
     if (!prev) return
     setCurrentBook(prev.book)
     setCurrentChapter(prev.chapter)
@@ -346,7 +343,7 @@ export function PresenterBuilder() {
     }
 
     // no playlist: step to next verse
-    const nx = normalizeRef(getNextVerse(currentBook, currentChapter, currentVerse))
+    const nx = normalizeRef(bible.getNextVerse(currentBook, currentChapter, currentVerse))
     if (!nx) return
     setCurrentBook(nx.book)
     setCurrentChapter(nx.chapter)
@@ -654,8 +651,8 @@ export function PresenterBuilder() {
   }, [])
 
   const activeReference = useMemo(() => {
-    return `${formatReference(previewVerse.book, previewVerse.chapter, previewVerse.verse)}`
-  }, [previewVerse.book, previewVerse.chapter, previewVerse.verse])
+    return `${bible.formatReference(previewVerse.book, previewVerse.chapter, previewVerse.verse)}`
+  }, [bible, previewVerse.book, previewVerse.chapter, previewVerse.verse])
 
   const slideCount = playlist.length
   // reuse the `selectedIndex` computed above to avoid redefining the same
@@ -697,11 +694,14 @@ export function PresenterBuilder() {
                 onChange={(e) => setCurrentBook(Number(e.target.value))}
                 className="rounded-xl border border-black/10 dark:border-white/10 bg-white/90 dark:bg-neutral-900/80 px-3 py-2"
               >
-                {BOOK_ORDER_DROPDOWN.map((book) => (
-                  <option key={book} value={book}>
-                    {combinedBookLabel(book, BOOK_NAMES[book])}
-                  </option>
-                ))}
+                {BOOK_ORDER_DROPDOWN.map((book) => {
+                  const name = getLocalizedBookName(book, lang, bible.getBook(book)?.bname || BOOK_NAMES[book])
+                  return (
+                    <option key={book} value={book}>
+                      {combinedBookLabel(book, name, lang === 'en')}
+                    </option>
+                  )
+                })}
               </select>
             </label>
 
@@ -761,9 +761,9 @@ export function PresenterBuilder() {
                   normalizeTheme(theme).textAlign === 'center' ? 'text-center' :
                   normalizeTheme(theme).textAlign === 'right' ? 'text-right' : 'text-left',
                 )}
-                style={{ fontSize: `${previewFontSize}px`, lineHeight: normalizeTheme(theme).lineHeight, fontFamily: "Dhurjati, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" }}
+                style={{ fontSize: `${previewFontSize}px`, lineHeight: normalizeTheme(theme).lineHeight, fontFamily: lang === 'te' ? "Dhurjati, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial" : undefined }}
               >
-                {previewVerse.text || 'Select a verse to preview'}
+                {previewVerse.text}
               </div>
             </div>
             {previewVerse.note ? <p className="mt-4 text-sm opacity-80">{previewVerse.note}</p> : null}
@@ -903,6 +903,7 @@ export function PresenterBuilder() {
                           active={item.id === selectedId}
                           onSelect={() => handleSelectSlide(item.id)}
                           onRemove={() => handleRemoveSlide(item.id)}
+                          formatRef={(b,c,v)=>bible.formatReference(b,c,v)}
                         />
                       </li>
                     ))}
@@ -939,3 +940,8 @@ export function PresenterBuilder() {
 }
 
 export default PresenterBuilder
+
+
+
+
+

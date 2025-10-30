@@ -1,8 +1,10 @@
 // app/parasha/[iso]/aliyah/[idx]/page.tsx
 import dynamic from 'next/dynamic'
-import bible from '../../../../../data/bible.json'
+import { getBibleServer, getLangFromCookie } from '../../../../../lib/bibleServer'
+import { uiStrings } from '../../../../../lib/i18n'
 import { getLeyningForDate } from '../../../../../lib/api/hebcal'
 import { BOOK_NAMES_EN } from '../../../../../lib/data/books'
+import ZoomStyle from '../../../../../components/ZoomStyle'
 
 // Load the client toolbar safely (avoids server onChange errors)
 const AliyahToolbar = dynamic(
@@ -101,7 +103,7 @@ function toRange(enBook: string, b: string, e: string, label?: string): Range {
   }
 }
 
-function sliceVerses(r: Range): Verse[] {
+async function sliceVerses(r: Range, bible: any): Promise<Verse[]> {
   const book = (bible as any).books.find((x: any) => x.bnumber === r.start.bnum)
   if (!book) return []
 
@@ -134,6 +136,9 @@ export default async function AliyahPage({
 }: {
   params: { iso: string; idx: string }
 }) {
+  const bible = await getBibleServer()
+  const lang = getLangFromCookie()
+  const UI = uiStrings(lang)
   const iso = decodeURIComponent(params.iso)
   const idxStr = params.idx // "1".."7" or "H"
   const upperIdx = idxStr.toUpperCase()
@@ -165,20 +170,20 @@ export default async function AliyahPage({
       if (!seg) continue
       const range = toRange(seg.k, seg.b, seg.e, seg.label)
       if (!range.start.bnum) continue
-      sections.push({ range, verses: sliceVerses(range) })
+      sections.push({ range, verses: await sliceVerses(range, bible) })
     }
   } else if (isMaftir && data.maftir) {
     const range = toRange(data.maftir.k, data.maftir.b, data.maftir.e, data.maftir.label)
-    if (range.start.bnum) sections.push({ range, verses: sliceVerses(range) })
+    if (range.start.bnum) sections.push({ range, verses: await sliceVerses(range, bible) })
   } else if (!Number.isNaN(idxNum) && idxNum >= 1 && idxNum <= aliyot.length) {
     const a = aliyot[idxNum - 1]
     const range = toRange(a.k, a.b, a.e)
-    if (range.start.bnum) sections.push({ range, verses: sliceVerses(range) })
+    if (range.start.bnum) sections.push({ range, verses: await sliceVerses(range, bible) })
   }
 
   if (!sections.length) return <div className="card">Invalid aliyah.</div>
 
-  const baseTitle = isHaft ? 'Haftarah' : isMaftir ? 'Maftir' : `Aliyah ${aliyahLabel}`
+  const baseTitle = isHaft ? UI.haftarah : isMaftir ? UI.maftir : `${UI.aliyah} ${aliyahLabel}`
   const rangeSummary = sections.map((s) => s.range.label).filter(Boolean).join(' + ')
   const title = rangeSummary ? `${baseTitle} - ${rangeSummary}` : baseTitle
 
@@ -195,13 +200,15 @@ export default async function AliyahPage({
   const backHref = `/parasha/${data.shabbatDateISO}`
 
   const options = [
-    ...aliyot.map((_, i) => ({ value: String(i + 1), label: `Aliyah ${i + 1}` })),
-    ...(data.maftir ? [{ value: 'M', label: 'Maftir' }] : []),
-    ...(data.haftara ? [{ value: 'H', label: 'Haftarah' }] : []),
+    ...aliyot.map((_, i) => ({ value: String(i + 1), label: `${UI.aliyah} ${i + 1}` })),
+    ...(data.maftir ? [{ value: 'M', label: UI.maftir }] : []),
+    ...(data.haftara ? [{ value: 'H', label: UI.haftarah }] : []),
   ]
 
   return (
     <div className="space-y-4">
+      {/* apply zoom CSS var on client */}
+      <ZoomStyle />
       {/* Client toolbar (no server onChange errors) */}
       <AliyahToolbar
         iso={data.shabbatDateISO}
@@ -230,9 +237,9 @@ export default async function AliyahPage({
               {section.verses.length ? (
                 section.verses.map((v, verseIdx) => (
                   <div key={`${sectionIdx}-${verseIdx}`} className="card">
-                    <div className="flex items-start gap-3">
+                    <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                       <span className="badge">{badgeLabel(v)}</span>
-                      <div className="leading-relaxed">{v.text}</div>
+                      <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined} style={{ fontSize: 'calc(1em + var(--chapter-zoom, 0px))' }}>{v.text}</div>
                     </div>
                   </div>
                 ))

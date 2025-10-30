@@ -1,10 +1,11 @@
 'use client'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import bible from '../data/bible.json'
-import { BOOK_ORDER_DROPDOWN, combinedBookLabel } from '../lib/data/books'
+import { useBible } from './providers/LanguageProvider'
+import { BOOK_ORDER_DROPDOWN, combinedBookLabel, getLocalizedBookName } from '../lib/data/books'
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getPsalmCategoryOrder } from '../lib/data/psalmCategories'
+import { useLanguage } from './providers/LanguageProvider'
 
 type B = { bnumber: number; bname: string; chapters: { cnumber: number }[] }
 
@@ -50,6 +51,7 @@ export default function BookChapterNav() {
 
   const params = useParams() as any
   const search = useSearchParams()
+  const { lang } = useLanguage()
 
   const b = params?.bnumber ? Number(params.bnumber) : undefined
   const c = params?.cnumber ? Number(params.cnumber) : undefined
@@ -58,7 +60,8 @@ export default function BookChapterNav() {
   const mode = search?.get('mode') || null            // 'parashot' | 'categories' | null
   const cat  = search?.get('cat')  || null            // only when mode === 'categories'
 
-  const allBooks: B[] = (bible as any).books ?? []
+  const bible = useBible()
+  const allBooks: B[] = (bible as any)?.books ?? []
   const order = BOOK_ORDER_DROPDOWN.filter(bn => allBooks.some(x => x.bnumber === bn))
 
   const currentBook = allBooks.find(x => x.bnumber === b)
@@ -163,7 +166,7 @@ export default function BookChapterNav() {
           aria-expanded={bookOpen}
           title="Select Book"
         >
-          {combinedBookLabel(b ?? order[0], currentBook?.bname)}
+          {combinedBookLabel(b ?? order[0], getLocalizedBookName(b ?? order[0], lang, currentBook?.bname), lang === 'en')}
           <ChevronDown className="w-4 h-4 opacity-70" />
         </button>
       </div>
@@ -212,6 +215,7 @@ export default function BookChapterNav() {
           <ul className="space-y-1">
             {order.map(bn => {
               const isActive = bn === b
+              const name = getLocalizedBookName(bn, lang, allBooks.find(x => x.bnumber === bn)?.bname)
               return (
                 <li key={bn}>
                   <button
@@ -222,7 +226,7 @@ export default function BookChapterNav() {
                     }`}
                     onClick={() => goBook(bn)}
                   >
-                    {combinedBookLabel(bn)}
+                    {combinedBookLabel(bn, name, lang === 'en')}
                   </button>
                 </li>
               )

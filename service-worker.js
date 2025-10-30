@@ -42,7 +42,7 @@ registerRoute(
 
 // 2) Bible JSON: Cache-First (never blocked offline)
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/data/bible.json'),
+  ({ url }) => url.pathname.startsWith('/data/') && url.pathname.endsWith('.json'),
   new CacheFirst({ cacheName: 'bible-json' })
 )
 

@@ -4,7 +4,8 @@ import path from 'node:path'
 
 async function main() {
   const root = process.cwd()
-  const biblePath = path.join(root, 'data', 'bible.json')
+  // Use Telugu data as the canonical structure for warm URLs
+  const biblePath = path.join(root, 'data', 'te.json')
   const outPath = path.join(root, 'public', 'warm-urls.json')
 
   const raw = await fs.readFile(biblePath, 'utf8')

@@ -1,13 +1,16 @@
 // app/page.tsx
 import Link from 'next/link'
-import { HOME_SECTIONS, BOOK_NAMES } from '../lib/data/books'
+import { HOME_SECTIONS, BOOK_NAMES, getLocalizedBookName } from '../lib/data/books'
 import Footer from '../components/footer'
 import InstallFAB from '../components/InstallFAB'
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import { getBibleServer } from '../lib/bibleServer'
 
 // ✅ Weekly Parasha teaser
 import ParashaTeaser from '../components/ParashaTeaser'
+import { getLangFromCookie } from '../lib/bibleServer'
+import { uiStrings } from '../lib/i18n'
 
 // ✅ Home page SEO metadata
 export const metadata = {
@@ -90,7 +93,10 @@ export const metadata = {
   alternates: { canonical: '/' },
 }
 
-export default function Home() {
+export default async function Home() {
+  const bible = await getBibleServer()
+  const lang = getLangFromCookie()
+  const UI = uiStrings(lang)
   return (
     <div className="space-y-8 pb-12">
       {/* Weekly Parasha / Haftarah teaser */}
@@ -100,18 +106,21 @@ export default function Home() {
       {HOME_SECTIONS.map((sec) => (
         <section key={sec.key} id={sec.label}>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-semibold">{sec.label}</h2>
+            <h2 className="text-xl font-semibold">{UI.divisions[sec.key as keyof typeof UI.divisions]}</h2>
           </div>
           <div className="card">
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-              {sec.order.map((bnum) => (
-                <Link key={bnum} href={`/book/${bnum}`} className="btn btn-book">
-                  {BOOK_NAMES[bnum] ?? `Book ${bnum}`}
-                </Link>
-              ))}
-            </div>
+              {sec.order.map((bnum) => {
+                const bname = getLocalizedBookName(bnum, lang, (bible as any)?.books?.find((b:any)=>b.bnumber===bnum)?.bname)
+                return (
+                  <Link key={bnum} href={`/book/${bnum}`} className="btn btn-book">
+                    {bname ?? BOOK_NAMES[bnum] ?? `Book ${bnum}`}
+                  </Link>
+                )
+              })}
           </div>
-        </section>
+        </div>
+      </section>
       ))}
 
       <Footer />

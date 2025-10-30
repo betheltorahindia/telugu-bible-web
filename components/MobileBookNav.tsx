@@ -1,10 +1,11 @@
 'use client'
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
-import bible from '../data/bible.json'
-import { BOOK_ORDER_DROPDOWN, BOOK_NAMES, combinedBookLabel } from '../lib/data/books'
+import { useBible } from './providers/LanguageProvider'
+import { BOOK_ORDER_DROPDOWN, BOOK_NAMES, combinedBookLabel, getLocalizedBookName } from '../lib/data/books'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getPsalmCategoryOrder } from '../lib/data/psalmCategories'
+import { useLanguage } from './providers/LanguageProvider'
 
 export default function MobileBookNav() {
   const router = useRouter()
@@ -14,6 +15,7 @@ export default function MobileBookNav() {
 
   const params = useParams() as any
   const search = useSearchParams()
+  const { lang } = useLanguage()
 
   const b = params?.bnumber ? Number(params.bnumber) : undefined
   const c = params?.cnumber ? Number(params.cnumber) : undefined
@@ -22,7 +24,8 @@ export default function MobileBookNav() {
   const mode = search?.get('mode') || null            // 'parashot' | 'categories' | null
   const cat  = search?.get('cat')  || null            // only when mode === 'categories'
 
-  const allBooks = (bible as any).books ?? []
+  const bible = useBible()
+  const allBooks = (bible as any)?.books ?? []
   const order = useMemo(
     () => BOOK_ORDER_DROPDOWN.filter(bn => allBooks.some(x => x.bnumber === bn)),
     [allBooks]
@@ -91,11 +94,14 @@ export default function MobileBookNav() {
             value={b ?? order[0]}
             onChange={(e)=>changeBook(e.target.value)}
           >
-            {order.map((bn)=>(
-              <option key={bn} value={bn}>
-                {combinedBookLabel(bn, BOOK_NAMES[bn])}
-              </option>
-            ))}
+            {order.map((bn)=>{
+              const name = getLocalizedBookName(bn, lang, allBooks.find((x:any)=>x.bnumber===bn)?.bname)
+              return (
+                <option key={bn} value={bn}>
+                  {combinedBookLabel(bn, name, lang === 'en')}
+                </option>
+              )
+            })}
           </select>
         </div>
 

@@ -1,19 +1,24 @@
 'use client'
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
-import bible from '../../../data/bible.json'
-import { BOOK_NAMES, DIVISION_BOOKS } from '../../../lib/data/books'
+import { useBible } from '../../../components/providers/LanguageProvider'
+import { BOOK_NAMES, DIVISION_BOOKS, getLocalizedBookName } from '../../../lib/data/books'
 import { PARASHIYOT } from '../../../lib/data/parashiyot'
 import { useMemo, useState, useEffect } from 'react'
 import { PSALM_CATEGORIES } from '../../../lib/data/psalmCategories'
+import { useLanguage } from '../../../components/providers/LanguageProvider'
+import { uiStrings } from '../../../lib/i18n'
 
 export default function BookPage() {
   // Keep this simple & robust
   const params = useParams() as { [key: string]: string }
   const search = useSearchParams()
+  const bible = useBible()
+  const { lang } = useLanguage()
+  const UI = uiStrings(lang)
 
   const bnum = Number(params.bnumber)
-  const book = (bible as any).books?.find((b: any) => b.bnumber === bnum)
+  const book = (bible as any)?.books?.find((b: any) => b.bnumber === bnum)
 
   // Modes:
   // - 'parashot' is only used/shown for Torah
@@ -45,25 +50,25 @@ export default function BookPage() {
     <div className="space-y-4">
       {/* Title + toggles (Torah/Psalms only) */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-semibold">{BOOK_NAMES[bnum] ?? book.bname}</h1>
+        <h1 className="text-2xl font-semibold">{getLocalizedBookName(bnum, lang, book.bname)}</h1>
 
         {/* Torah toggle */}
         {isTorah && (
           <div className="flex items-center gap-2 overflow-x-auto flex-nowrap -mx-1 px-1">
-            <span className="badge shrink-0">అధ్యాయాలు / పరాషాలు</span>
+            <span className="badge shrink-0">{UI.chapters} / {UI.parashiyot}</span>
             <div className="btn shrink-0">
               <button
                 onClick={() => setMode('chapters')}
                 className={mode === 'chapters' ? 'font-semibold' : ''}
               >
-                అధ్యాయాలు
+                {UI.chapters}
               </button>
               <span className="mx-1">|</span>
               <button
                 onClick={() => setMode('parashot')}
                 className={mode === 'parashot' ? 'font-semibold' : ''}
               >
-                పరాషాలు
+                {UI.parashiyot}
               </button>
             </div>
           </div>
@@ -77,14 +82,14 @@ export default function BookPage() {
                 onClick={() => setMode('chapters')}
                 className={mode === 'chapters' ? 'font-semibold' : ''}
               >
-                అధ్యాయాలు
+                {UI.chapters}
               </button>
               <span className="mx-1">|</span>
               <button
                 onClick={() => setMode('categories')}
                 className={mode === 'categories' ? 'font-semibold' : ''}
               >
-                వివిధ సందర్భాలు
+                {UI.categories}
               </button>
             </div>
           </div>
@@ -127,7 +132,7 @@ export default function BookPage() {
                     className="btn btn-chip"
                     href={`/book/${a.b}/chapter/${a.c}?mode=parashot#v${a.v}`}
                   >
-                    {idx + 1} అలియా
+                    {idx + 1} {UI.aliyah}
                   </Link>
                 ))}
               </div>
@@ -161,3 +166,4 @@ export default function BookPage() {
     </div>
   )
 }
+

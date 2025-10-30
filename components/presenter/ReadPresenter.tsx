@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { getVerseText, getChapterCount } from '../../lib/presenter/bible'
-import { BOOK_NAMES } from '../../lib/data/books'
+import { usePresenterBible } from './usePresenterBible'
+import { useLanguage } from '../providers/LanguageProvider'
 import type { ThemeSettings } from '../../lib/supabase/types'
 import ReadSlide from './ReadSlide'
 
@@ -70,6 +70,8 @@ function groupVersesIntoSlides(verses: VerseContent[], maxHeight: number, fontSi
 }
 
 export default function ReadPresenter({ book, chapter, theme, fontSize = 65, onRequestClose }: ReadPresenterProps) {
+  const bible = usePresenterBible()
+  const { lang } = useLanguage()
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [measureContainer, setMeasureContainer] = useState<HTMLDivElement | null>(null)
   const [scale, setScale] = useState(1)
@@ -80,12 +82,12 @@ export default function ReadPresenter({ book, chapter, theme, fontSize = 65, onR
   // through subsequent chapters in the book. Each new chapter begins on a new slide.
   const collected = useMemo(() => {
     const out: { book: number; chapter: number; verses: VerseContent[] }[] = []
-    const chapterCount = getChapterCount(book)
+    const chapterCount = bible.getChapterCount(book)
     for (let c = chapter; c <= chapterCount; c++) {
       const verses: VerseContent[] = []
       let v = 1
       while (true) {
-        const text = getVerseText(book, c, v)
+        const text = bible.getVerseText(book, c, v)
         if (!text) break
         verses.push({ text, number: v })
         v++
@@ -93,7 +95,7 @@ export default function ReadPresenter({ book, chapter, theme, fontSize = 65, onR
       out.push({ book, chapter: c, verses })
     }
     return out
-  }, [book, chapter])
+  }, [bible, book, chapter])
 
   // Group collected verses into slides using measurement container.
   useEffect(() => {
@@ -247,7 +249,7 @@ export default function ReadPresenter({ book, chapter, theme, fontSize = 65, onR
           >
           <ReadSlide
             verses={active?.verses ?? []}
-            bookName={BOOK_NAMES[active?.book - 1]}
+            bookName={bible.getBook(active?.book ?? book)?.bname}
             chapterNumber={active?.chapter ?? chapter}
             theme={theme}
             fontSize={fontSize}

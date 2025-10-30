@@ -1,8 +1,15 @@
 // components/ParashaTeaser.tsx
 import { Calendar } from 'lucide-react'
 import { getWeeklyLeyning } from '../lib/api/hebcal'
+import { use } from 'react'
+import { getLangFromCookie } from '../lib/bibleServer'
+import { LANG_LABELS } from '../lib/lang'
+import { uiStrings } from '../lib/i18n'
 
 export default async function ParashaTeaser() {
+  const lang = getLangFromCookie()
+  const locale = LANG_LABELS[lang]?.locale || 'en-US'
+  const UI = uiStrings(lang)
   // Get all leyning items in the next 7 days (festivals + shabbat)
   const items = await getWeeklyLeyning()
 
@@ -12,7 +19,7 @@ export default async function ParashaTeaser() {
   return (
     <>
       {items.map((it, idx) => {
-        const dateLabel = new Date(it.isoDate).toLocaleDateString('te-IN', {
+        const dateLabel = new Date(it.isoDate).toLocaleDateString(locale, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',
@@ -34,7 +41,7 @@ export default async function ParashaTeaser() {
                 </div>
 
                 <h3 className="text-lg font-semibold">
-                  {it.titleEn ?? 'Reading'}
+                  {it.titleEn ?? UI.reading}
                   {it.titleHe ? ` / ${it.titleHe}` : ''}
                 </h3>
 
@@ -46,7 +53,7 @@ export default async function ParashaTeaser() {
                       className="btn btn-chip"
                       title={`${a.k} ${a.b}-${a.e}`}
                     >
-                      Aliyah {a.n}
+                      {UI.aliyah} {a.n}
                     </a>
                   ))}
 
@@ -56,7 +63,7 @@ export default async function ParashaTeaser() {
                       href={`/parasha/${it.isoDate}/aliyah/M`}
                       title={it.maftir.label}
                     >
-                      Maftir
+                      {UI.maftir}
                     </a>
                   )}
                   {hasHaftarah && (
@@ -66,10 +73,10 @@ export default async function ParashaTeaser() {
                       title={
                         it.haftaraSegments && it.haftaraSegments.length > 1
                           ? it.haftaraSegments.map((seg) => seg.label).join(' + ')
-                          : it.haftara?.label ?? 'Haftarah'
+                          : it.haftara?.label ?? UI.haftarah
                       }
                     >
-                      Haftarah
+                      {UI.haftarah}
                     </a>
                   )}
                 </div>

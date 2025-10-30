@@ -2,11 +2,15 @@
 import Header from '../components/Header'
 import { SupabaseProvider } from '../components/providers/SupabaseProvider'
 import { QueryProvider } from '../components/providers/QueryProvider'
-import { Noto_Sans_Telugu } from 'next/font/google'
+import { Noto_Sans_Telugu, Noto_Sans_Tamil, Tiro_Devanagari_Hindi, Frank_Ruhl_Libre } from 'next/font/google'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import { LanguageProvider } from '../components/providers/LanguageProvider'
+import { ZoomProvider } from '../components/providers/ZoomProvider'
+import { getLangFromCookie } from '../lib/bibleServer'
+import type { LangCode } from '../lib/lang'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/'),
@@ -63,11 +67,38 @@ const notoTelugu = Noto_Sans_Telugu({
   display: 'swap',
 })
 
+const notoTamil = Noto_Sans_Tamil({
+  subsets: ['tamil'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+})
+
+const tiroHindi = Tiro_Devanagari_Hindi({
+  subsets: ['devanagari'],
+  weight: ['400'],
+  display: 'swap',
+})
+
+const frankHebrew = Frank_Ruhl_Libre({
+  subsets: ['hebrew'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+})
+
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const initialSession: Session | null = null
+  const lang: LangCode = getLangFromCookie()
+
+  // Fonts: Telugu + English keep current (Telugu font class).
+  // Hindi/Tamil use Noto Sans; Hebrew uses Frank Ruhl Libre globally.
+  const fontClass =
+    lang === 'hi' ? tiroHindi.className :
+    lang === 'ta' ? notoTamil.className :
+    lang === 'he' ? frankHebrew.className :
+    notoTelugu.className
 
   return (
-    <html lang="te" className={notoTelugu.className}>
+    <html lang={lang} className={`${fontClass} ${lang === 'he' ? 'hebrew-boost' : ''}`}>
       <head>
         {/* Apple icons (optional but fine to keep) */}
         <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
@@ -99,9 +130,13 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <SupabaseProvider initialSession={initialSession}>
           <QueryProvider>
-            <Header />
-            {/* keep content below the fixed header */}
-            <main className="container mt-20 pb-6">{children}</main>
+            <LanguageProvider initialLang={lang}>
+              <ZoomProvider>
+                <Header />
+                {/* keep content below the fixed header */}
+                <main className="container mt-20 pb-6">{children}</main>
+              </ZoomProvider>
+            </LanguageProvider>
           </QueryProvider>
         </SupabaseProvider>
         <SpeedInsights />

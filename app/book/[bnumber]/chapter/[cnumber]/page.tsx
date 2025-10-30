@@ -1,8 +1,12 @@
-'use client'
+"use client"
+
 import Link from 'next/link'
 import { useParams, useSearchParams } from 'next/navigation'
-import bible from '../../../../../data/bible.json'
-import { BOOK_NAMES } from '../../../../../lib/data/books'
+import { useBible } from '../../../../../components/providers/LanguageProvider'
+import { useLanguage } from '../../../../../components/providers/LanguageProvider'
+import { uiStrings } from '../../../../../lib/i18n'
+import { useZoom } from '../../../../../components/providers/ZoomProvider'
+import { getLocalizedBookName } from '../../../../../lib/data/books'
 import { PARASHIYOT, aliyahStartSet, aliyahId } from '../../../../../lib/data/parashiyot'
 import { useEffect, useMemo } from 'react'
 import { ChevronLeft } from 'lucide-react'
@@ -10,6 +14,11 @@ import { ChevronLeft } from 'lucide-react'
 export default function ChapterPage() {
   const params = useParams<{ bnumber: string, cnumber: string }>()
   const search = useSearchParams()
+  const bible = useBible()
+  const { lang } = useLanguage()
+  const UI = uiStrings(lang)
+  const { level } = useZoom()
+  const fontAdjust = `calc(1em + ${level * 2}px)`
 
   const b = parseInt(params.bnumber)
   const c = parseInt(params.cnumber)
@@ -17,7 +26,7 @@ export default function ChapterPage() {
   const mode = search?.get('mode') || null
   const cat  = search?.get('cat')  || null
 
-  const book = (bible as any).books?.find((x: any) => x.bnumber === b)
+  const book = (bible as any)?.books?.find((x: any) => x.bnumber === b)
   const chapter = book?.chapters?.find((x: any) => x.cnumber === c)
 
   let backHref = `/book/${b}`
@@ -45,14 +54,14 @@ export default function ChapterPage() {
     }
   }, [])
 
-  if (!book || !chapter) return <div>డేటా లేదు (తర్వాత XML నుంచి వస్తుంది).</div>
+  if (!book || !chapter) return <div>Chapter unavailable.</div>
 
   return (
     <div className="space-y-4 relative">
       {/* Back button at top-left, under header */}
       <Link
         href={backHref}
-        title="పుస్తకానికి వెనుకకు"
+        title="Back"
         className="
           fixed top-25 left-4 z-50
           w-9 h-9 rounded-full
@@ -66,7 +75,7 @@ export default function ChapterPage() {
 
       {/* Chapter title */}
       <h1 className="text-xl font-semibold text-center">
-        {BOOK_NAMES[b] ?? book.bname} {c}
+        {getLocalizedBookName(b, lang, book.bname)} {c}
       </h1>
 
       <div className="space-y-2">
@@ -78,13 +87,13 @@ export default function ChapterPage() {
 
           return (
             <div key={id} id={id} className="card">
-              <div className="flex items-start gap-3">
+              <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                 <span className="badge">{v.vnumber}</span>
-                <div className="leading-relaxed">
-                  <span>{v.text}</span>
+                <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined}>
+                  <span style={{ fontSize: fontAdjust }}>{v.text}</span>
                   {isAliyahStart && (
-                    <span className="ml-2 badge-aliyah">
-                      ▸ అలియా {aliyahNumber}
+                    <span className={`${lang === 'he' ? 'mr-2' : 'ml-2'} badge-aliyah`}>
+                      {UI.aliyah} {aliyahNumber}
                     </span>
                   )}
                 </div>

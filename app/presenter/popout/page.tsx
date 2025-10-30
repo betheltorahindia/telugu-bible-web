@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { normalizeTheme } from '../../../lib/presenter/theme'
 import SlideStage from '../../../components/presenter/SlideStage'
 import { useAutoFitText } from '../../../components/presenter/useAutoFitText'
+import { useLanguage } from '../../../components/providers/LanguageProvider'
 
 type ChannelLike = {
   postMessage: (data: unknown) => void
@@ -42,6 +43,7 @@ function createChannel(sid: string): ChannelLike | BroadcastChannel {
 }
 
 export default function PopoutPage() {
+  const { lang } = useLanguage()
   const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
   const sessionId = params.get('sessionId')
   const role = params.get('role') || 'display'
@@ -150,7 +152,7 @@ export default function PopoutPage() {
     const thumbSize = (state?.fontSize as number) ?? 80
 
     return (
-      <div style={{ padding: 16, fontFamily: "Dhurjati, system-ui, -apple-system", maxWidth: '100vw', height: '100vh', overflow: 'auto', background: '#1a1a1a', color: '#fff' }}>
+      <div style={{ padding: 16, fontFamily: lang === 'te' ? "Dhurjati, system-ui, -apple-system" : undefined, maxWidth: '100vw', height: '100vh', overflow: 'auto', background: '#1a1a1a', color: '#fff' }}>
         <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
           {/* Current slide preview */}
           <div style={{ flex: '2', background: '#000', borderRadius: 12, padding: 8, boxShadow: '0 6px 20px rgba(0,0,0,0.4)' }}>
