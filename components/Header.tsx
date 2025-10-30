@@ -7,7 +7,7 @@ import Image from 'next/image'
 import ThemeToggle from './ThemeToggle'
 import BookChapterNav from './BookChapterNav'
 import MobileBookNav from './MobileBookNav'
-import { Home, Search, MonitorPlay, Menu, X, Search as Magnify } from 'lucide-react'
+import { Home, Search, MonitorPlay, Menu, X, Plus, Minus } from 'lucide-react'
 import { uiStrings } from '../lib/i18n'
 import { useLanguage } from './providers/LanguageProvider'
 import { LANG_LABELS } from '../lib/lang'
@@ -248,58 +248,36 @@ export default function Header() {
 
 function ZoomSlider() {
   const { level, setLevel } = useZoom()
-  // 5 positions: -2..+2
-  const idx = level + 2
+  // 5 steps mapped to 0,25,50,75,100%
+  const percents = [0, 25, 50, 75, 100]
+  const idx = Math.max(0, Math.min(4, level + 2))
+  const percent = percents[idx]
 
-  const onTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const pos = Math.round((x / rect.width) * 4)
-    setLevel(pos - 2)
-  }
-
-  const onDrag = (e: React.PointerEvent<HTMLButtonElement>) => {
-    const track = (e.currentTarget.parentElement as HTMLElement)
-    const rect = track.getBoundingClientRect()
-    const handler = (ev: PointerEvent) => {
-      const x = Math.max(0, Math.min(rect.width, ev.clientX - rect.left))
-      const pos = Math.round((x / rect.width) * 4)
-      setLevel(pos - 2)
-    }
-    const up = () => {
-      window.removeEventListener('pointermove', handler)
-      window.removeEventListener('pointerup', up)
-    }
-    window.addEventListener('pointermove', handler)
-    window.addEventListener('pointerup', up)
-  }
-
-  const percent = (idx / 4) * 100
+  const inc = () => setLevel(level + 1)
+  const dec = () => setLevel(level - 1)
 
   return (
     <div className="space-y-2">
-      <div className="text-sm opacity-70 mb-1">Zoom</div>
-      <div className="relative h-6 select-none">
-        {/* track */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 rounded-full bg-black/10 dark:bg-white/10" onClick={onTrackClick} />
-        {/* fill */}
-        <div className="absolute top-1/2 -translate-y-1/2 left-0 h-2 rounded-full bg-amber-400" style={{ width: `${percent}%` }} />
-        {/* knob */}
+      <div className="text-sm opacity-70 mb-1 text-center">Zoom</div>
+      <div className="flex items-center justify-center gap-2">
         <button
           type="button"
-          onPointerDown={onDrag}
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-neutral-800 border border-black/10 dark:border-white/10 shadow flex items-center justify-center active:scale-95"
-          style={{ left: `${percent}%` }}
-          aria-label="Zoom"
+          className={`btn btn-chip ${level <= -2 ? 'opacity-50 pointer-events-none' : ''}`}
+          onClick={dec}
+          aria-label="Zoom out"
         >
-          <Magnify className="w-3.5 h-3.5" />
+          <Minus className="w-4 h-4" />
         </button>
-        {/* ticks */}
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="absolute top-1/2 -translate-y-1/2 w-1 h-3 bg-black/20 dark:bg-white/20" style={{ left: `${(i / 4) * 100}%` }} />
-        ))}
+        <div className="min-w-[64px] text-center font-semibold select-none">{percent}%</div>
+        <button
+          type="button"
+          className={`btn btn-chip ${level >= 2 ? 'opacity-50 pointer-events-none' : ''}`}
+          onClick={inc}
+          aria-label="Zoom in"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
       </div>
-      <div className="text-xs opacity-70 text-center">{level > 0 ? `+${level}` : level}</div>
     </div>
   )
 }
