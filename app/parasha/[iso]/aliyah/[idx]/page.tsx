@@ -239,7 +239,7 @@ export default async function AliyahPage({
                   <div key={`${sectionIdx}-${verseIdx}`} className="card">
                     <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                       <span className="badge">{badgeLabel(v)}</span>
-                      <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined} style={{ fontSize: 'calc(1em + var(--chapter-zoom, 0px))' }}>{v.text}</div>
+                      <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined} style={{ fontSize: `calc(1em + var(--chapter-zoom, 0px) + ${lang === 'he' ? '4px' : '0px'})` }}>{v.text}</div>
                     </div>
                   </div>
                 ))

@@ -52,7 +52,7 @@ export default function SlideStage({ text, reference, theme, fontSize, container
       <div style={{ position: 'absolute', inset: 0, background: 'transparent' }} />
       <div style={{ position: 'relative', zIndex: 10, height: '100%', width: '100%', display: 'flex', flexDirection: 'column', paddingLeft, paddingRight, paddingTop, paddingBottom, color: 'white' }}>
         <div ref={containerRef} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: defaultTextAlign === 'center' ? 'center' : defaultTextAlign === 'right' ? 'flex-end' : 'flex-start', width: '100%' }}>
-          <div ref={contentRef} style={{ width: '100%', fontWeight: 600, textAlign: defaultTextAlign, whiteSpace: 'pre-wrap', filter: 'drop-shadow(0 6px 8px rgba(0,0,0,0.4))', fontSize: `${fontSize}px`, lineHeight: theme.lineHeight ?? 1.35, fontFamily: lang === 'te' ? (theme.fontFamily ?? "Dhurjati, system-ui, -apple-system") : theme.fontFamily }} dir={lang === 'he' ? 'rtl' : undefined}>
+          <div ref={contentRef} style={{ width: '100%', fontWeight: 600, textAlign: defaultTextAlign, whiteSpace: 'pre-wrap', filter: 'drop-shadow(0 6px 8px rgba(0,0,0,0.4))', fontSize: `${fontSize + (lang === 'he' ? 4 : 0)}px`, lineHeight: theme.lineHeight ?? 1.35, fontFamily: lang === 'te' ? (theme.fontFamily ?? "Dhurjati, system-ui, -apple-system") : theme.fontFamily }} dir={lang === 'he' ? 'rtl' : undefined}>
             {text}
           </div>
         </div>

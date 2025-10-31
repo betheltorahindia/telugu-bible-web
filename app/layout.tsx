@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     notoTelugu.className
 
   return (
-    <html lang={lang} className={`${fontClass} ${lang === 'he' ? 'hebrew-boost' : ''}`}>
+    <html lang={lang} className={fontClass}>
       <head>
         {/* Apple icons (optional but fine to keep) */}
         <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />

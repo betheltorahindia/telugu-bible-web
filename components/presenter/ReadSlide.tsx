@@ -104,7 +104,7 @@ export default function ReadSlide({ verses, bookName, chapterNumber, theme, font
 
               {/* Verse Text */}
               <div style={{
-                fontSize: `${fontSize}px`,
+                fontSize: `${fontSize + (lang === 'he' ? 4 : 0)}px`,
                 lineHeight: theme.lineHeight ?? 1.35,
                 fontFamily: lang === 'te' ? 'Dhurjati, system-ui, -apple-system' : undefined,
                 fontWeight: 600,

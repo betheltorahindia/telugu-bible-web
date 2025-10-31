@@ -18,7 +18,7 @@ export default function ChapterPage() {
   const { lang } = useLanguage()
   const UI = uiStrings(lang)
   const { level } = useZoom()
-  const fontAdjust = `calc(1em + ${level * 2}px)`
+  const fontAdjust = `calc(1em + ${level * 2}px + ${lang === 'he' ? 4 : 0}px)`
 
   const b = parseInt(params.bnumber)
   const c = parseInt(params.cnumber)
