@@ -12,6 +12,8 @@ import { uiStrings } from '../lib/i18n'
 import { useLanguage } from './providers/LanguageProvider'
 import { LANG_LABELS } from '../lib/lang'
 import { useZoom } from './providers/ZoomProvider'
+import { useParallel } from './providers/ParallelProvider'
+import type { LangCode } from '../lib/lang'
 
 export default function Header() {
   const pathname = usePathname() || '/'
@@ -25,6 +27,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { lang, setLang } = useLanguage()
   const UI = uiStrings(lang)
+  const { parallel, setParallel } = useParallel()
   
 
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -177,6 +180,25 @@ export default function Header() {
                     <ZoomSlider />
                   </div>
                 )}
+
+                {/* Parallel selector */}
+                {showZoom && (
+                  <div className="mt-2">
+                    <div className="px-1 pb-1 text-sm opacity-70">Parallel</div>
+                    <div className="grid grid-cols-5 gap-1">
+                      {(['te','hi','ta','en','he'] as LangCode[]).map(code => (
+                        <button
+                          key={code}
+                          className={`btn ${parallel===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''} ${code===lang ? 'opacity-50 pointer-events-none' : ''}`}
+                          onClick={() => { setParallel(parallel===code ? null : code) }}
+                          title={`Parallel ${code.toUpperCase()}`}
+                        >
+                          {LANG_LABELS[code].glyph}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : null}
           </div>
@@ -234,6 +256,25 @@ export default function Header() {
               {showZoom && (
                 <div className="mt-2">
                   <ZoomSlider />
+                </div>
+              )}
+
+              {/* Parallel selector (mobile) */}
+              {showZoom && (
+                <div className="mt-2">
+                  <div className="px-1 pb-1 text-sm opacity-70">Parallel</div>
+                  <div className="grid grid-cols-5 gap-1">
+                    {(['te','hi','ta','en','he'] as LangCode[]).map(code => (
+                      <button
+                        key={code}
+                        className={`btn ${parallel===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''} ${code===lang ? 'opacity-50 pointer-events-none' : ''}`}
+                        onClick={() => { setParallel(parallel===code ? null : code); closeMobileMenu() }}
+                        title={`Parallel ${code.toUpperCase()}`}
+                      >
+                        {LANG_LABELS[code].glyph}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

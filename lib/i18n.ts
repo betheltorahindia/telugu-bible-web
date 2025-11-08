@@ -33,7 +33,7 @@ const STRINGS: Record<LangCode, UI> = {
   te: {
     chapters: 'అధ్యాయాలు',
     parashiyot: 'పరాషోత్',
-    categories: 'వర్గాలు',
+    categories: 'వివిధ సందర్భాలు',
     aliyah: 'అలియా',
     home: 'Home',
     search: 'శోధన',

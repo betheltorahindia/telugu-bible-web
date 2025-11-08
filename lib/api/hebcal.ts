@@ -103,6 +103,48 @@ function normalizeHaft(haft: LeyningItem['haft'], fallbackLabel?: string): Hafta
   return normalizeHaftSegments(haft, fallbackLabel)[0];
 }
 
+// Variant that respects a chosen tradition. When trad='sef', prefer item.seph.
+// When trad='ash', ignore item.seph and use standard haft entries.
+function normalizeHaftSegmentsByTrad(
+  haft: LeyningItem['haft'],
+  fallbackLabel: string | undefined,
+  item: LeyningItem | undefined,
+  trad: 'ash' | 'sef'
+): HaftaraSegment[] {
+  if (!haft && trad === 'sef' && item?.seph && item.seph.k && item.seph.b && item.seph.e) {
+    return [{
+      k: item.seph.k,
+      b: item.seph.b,
+      e: item.seph.e,
+      label: item.sephardic || `${item.seph.k} ${item.seph.b}-${item.seph.e}`,
+    }];
+  }
+
+  if (trad === 'sef' && item?.seph && item.seph.k && item.seph.b && item.seph.e) {
+    return [{
+      k: item.seph.k,
+      b: item.seph.b,
+      e: item.seph.e,
+      label: item.sephardic || `${item.seph.k} ${item.seph.b}-${item.seph.e}`,
+    }];
+  }
+
+  // Fallback to regular haft if no Sephardic reading or if Ashkenazi selected
+  if (!haft) return [];
+  const entries = Array.isArray(haft) ? haft : [haft];
+  const segments: HaftaraSegment[] = [];
+  entries.forEach((entry, idx) => {
+    if (!entry || !entry.k || !entry.b || !entry.e) return;
+    segments.push({
+      k: entry.k,
+      b: entry.b,
+      e: entry.e,
+      label: idx === 0 && fallbackLabel ? fallbackLabel : `${entry.k} ${entry.b}-${entry.e}`,
+    });
+  });
+  return segments;
+}
+
 function mapItemToWeekly(it: LeyningItem, kind: 'festival'|'shabbat'): WeeklyItem | null {
   if (!it.fullkriyah) return null;
 
@@ -260,6 +302,69 @@ type NextFetchOptions = RequestInit & {
   next?: {
     revalidate?: number | false
     tags?: string[]
+  }
+}
+
+/**
+ * Fetch leyning for a specific date with an explicit tradition for Haftarah.
+ * - trad 'sef' => Sephardic (custom=seph) and prefer root-level seph fields
+ * - trad 'ash' => Ashkenazi (default API; ignore root-level seph)
+ */
+export async function getLeyningForDateByTrad(
+  isoDate: string,
+  trad: 'ash' | 'sef'
+): Promise<UpcomingShabbat | null> {
+  const start = isoDate.slice(0, 10);
+  const customParam = trad === 'sef' ? '&custom=seph' : '';
+  const url = `https://www.hebcal.com/leyning?cfg=json&start=${start}&end=${start}&i=off&triennial=off${customParam}`;
+
+  try {
+    const res = await fetch(url, { next: { revalidate: 60 * 60 * 6 } } as NextFetchOptions);
+    if (!res.ok) {
+      return { shabbatDateISO: start, aliyot: [], _url: url, _status: res.status, _error: 'HTTP not OK' };
+    }
+
+    const data = (await res.json()) as { items?: LeyningItem[] };
+    const item = (data.items || []).find((it) => it.fullkriyah);
+    if (!item || !item.fullkriyah) {
+      return { shabbatDateISO: start, aliyot: [], _url: url, _status: 204, _error: 'No fullkriyah in response' };
+    }
+
+    const aliyahKeys = ['1','2','3','4','5','6','7'];
+    const aliyot = aliyahKeys
+      .map((n) => item.fullkriyah![n])
+      .filter(Boolean)
+      .map((a, idx) => ({ n: String(idx + 1), k: a.k, b: a.b, e: a.e }));
+
+    const haftaraSegments = normalizeHaftSegmentsByTrad(item.haft, item.haftara, item, trad);
+    const haft = haftaraSegments[0];
+
+    const maftirAliyah = item.fullkriyah?.M || item.fullkriyah?.maftir || item.fullkriyah?.maf;
+    const maftir = maftirAliyah
+      ? {
+          k: maftirAliyah.k,
+          b: maftirAliyah.b,
+          e: maftirAliyah.e,
+          label: item.reason?.M
+            ? `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e} (${item.reason.M})`
+            : `${maftirAliyah.k} ${maftirAliyah.b}-${maftirAliyah.e}`,
+        }
+      : undefined;
+
+    return {
+      shabbatDateISO: start,
+      shabbatHebrew: item.hdate,
+      parashaEn: item.name?.en,
+      parashaHe: item.name?.he,
+      aliyot,
+      haftara: haft,
+      haftaraSegments,
+      maftir,
+      _url: url,
+      _status: 200,
+    };
+  } catch (e: any) {
+    return { shabbatDateISO: start, aliyot: [], _url: url, _status: 0, _error: e?.message || 'Fetch failed' };
   }
 }
 

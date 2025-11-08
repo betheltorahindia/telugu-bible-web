@@ -6,6 +6,8 @@ import { useBible } from '../../../../../components/providers/LanguageProvider'
 import { useLanguage } from '../../../../../components/providers/LanguageProvider'
 import { uiStrings } from '../../../../../lib/i18n'
 import { useZoom } from '../../../../../components/providers/ZoomProvider'
+import { useParallel } from '../../../../../components/providers/ParallelProvider'
+import { useBibleFor } from '../../../../../components/hooks/useBibleFor'
 import { getLocalizedBookName } from '../../../../../lib/data/books'
 import { PARASHIYOT, aliyahStartSet, aliyahId } from '../../../../../lib/data/parashiyot'
 import { useEffect, useMemo } from 'react'
@@ -19,6 +21,8 @@ export default function ChapterPage() {
   const UI = uiStrings(lang)
   const { level } = useZoom()
   const fontAdjust = `calc(1em + ${level * 2}px + ${lang === 'he' ? 4 : 0}px)`
+  const { parallel } = useParallel()
+  const parallelBible = useBibleFor(parallel && parallel !== lang ? parallel : null)
 
   const b = parseInt(params.bnumber)
   const c = parseInt(params.cnumber)
@@ -85,7 +89,10 @@ export default function ChapterPage() {
           const isAliyahStart = aliyahStartSet.has(key)
           const aliyahNumber = aliyahNumMap.get(key)
 
-          return (
+          const cards: any[] = []
+
+          // Main language card
+          cards.push(
             <div key={id} id={id} className="card">
               <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                 <span className="badge">{v.vnumber}</span>
@@ -99,6 +106,40 @@ export default function ChapterPage() {
                 </div>
               </div>
             </div>
+          )
+
+          // Parallel language card (if selected and available)
+          if (parallel && parallel !== lang && parallelBible) {
+            const pb = parallelBible as any
+            const bookP = pb?.books?.find((x:any)=>x.bnumber===b)
+            const chP = bookP?.chapters?.find((x:any)=>x.cnumber===c)
+            const vv = chP?.verses?.find((x:any)=>x.vnumber===v.vnumber)
+            const pText = vv?.text ?? ''
+            const pIsHebrew = parallel === 'he'
+            const pFont = `calc(1em + ${level * 2}px + ${pIsHebrew ? 4 : 0}px)`
+
+            cards.push(
+              <div key={`${id}-parallel`} className="card card-parallel">
+                <div className={`flex items-start gap-3 ${pIsHebrew ? 'flex-row-reverse' : ''}`}>
+                  <span className="badge">{v.vnumber}</span>
+                  <div className={`leading-relaxed ${pIsHebrew ? 'text-right' : ''}`} dir={pIsHebrew ? 'rtl' : undefined}>
+                    <span style={{ fontSize: pFont }}>{pText}</span>
+                    {isAliyahStart && (
+                      <span className={`${pIsHebrew ? 'mr-2' : 'ml-2'} badge-aliyah`}>
+                        {UI.aliyah} {aliyahNumber}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+
+          const hasParallel = parallel && parallel !== lang && parallelBible
+          return hasParallel ? (
+            <div className="grid gap-2 md:grid-cols-2">{cards}</div>
+          ) : (
+            <>{cards[0]}</>
           )
         })}
       </div>

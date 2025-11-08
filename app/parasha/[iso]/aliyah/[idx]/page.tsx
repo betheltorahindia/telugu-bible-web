@@ -2,9 +2,10 @@
 import dynamic from 'next/dynamic'
 import { getBibleServer, getLangFromCookie } from '../../../../../lib/bibleServer'
 import { uiStrings } from '../../../../../lib/i18n'
-import { getLeyningForDate } from '../../../../../lib/api/hebcal'
+import { getLeyningForDateByTrad } from '../../../../../lib/api/hebcal'
 import { BOOK_NAMES_EN } from '../../../../../lib/data/books'
 import ZoomStyle from '../../../../../components/ZoomStyle'
+import ParallelVerseCards from '../../../../../components/ParallelVerseCards'
 
 // Load the client toolbar safely (avoids server onChange errors)
 const AliyahToolbar = dynamic(
@@ -14,7 +15,7 @@ const AliyahToolbar = dynamic(
 
 type Ref = { bnum: number; c: number; v: number }
 type Range = { start: Ref; end: Ref; label: string }
-type Verse = { c: number; v: number; text: string }
+type Verse = { b?: number; c: number; v: number; text: string }
 
 // Map Hebcal English book -> bnumber
 function enToBnum(en: string): number {
@@ -124,7 +125,7 @@ async function sliceVerses(r: Range, bible: any): Promise<Verse[]> {
 
     for (const v of chap.verses) {
       if (v.vnumber >= vStart && v.vnumber <= vEnd)
-        out.push({ c, v: v.vnumber, text: v.text })
+        out.push({ b: r.start.bnum, c, v: v.vnumber, text: v.text })
     }
   }
 
@@ -133,8 +134,10 @@ async function sliceVerses(r: Range, bible: any): Promise<Verse[]> {
 
 export default async function AliyahPage({
   params,
+  searchParams,
 }: {
   params: { iso: string; idx: string }
+  searchParams?: Record<string, string | string[] | undefined>
 }) {
   const bible = await getBibleServer()
   const lang = getLangFromCookie()
@@ -142,7 +145,9 @@ export default async function AliyahPage({
   const iso = decodeURIComponent(params.iso)
   const idxStr = params.idx // "1".."7" or "H"
   const upperIdx = idxStr.toUpperCase()
-  const data = await getLeyningForDate(iso)
+  const rawTrad = (searchParams?.trad as string) || 'sef'
+  const trad: 'ash' | 'sef' = rawTrad === 'ash' ? 'ash' : 'sef'
+  const data = await getLeyningForDateByTrad(iso, trad)
 
   if (!data || !data.aliyot.length) {
     return <div className="card">No data for this date.</div>
@@ -198,12 +203,17 @@ export default async function AliyahPage({
   const next = pos < order.length - 1 ? order[pos + 1] : null
 
   const backHref = `/parasha/${data.shabbatDateISO}`
+  const currentHrefBase = `/parasha/${data.shabbatDateISO}/aliyah/${upperIdx}`
+  const tradAshHref = `${currentHrefBase}?trad=ash`
+  const tradSefHref = `${currentHrefBase}?trad=sef`
 
   const options = [
     ...aliyot.map((_, i) => ({ value: String(i + 1), label: `${UI.aliyah} ${i + 1}` })),
     ...(data.maftir ? [{ value: 'M', label: UI.maftir }] : []),
     ...(data.haftara ? [{ value: 'H', label: UI.haftarah }] : []),
   ]
+
+  // client-side parallel cards moved to components/ParallelVerseCards.tsx
 
   return (
     <div className="space-y-4">
@@ -217,6 +227,10 @@ export default async function AliyahPage({
         backHref={backHref}
         prev={prev}
         next={next}
+        showTradToggle={isHaft}
+        trad={trad}
+        tradAshHref={tradAshHref}
+        tradSefHref={tradSefHref}
       />
 
       <h1 className="text-xl font-semibold">{title}</h1>
@@ -236,12 +250,7 @@ export default async function AliyahPage({
 
               {section.verses.length ? (
                 section.verses.map((v, verseIdx) => (
-                  <div key={`${sectionIdx}-${verseIdx}`} className="card">
-                    <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
-                      <span className="badge">{badgeLabel(v)}</span>
-                      <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined} style={{ fontSize: `calc(1em + var(--chapter-zoom, 0px) + ${lang === 'he' ? '4px' : '0px'})` }}>{v.text}</div>
-                    </div>
-                  </div>
+                  <ParallelVerseCards key={`${sectionIdx}-${verseIdx}`} verse={{ b: v.b || section.range.start.bnum, c: v.c, v: v.v, text: v.text }} mainLang={lang} />
                 ))
               ) : (
                 <div className="card text-sm opacity-70">

@@ -11,6 +11,10 @@ export default function AliyahToolbar({
   backHref,
   prev,
   next,
+  showTradToggle,
+  trad,
+  tradAshHref,
+  tradSefHref,
 }: {
   iso: string
   value: string              // current value: "1".."7" or "M"/"H"
@@ -18,6 +22,10 @@ export default function AliyahToolbar({
   backHref: string           // link back to /parasha/[iso]
   prev?: string | null       // "1".."7" or "M"/"H" | null
   next?: string | null
+  showTradToggle?: boolean   // show Ash|Sef toggle (only on Haftarah)
+  trad?: 'ash' | 'sef'       // current tradition
+  tradAshHref?: string       // href to switch to ash
+  tradSefHref?: string       // href to switch to sef
 }) {
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     // simple client-side navigation
@@ -61,6 +69,29 @@ export default function AliyahToolbar({
           >
             ›
           </Link>
+
+          {/* Ash | Sef toggle (match chapters-page segmented style; fixed labels) */}
+          {showTradToggle && (
+            <div className="flex items-center gap-2 overflow-x-auto flex-nowrap -mx-1 px-1">
+              <div className="btn shrink-0">
+                <a
+                  href={tradAshHref || '#'}
+                  className={trad === 'ash' ? 'font-semibold' : ''}
+                  aria-pressed={trad === 'ash'}
+                >
+                  Ash
+                </a>
+                <span className="mx-1">|</span>
+                <a
+                  href={tradSefHref || '#'}
+                  className={trad === 'sef' ? 'font-semibold' : ''}
+                  aria-pressed={trad === 'sef'}
+                >
+                  Sef
+                </a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

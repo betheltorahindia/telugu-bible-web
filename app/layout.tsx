@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from '../components/providers/LanguageProvider'
 import { ZoomProvider } from '../components/providers/ZoomProvider'
+import { ParallelProvider } from '../components/providers/ParallelProvider'
 import { getLangFromCookie } from '../lib/bibleServer'
 import type { LangCode } from '../lib/lang'
 
@@ -132,9 +133,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <QueryProvider>
             <LanguageProvider initialLang={lang}>
               <ZoomProvider>
-                <Header />
-                {/* keep content below the fixed header */}
-                <main className="container mt-20 pb-6">{children}</main>
+                <ParallelProvider>
+                  <Header />
+                  {/* keep content below the fixed header */}
+                  <main className="container mt-20 pb-6">{children}</main>
+                </ParallelProvider>
               </ZoomProvider>
             </LanguageProvider>
           </QueryProvider>
