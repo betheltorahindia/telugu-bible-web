@@ -6,6 +6,7 @@ import InstallFAB from '../components/InstallFAB'
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import { getBibleServer } from '../lib/bibleServer'
+import SocialEntryCard from '../components/SocialEntryCard'
 
 // ✅ Weekly Parasha teaser
 import ParashaTeaser from '../components/ParashaTeaser'
@@ -100,6 +101,7 @@ export default async function Home() {
   return (
     <div className="space-y-8 pb-12">
       {/* Weekly Parasha / Haftarah teaser */}
+      <SocialEntryCard />
       <ParashaTeaser />
 
       {/* --- Sections of books --- */}
