@@ -44,11 +44,13 @@ export const SPOTIFY_SHOW_IDS: string[] = [
   "0rNMAIcTdNKpLWQ7zVZBr6?si=12a4a105d9cf4484&nd=1&dlsi=949be1c67b964e59",
   "2QWhTO8Wn4eEECJtWS4V9U?si=gTLOAZSnT3ujko_0-7ej6w&nd=1&dlsi=c19e903b3d79430e",
   "2oYkmKCNmpQyNnaBQ2ldkg?si=O79WZqc8SP-rfysInqh38w&nd=1&dlsi=e4a3ffd381f645ec",
+  "1gfazq1EbcaYcH7zkgHo1S?si=zHUHd9r6SyaWl59jqPvvSQ&nd=1&dlsi=fcd5aadd1d774b77",
+  "63z2ljzXTnPQ5vcMI8UIFf?si=T3GeYHTgTWWieXw8zZexKA&nd=1&dlsi=89093e7d04a14d4c",
 ];
 
 export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/betheltorahindia/",
-  facebook: "https://www.facebook.com/betheltorahindia",
+  facebook: "https://www.facebook.com/miriyala.r.kumar?mibextid=wwXIfr&rdid=247LbQAq4SavXkKj&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1YdGajsmyp%2F%3Fmibextid%3DwwXIfr#",
   whatsapp: "https://wa.me/message/ZIXNZFZHNGPWC1",
 } as const;
 
