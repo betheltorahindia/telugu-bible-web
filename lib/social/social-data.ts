@@ -41,12 +41,15 @@ export const SPOTIFY_SHOW_IDS: string[] = [
   "5RUGGET13ngbY1AcZGVQE3",
   "033CyiYcj2Q6avPJYt1Lo7",
   "033TitSnYnItGuIWC6GDwq",
+  "0rNMAIcTdNKpLWQ7zVZBr6?si=12a4a105d9cf4484&nd=1&dlsi=949be1c67b964e59",
+  "2QWhTO8Wn4eEECJtWS4V9U?si=gTLOAZSnT3ujko_0-7ej6w&nd=1&dlsi=c19e903b3d79430e",
+  "2oYkmKCNmpQyNnaBQ2ldkg?si=O79WZqc8SP-rfysInqh38w&nd=1&dlsi=e4a3ffd381f645ec",
 ];
 
 export const SOCIAL_LINKS = {
   instagram: "https://www.instagram.com/betheltorahindia/",
   facebook: "https://www.facebook.com/betheltorahindia",
-  whatsapp: "https://whatsapp.com/channel/betheltorahindia",
+  whatsapp: "https://wa.me/message/ZIXNZFZHNGPWC1",
 } as const;
 
 export type YouTubeVideo = {
