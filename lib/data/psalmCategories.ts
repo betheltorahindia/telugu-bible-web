@@ -1,6 +1,7 @@
 // lib/data/psalmCategories.ts
 
 export type PsalmCategoryKey =
+  | 'hallel'
   | 'faith'
   | 'thanks'
   | 'praise'
@@ -30,11 +31,11 @@ export type PsalmCategory = {
  * The order in each array is the navigation order when user is in that category.
  */
 export const PSALM_CATEGORIES: PsalmCategory[] = [
+  { key: 'hallel',       label: 'హల్లేల్ - స్తుతి కీర్తనలు',          order: [113, 114, 115, 116, 117, 118] },
   { key: 'faith',       label: 'దేవునియందు నమ్మికయుంచుట',          order: [6, 26, 27, 28, 40, 44, 61, 127, 130, 139] },
   { key: 'thanks',      label: 'దేవునికి కృతజ్ఞత తెలిపే కీర్తనలు',   order: [67, 75, 86, 100, 103, 107, 118, 124, 136, 145] },
   { key: 'praise',      label: 'దేవునిని స్తుతియించే కీర్తనలు',        order: [33, 47, 105, 106, 113, 114, 115, 116, 117, 118] },
-  { key: 'deliverance', label: 'విడుదల కొరకు కీర్తనలు',               order: [20, 25, 57, 60, 62, 68, 98, 116, 124, 141] },
-  { key: 'trouble',     label: 'ఆపత్కాలమందు చదివే కీర్తనలు',          order: [6, 13, 22, 38, 39, 69, 77, 88, 102, 142] },
+  { key: 'deliverance', label: 'విడుదల కొరకు కీర్తనలు',               order: [20, 25, 57, 60, 62, 68, 98, 116, 124,] },
   { key: 'healing',     label: 'స్వస్థత కొరకు కీర్తనలు',               order: [6, 9, 13, 16, 17, 18, 20, 22, 23, 28, 30, 31, 32, 33, 37, 38, 39, 41, 49, 55, 56, 86, 88, 89, 90, 91, 102, 103, 104, 107, 116, 118, 142, 143, 148] },
   { key: 'spouse',      label: 'జీవిత భాగస్వామి కొరకు',               order: [32, 38, 70, 71, 72, 82, 92, 121, 124, 126] },
   { key: 'newlyweds',   label: 'నూతన వధూవరుల కొరకు',                  order: [19] },
