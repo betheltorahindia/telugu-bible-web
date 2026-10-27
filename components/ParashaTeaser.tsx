@@ -1,7 +1,7 @@
 // components/ParashaTeaser.tsx
 import { Calendar } from 'lucide-react'
+import Link from 'next/link'
 import { getWeeklyLeyning } from '../lib/api/hebcal'
-import { use } from 'react'
 import { getLangFromCookie } from '../lib/bibleServer'
 import { LANG_LABELS } from '../lib/lang'
 import { uiStrings } from '../lib/i18n'
@@ -47,27 +47,27 @@ export default async function ParashaTeaser() {
 
                 <div className="mt-2 flex flex-wrap gap-2">
                   {it.aliyot.map((a) => (
-                    <a
+                    <Link
                       key={a.n}
                       href={`/parasha/${it.isoDate}/aliyah/${a.n}`}
                       className="btn btn-chip"
                       title={`${a.k} ${a.b}-${a.e}`}
                     >
                       {UI.aliyah} {a.n}
-                    </a>
+                    </Link>
                   ))}
 
                   {it.maftir && (
-                    <a
+                    <Link
                       className="btn btn-chip"
                       href={`/parasha/${it.isoDate}/aliyah/M`}
                       title={it.maftir.label}
                     >
                       {UI.maftir}
-                    </a>
+                    </Link>
                   )}
                   {hasHaftarah && (
-                    <a
+                    <Link
                       className="btn btn-chip"
                       href={`/parasha/${it.isoDate}/aliyah/H`}
                       title={
@@ -77,7 +77,7 @@ export default async function ParashaTeaser() {
                       }
                     >
                       {UI.haftarah}
-                    </a>
+                    </Link>
                   )}
                 </div>
               </div>

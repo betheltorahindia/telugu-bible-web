@@ -4324,6 +4324,27 @@ html[data-theme] .launch-wordmark {
   z-index: 90;
 }
 
+.home-floating-actions {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.home-floating-actions > * { pointer-events: auto; }
+.home-floating-actions .install-app-button,
+.home-floating-actions .bethel-chat {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+}
+
 .bethel-chat-toggle {
   display: inline-flex;
   min-height: 52px;
@@ -4501,8 +4522,15 @@ html[data-theme] .launch-wordmark {
   .calendar-highlights > div { min-height: 48px; gap: 5px; border-radius: 10px; padding: 7px; }
   .calendar-highlights strong { font-size: 1rem; }
   .calendar-highlights span { font-size: 0.57rem; }
-  .bethel-chat { right: 12px; bottom: max(14px, env(safe-area-inset-bottom)); }
+  .home-floating-actions {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
   .bethel-chat-toggle { min-height: 48px; padding-inline: 13px; font-size: 0.76rem; }
+}
+
+:root[data-theme] .site-header {
+  border-bottom-color: #e50914 !important;
 }
 
 @media (max-height: 720px) and (min-width: 761px) {

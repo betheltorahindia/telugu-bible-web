@@ -43,7 +43,7 @@ const items = [
 export function SocialOrbs() {
   return (
     <div className="flex items-center justify-center gap-7 sm:gap-10">
-      {items.map((item, i) => (
+      {items.map((item) => (
         <a
           key={item.key}
           href={item.href}
@@ -52,10 +52,7 @@ export function SocialOrbs() {
           aria-label={item.label}
           title={item.label}
           className={`social-orb-link group relative grid h-16 w-16 place-items-center rounded-2xl sm:h-[74px] sm:w-[74px] social-orb-${item.key}`}
-          style={{
-            transformStyle: "preserve-3d",
-            animation: `sw-float 5s ease-in-out ${i * 0.5}s infinite`,
-          }}
+          style={{ transformStyle: "preserve-3d" }}
         >
           <span
             className="absolute inset-0 rounded-2xl opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-90"
@@ -66,7 +63,7 @@ export function SocialOrbs() {
           />
           <span
             className={`social-orb-icon relative transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110 social-orb-icon-${item.key}`}
-            style={{ color: item.glow, filter: "drop-shadow(0 6px 10px oklch(0 0 0 / 55%))" }}
+            style={{ color: item.glow }}
           >
             {item.icon}
           </span>

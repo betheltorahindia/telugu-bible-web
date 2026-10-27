@@ -7,6 +7,9 @@ const isProd = process.env.NODE_ENV === 'production'
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  devIndicators: {
+    buildActivity: false,
+  },
 }
 
 const withPWA = withPWAInit({

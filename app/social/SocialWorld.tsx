@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { ChevronDown, ExternalLink, ListVideo, Play, Youtube } from 'lucide-react'
 import { Coverflow } from '../../components/social/Coverflow'
 import { SocialOrbs } from '../../components/social/SocialOrbs'
@@ -106,13 +106,15 @@ function VideoCard({ video, active }: { video: YouTubeVideo; active: boolean }) 
       }}
     >
       <div className="relative h-full w-full">
-        {/* plain <img> on purpose: remote YouTube thumbnails, no next.config change needed */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <RemoteThumbnail
           src={video.thumbnail}
+          fallbackSources={[
+            `https://i.ytimg.com/vi/${video.id}/sddefault.jpg`,
+            `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`,
+          ]}
           alt={video.title}
-          loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
+          fallback={<Youtube className="h-12 w-12 text-red-500" aria-hidden="true" />}
         />
         <div
           className="absolute inset-0"
@@ -203,15 +205,12 @@ function SpotifySection({ shows }: { shows: SpotifyShow[] }) {
                     }}
                   >
                     <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-black/40">
-                      {show.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={show.thumbnail}
-                          alt=""
-                          loading="lazy"
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                      ) : null}
+                      <RemoteThumbnail
+                        src={show.thumbnail}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        fallback={<SpotifyGlyph />}
+                      />
                     </span>
                     <span className="min-w-0 flex-1 text-left text-sm leading-snug">
                       <span className="line-clamp-2">{show.title}</span>
@@ -248,19 +247,12 @@ function ShowCard({ show, active }: { show: SpotifyShow; active: boolean }) {
       }}
     >
       <div className="relative h-full w-full">
-        {show.thumbnail ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={show.thumbnail}
-            alt={show.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
-          />
-        ) : (
-          <div className="grid h-full w-full place-items-center opacity-50">
-            <SpotifyGlyph />
-          </div>
-        )}
+        <RemoteThumbnail
+          src={show.thumbnail}
+          alt={show.title}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
+          fallback={<SpotifyGlyph />}
+        />
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(180deg, transparent 35%, var(--sw-image-shade))' }}
@@ -290,6 +282,40 @@ function SpotifyGlyph() {
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
       <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m4.5 14.4a.75.75 0 0 1-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.55-1.04 8.47-.59 11.63 1.34a.75.75 0 0 1 .28 1.03m1.2-2.9a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.56-11.96-1.4a.94.94 0 1 1-.54-1.8c4.36-1.31 9.78-.67 13.49 1.6a.94.94 0 0 1 .3 1.29m.1-3.02c-3.87-2.3-10.26-2.51-13.96-1.39a1.12 1.12 0 1 1-.65-2.15c4.25-1.29 11.3-1.04 15.76 1.6a1.12 1.12 0 1 1-1.15 1.94" />
     </svg>
+  )
+}
+
+function RemoteThumbnail({
+  src,
+  fallbackSources = [],
+  alt,
+  className,
+  fallback,
+}: {
+  src: string | null
+  fallbackSources?: string[]
+  alt: string
+  className: string
+  fallback: ReactNode
+}) {
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const sources = [...new Set([src, ...fallbackSources].filter((source): source is string => Boolean(source)))]
+  const currentSource = sources[sourceIndex]
+
+  if (!currentSource) {
+    return <span className="grid h-full w-full place-items-center opacity-70">{fallback}</span>
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={currentSource}
+      alt={alt}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      className={className}
+      onError={() => setSourceIndex((index) => index + 1)}
+    />
   )
 }
 

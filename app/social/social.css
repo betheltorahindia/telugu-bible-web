@@ -167,6 +167,8 @@ body:has(.social-world)::-webkit-scrollbar {
   scroll-snap-type: x mandatory;
   scrollbar-color: var(--sw-gold-deep) transparent;
   scrollbar-width: thin;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sw-carousel-track:focus-visible {
@@ -443,16 +445,16 @@ body:has(.social-world)::-webkit-scrollbar {
   [data-theme="light"] .social-world .sw-scroll {
     scrollbar-color: var(--sw-gold-deep) transparent;
   }
+}
 
-  @media (max-width: 700px) {
-    .social-world .sw-media-section { padding: 34px 0 8px; }
-    .social-world .sw-section-header { align-items: flex-start; flex-direction: column; gap: 14px; padding: 0 20px; }
-    .social-world .sw-section-links { justify-content: flex-start; }
-    .social-world .sw-section-links .sw-btn,
-    .social-world .sw-section-links .sw-btn-ghost { padding: 0.65rem 0.78rem; }
-    .sw-carousel-track { padding-right: 8vw; padding-left: 8vw; }
-    .social-world .sw-podcast-actions { padding: 0 18px; }
-  }
+@media (max-width: 700px) {
+  .social-world .sw-media-section { padding: 34px 0 8px; }
+  .social-world .sw-section-header { align-items: flex-start; flex-direction: column; gap: 14px; padding: 0 20px; }
+  .social-world .sw-section-links { justify-content: flex-start; }
+  .social-world .sw-section-links .sw-btn,
+  .social-world .sw-section-links .sw-btn-ghost { padding: 0.65rem 0.78rem; }
+  .sw-carousel-track { padding-right: 8vw; padding-left: 8vw; }
+  .social-world .sw-podcast-actions { padding: 0 18px; }
 }
 
 html[data-theme] .social-world .sw-btn {
@@ -492,70 +494,73 @@ html[data-theme="light"] .social-world .sw-btn-ghost {
   box-shadow: inset 0 1px #fff, 0 5px 14px rgba(74, 56, 29, 0.12) !important;
 }
 
-html[data-theme] .social-world .social-orb-surface {
-  background: linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(128, 98, 50, 0.08)) !important;
-  border-color: var(--sw-orb-border) !important;
-  box-shadow: var(--sw-orb-shadow) !important;
+.social-world .social-orb-link {
+  overflow: visible;
+  isolation: isolate;
+  color: #f2f1f5;
+  animation: none !important;
 }
 
-.social-world .social-orb-link.social-orb-instagram .social-orb-surface {
-  border-color: #e1306c !important;
-  background: linear-gradient(135deg, #833ab4 4%, #fd1d1d 55%, #fcb045 100%) !important;
+.social-world .social-orb-surface {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 19px !important;
+  background: linear-gradient(145deg, rgba(38, 38, 48, 0.94), rgba(20, 20, 28, 0.98)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 28px rgba(0, 0, 0, 0.28) !important;
+  backdrop-filter: blur(14px);
 }
 
-html[data-theme] .social-world .social-orb-icon-instagram {
+.social-world .social-orb-icon {
+  z-index: 1;
   display: grid;
   width: 40px;
   height: 40px;
   place-items: center;
   border-radius: 50%;
   background: transparent !important;
-  color: #fff !important;
-  filter: drop-shadow(0 4px 9px rgba(225, 48, 108, 0.3)) !important;
+  filter: none !important;
 }
 
-html[data-theme] .social-world .social-orb-icon-instagram svg {
-  width: 27px;
-  height: 27px;
-  color: #fff !important;
-  stroke: #fff !important;
+.social-world .social-orb-icon svg { width: 27px; height: 27px; }
+.social-world .social-orb-icon-instagram,
+.social-world .social-orb-icon-instagram svg { color: #ff477e !important; stroke: #ff477e !important; }
+.social-world .social-orb-icon-facebook,
+.social-world .social-orb-icon-facebook svg { color: #378bff !important; fill: #378bff !important; }
+.social-world .social-orb-icon-whatsapp,
+.social-world .social-orb-icon-whatsapp svg { color: #35d982 !important; fill: #35d982 !important; }
+
+.social-world .social-orb-link > span:first-child {
+  display: none;
 }
 
-.social-world .social-orb-link.social-orb-facebook .social-orb-surface {
-  border-color: #1877f2 !important;
-  background: #1877f2 !important;
+.social-world .social-orb-link:hover .social-orb-surface,
+.social-world .social-orb-link:focus-visible .social-orb-surface {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 15px 34px rgba(0, 0, 0, 0.36) !important;
+}
+.social-world .social-orb-link.social-orb-instagram:hover .social-orb-surface,
+.social-world .social-orb-link.social-orb-instagram:focus-visible .social-orb-surface {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 26px rgba(255, 71, 126, 0.3), 0 15px 34px rgba(0, 0, 0, 0.36) !important;
+}
+.social-world .social-orb-link.social-orb-facebook:hover .social-orb-surface,
+.social-world .social-orb-link.social-orb-facebook:focus-visible .social-orb-surface {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 26px rgba(55, 139, 255, 0.3), 0 15px 34px rgba(0, 0, 0, 0.36) !important;
+}
+.social-world .social-orb-link.social-orb-whatsapp:hover .social-orb-surface,
+.social-world .social-orb-link.social-orb-whatsapp:focus-visible .social-orb-surface {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.13), 0 0 30px rgba(53, 217, 130, 0.38), 0 15px 34px rgba(0, 0, 0, 0.36) !important;
 }
 
-.social-world .social-orb-link.social-orb-whatsapp .social-orb-surface {
-  border-color: #25d366 !important;
-  border-radius: 50% !important;
-  background: #25d366 !important;
+.social-world .social-orb-link > span:last-child {
+  z-index: 2;
+  bottom: -25px;
+  color: rgba(242, 241, 245, 0.68);
+  font-size: 10px;
+  letter-spacing: 0.17em;
+  opacity: 0;
+  transition: opacity 180ms ease;
 }
-
-html[data-theme] .social-world .social-orb-icon-facebook {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 50%;
-  background: transparent !important;
-  color: #fff !important;
-  filter: drop-shadow(0 4px 9px rgba(24, 119, 242, 0.32)) !important;
-}
-
-html[data-theme] .social-world .social-orb-icon-whatsapp {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 50%;
-  background: transparent !important;
-  color: #fff !important;
-  filter: drop-shadow(0 4px 9px rgba(37, 211, 102, 0.3)) !important;
-}
-
-html[data-theme] .social-world .social-orb-icon-facebook svg,
-html[data-theme] .social-world .social-orb-icon-whatsapp svg {
-  color: inherit !important;
-  fill: currentColor !important;
-}
+.social-world .social-orb-link:hover > span:last-child,
+.social-world .social-orb-link:focus-visible > span:last-child { opacity: 0.8; }

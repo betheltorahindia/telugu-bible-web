@@ -157,8 +157,10 @@ export default async function Home() {
         <span>BETHEL TORAH INDIA</span>
         <span>A community in the making.</span>
       </footer>
-      <BethelChat />
-      <InstallFAB />
+      <div className="home-floating-actions">
+        <BethelChat />
+        <InstallFAB />
+      </div>
     </div>
   )
 }

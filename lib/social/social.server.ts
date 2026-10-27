@@ -46,6 +46,10 @@ export async function scrapeYouTubeVideos(limit: number): Promise<YouTubeVideo[]
     const res = await fetch(YOUTUBE.videosUrl, {
       headers: { "user-agent": UA, "accept-language": "en-US,en;q=0.9" },
     });
+    if (!res.ok) {
+      console.error(`YouTube channel request failed with status ${res.status}`);
+      return [];
+    }
     const html = await res.text();
     const match = html.match(/var ytInitialData = (\{.*?\});<\/script>/s);
     if (!match?.[1]) return [];
@@ -123,7 +127,15 @@ export async function scrapeYouTubeVideos(limit: number): Promise<YouTubeVideo[]
 export async function fetchSpotifyShows(): Promise<SpotifyShow[]> {
   return cached("spotify:shows", async () => {
     const results = await Promise.all(
-      SPOTIFY_SHOW_IDS.map(async (id): Promise<SpotifyShow> => {
+      SPOTIFY_SHOW_IDS.map(async (rawId): Promise<SpotifyShow> => {
+        const id = rawId.split(/[?#]/, 1)[0].trim();
+        if (!id) return {
+          id: rawId,
+          title: "BethEl Torah India Podcast",
+          thumbnail: null,
+          url: "https://open.spotify.com/",
+          embedUrl: "https://open.spotify.com/",
+        };
         const url = `https://open.spotify.com/show/${id}`;
         const fallback: SpotifyShow = {
           id,
