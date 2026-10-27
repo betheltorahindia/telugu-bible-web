@@ -1,325 +1,602 @@
-﻿'use client'
+'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import {
+  BookOpen,
+  CalendarDays,
+  Home,
+  Languages,
+  Heart,
+  Menu,
+  MousePointer2,
+  Minus,
+  MonitorPlay,
+  Columns2,
+  Search,
+  Settings,
+  Sparkles,
+  Type,
+  Users,
+  X,
+  Plus,
+  ZoomIn,
+} from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
 import BookChapterNav from './BookChapterNav'
 import MobileBookNav from './MobileBookNav'
-import { Home, Search, MonitorPlay, Menu, X, Plus, Minus } from 'lucide-react'
+import StudyNavigation from './study/StudyNavigation'
+import PrayerNavigation from './prayers/PrayerNavigation'
 import { uiStrings } from '../lib/i18n'
 import { useLanguage } from './providers/LanguageProvider'
-import { LANG_LABELS } from '../lib/lang'
+import { LANG_LABELS, type LangCode } from '../lib/lang'
 import { useZoom } from './providers/ZoomProvider'
 import { useParallel } from './providers/ParallelProvider'
-import type { LangCode } from '../lib/lang'
+import { getStudyBook, hasStudyTranslation, studyBooks } from '../lib/data/study/books'
+import { getPrayer, hasPrayerTranslation, hasPrayerTransliteration, prayers } from '../lib/data/prayers'
+
+const primaryLinks = [
+  { name: 'Home', href: '/', icon: Home, available: true },
+  { name: 'Prayers', href: '/prayers', icon: Heart, available: true },
+  { name: 'Tanach', href: '/tanach', icon: BookOpen, available: true },
+  { name: 'Social', href: '/social', icon: Users, available: true },
+  { name: 'Study', href: '/study', icon: Sparkles, available: true },
+  { name: 'Calendar', href: '/calendar', icon: CalendarDays, available: true },
+]
 
 export default function Header() {
   const pathname = usePathname() || '/'
-  const showBookNav = pathname.startsWith('/book')
-  const isChapter = /^\/book\/\d+\/chapter\//.test(pathname || '')
-  const isParasha = (pathname || '').startsWith('/parasha')
-  const showZoom = isChapter || isParasha
-  const isHome = pathname === '/'
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const showBookNav = pathname.startsWith('/book')
+  const showStudyTools = pathname.startsWith('/study')
+  const showPrayerTools = pathname.startsWith('/prayers')
+  const currentStudyBook = showStudyTools
+    ? getStudyBook(pathname.split('/')[2] || '')
+    : undefined
+  const currentPrayer = showPrayerTools ? getPrayer(pathname.split('/')[2] || '') : undefined
+  const currentPrayerSection = showPrayerTools ? pathname.split('/')[3] : undefined
+  const showZoom = /^\/book\/\d+\/chapter\//.test(pathname) || pathname.startsWith('/parasha') || showStudyTools || showPrayerTools
+  const showTanachTools =
+    pathname === '/tanach' ||
+    pathname.startsWith('/book') ||
+    pathname.startsWith('/parasha') ||
+    pathname === '/search' ||
+    pathname.startsWith('/presenter') ||
+    showStudyTools ||
+    showPrayerTools
+  const isPrimaryLinkActive = (name: string) => {
+    if (name === 'Home') return pathname === '/' && activeHash !== '#prayers' && activeHash !== '#wisdom'
+    if (name === 'Tanach') return showTanachTools && !showStudyTools && !showPrayerTools
+    if (name === 'Settings') return pathname.startsWith('/settings')
+    if (name === 'Prayers') return showPrayerTools || (pathname === '/' && activeHash === '#prayers')
+    if (name === 'Study') return pathname.startsWith('/study') || (pathname === '/' && activeHash === '#wisdom')
+    const link = primaryLinks.find((item) => item.name === name)
+    return link ? pathname.startsWith(link.href) : false
+  }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [mobileTanachToolsOpen, setMobileTanachToolsOpen] = useState(false)
+  const [activeTanachTool, setActiveTanachTool] = useState<'search' | 'language' | 'zoom' | 'parallel' | null>(null)
+  const [tanachToolPopoverTop, setTanachToolPopoverTop] = useState<number | null>(null)
+  const [studyLanguageNotice, setStudyLanguageNotice] = useState('')
+  const [prayerSearchValue, setPrayerSearchValue] = useState('')
+  const [activeHash, setActiveHash] = useState('')
   const { lang, setLang } = useLanguage()
   const UI = uiStrings(lang)
   const { parallel, setParallel } = useParallel()
-  
-
+  const prayerLanguageAvailable = (code: LangCode) =>
+    currentPrayer
+      ? hasPrayerTranslation(currentPrayer, code, currentPrayerSection)
+      : prayers.some((prayer) => hasPrayerTranslation(prayer, code))
+  const prayerToolLanguage = lang
+  const prayerTransliterationMode = searchParams.get('mode') === 'transliteration'
+  const prayerTransliterationAvailable = currentPrayer
+    ? hasPrayerTransliteration(currentPrayer, 'te', currentPrayerSection)
+    : prayers.some((prayer) => hasPrayerTransliteration(prayer, 'te'))
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
   const menuPanelRef = useRef<HTMLDivElement | null>(null)
-
-  const closeMobileMenu = () => setMobileMenuOpen(false)
-  const closeMenu = () => setMenuOpen(false)
+  const toolsPanelRef = useRef<HTMLElement | null>(null)
+  const toolsWrapRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    closeMobileMenu()
+    setMobileMenuOpen(false)
+    setMobileTanachToolsOpen(false)
+    setActiveTanachTool(null)
+    setTanachToolPopoverTop(null)
+    setStudyLanguageNotice('')
   }, [pathname])
 
   useEffect(() => {
-    if (!mobileMenuOpen) return
+    setPrayerSearchValue(searchParams.get('q') ?? '')
+  }, [searchParams])
+
+  useEffect(() => {
+    const updateHash = () => setActiveHash(window.location.hash)
+    updateHash()
+    window.addEventListener('hashchange', updateHash)
+    return () => window.removeEventListener('hashchange', updateHash)
+  }, [])
+
+  useEffect(() => {
+    if (!mobileMenuOpen && !mobileTanachToolsOpen && !activeTanachTool) return
 
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node
       if (
-        menuPanelRef.current &&
-        !menuPanelRef.current.contains(target) &&
-        menuButtonRef.current &&
-        !menuButtonRef.current.contains(target)
+        mobileMenuOpen &&
+        !menuPanelRef.current?.contains(target) &&
+        !menuButtonRef.current?.contains(target)
       ) {
-        closeMobileMenu()
+        setMobileMenuOpen(false)
+      }
+      if (mobileTanachToolsOpen && !toolsWrapRef.current?.contains(target)) {
+        setMobileTanachToolsOpen(false)
+      }
+      if (
+        activeTanachTool &&
+        !toolsWrapRef.current?.contains(target) &&
+        !toolsPanelRef.current?.contains(target)
+      ) {
+        setActiveTanachTool(null)
+        setTanachToolPopoverTop(null)
       }
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        closeMobileMenu()
+        setMobileMenuOpen(false)
+        setMobileTanachToolsOpen(false)
+        setActiveTanachTool(null)
+        setTanachToolPopoverTop(null)
       }
     }
 
     window.addEventListener('pointerdown', handlePointerDown)
     window.addEventListener('keydown', handleKeyDown)
-
     return () => {
       window.removeEventListener('pointerdown', handlePointerDown)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [mobileMenuOpen])
+  }, [mobileMenuOpen, mobileTanachToolsOpen, activeTanachTool])
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen((prev) => !prev)
+  const toggleTanachTool = (
+    tool: 'search' | 'language' | 'zoom' | 'parallel',
+    event: MouseEvent<HTMLButtonElement>,
+  ) => {
+    if (activeTanachTool === tool) {
+      setActiveTanachTool(null)
+      setTanachToolPopoverTop(null)
+      return
+    }
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const wrapBounds = toolsWrapRef.current?.getBoundingClientRect()
+    if (!wrapBounds) return
+    const buttonCenter = bounds.top + bounds.height / 2 - wrapBounds.top
+    setTanachToolPopoverTop(Math.max(40, Math.min(buttonCenter, wrapBounds.height - 40)))
+    setActiveTanachTool(tool)
   }
 
-  const toggleMenu = () => setMenuOpen((o) => !o)
+  const studyLanguageAvailable = (code: LangCode) =>
+    currentStudyBook
+      ? hasStudyTranslation(currentStudyBook, code)
+      : studyBooks.some((book) => hasStudyTranslation(book, code))
+  const studyToolLanguage =
+    showStudyTools && lang !== 'en' && lang !== 'te' && !studyLanguageAvailable(lang)
+      ? 'te'
+      : lang
 
-  // Sign in/out removed from header per request
+  const submitPrayerSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const params = new URLSearchParams(searchParams.toString())
+    if (prayerSearchValue.trim()) params.set('q', prayerSearchValue.trim())
+    else params.delete('q')
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname)
+  }
+
+  const togglePrayerTransliteration = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (prayerTransliterationMode) params.delete('mode')
+    else params.set('mode', 'transliteration')
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname)
+  }
 
   return (
-    <header
-      data-site-header
-      className="sticky top-0 z-40 backdrop-blur border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-black/40"
-    >
-      <div className="container py-2 md:py-3 flex items-center gap-3 md:gap-4">
-        <Link href="/" className="flex items-center gap-2 md:gap-3">
-          <Image
-            src="/logo.png"
-            alt="Logo"
-            width={40}
-            height={40}
-            className="object-contain"
-            priority
-          />
-
-          {isHome ? (
-            <div className="flex flex-col leading-tight md:hidden">
-              <span className="text-[14px] font-extrabold tracking-wide text-yellow-800">
-                TANACH | TELUGU
-              </span>
-              <span className="text-[11px] font-medium text-yellow-700">
-                powered by Beth-El Torah India
-              </span>
-            </div>
-          ) : null}
-
-          <div className="hidden md:flex flex-col leading-tight">
-            <span className="text-base font-extrabold tracking-wide text-yellow-800">
-              TANACH | TELUGU
+    <>
+      <header data-site-header className="site-header sticky top-0 z-40">
+        <div className="container site-header-inner">
+          <Link href="/" className="site-brand">
+            <Image
+              src="/android-icon-512x512.png"
+              alt=""
+              width={56}
+              height={56}
+              className="site-brand-mark object-contain"
+              priority
+            />
+            <span className="site-brand-copy">
+              <span className="site-brand-name">BETHEL TORAH INDIA</span>
+              <span className="site-brand-tagline">Direct way to Shamayim</span>
             </span>
-            <span className="text-sm font-medium text-yellow-700">
-              powered by Beth-El Torah India
-            </span>
-          </div>
-        </Link>
-
-        <div className="flex-1 justify-center hidden md:flex">
-          {showBookNav && <BookChapterNav />}
-        </div>
-
-        <nav className="relative ml-auto flex items-center gap-2 md:gap-3">
-          <Link href="/" className="btn" title={UI.home ?? 'Home'}>
-            <Home className="w-5 h-5" />
-          </Link>
-          <Link href="/search" className="btn" title={UI.search ?? 'Search'}>
-            <Search className="w-5 h-5" />
           </Link>
 
-          {/* Single menu button for all actions (desktop + mobile) */}
-          <div className="relative hidden sm:block">
-            <button
-              className="btn"
-              aria-haspopup="true"
-              aria-expanded={menuOpen}
-              onClick={toggleMenu}
-              title="Menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+          <nav className="primary-nav" aria-label="Main navigation">
+            {primaryLinks.map(({ name, href, available }) => {
+              const isActive = isPrimaryLinkActive(name)
+              if (!available) {
+                return (
+                  <span key={name} className={`primary-nav-link is-coming-soon ${isActive ? 'is-active' : ''}`} title="Coming soon">
+                    {name}
+                  </span>
+                )
+              }
 
-            {menuOpen ? (
-              <div
-                className="absolute right-0 top-full mt-2 w-60 rounded-2xl border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95 shadow-xl p-3 flex flex-col gap-2 z-50"
-                role="menu"
-              >
-                <button
-                  className="btn w-full justify-start gap-2"
-                  onClick={() => { closeMenu(); router.push('/presenter') }}
+              return (
+                <Link
+                  key={name}
+                  href={href}
+                  className={`primary-nav-link ${isActive ? 'is-active' : ''}`}
+                  aria-current={isActive ? 'page' : undefined}
                 >
-                  <MonitorPlay className="w-5 h-5" />
-                  <span>{UI.presenter}</span>
-                </button>
+                  {name}
+                </Link>
+              )
+            })}
+          </nav>
 
-                <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
-
-                {/* Language selector */}
-                <div className="px-1 pb-1 text-sm opacity-70">{UI.language}</div>
-                <div className="grid grid-cols-5 gap-1">
-                  {(['te','hi','ta','en','he'] as const).map(code => (
-                    <button
-                      key={code}
-                      className={`btn ${lang===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''}`}
-                      onClick={() => { setLang(code); closeMenu() }}
-                      title={LANG_LABELS[code].name}
-                    >
-                      {LANG_LABELS[code].glyph}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
-                <div className="flex justify-start">
-                  <ThemeToggle />
-                </div>
-
-                {/* Zoom slider (desktop menu, chapter pages only) */}
-                {showZoom && (
-                  <div className="mt-2">
-                    <ZoomSlider />
-                  </div>
-                )}
-
-                {/* Parallel selector */}
-                {showZoom && (
-                  <div className="mt-2">
-                    <div className="px-1 pb-1 text-sm opacity-70">Parallel</div>
-                    <div className="grid grid-cols-5 gap-1">
-                      {(['te','hi','ta','en','he'] as LangCode[]).map(code => (
-                        <button
-                          key={code}
-                          className={`btn ${parallel===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''} ${code===lang ? 'opacity-50 pointer-events-none' : ''}`}
-                          onClick={() => { setParallel(parallel===code ? null : code) }}
-                          title={`Parallel ${code.toUpperCase()}`}
-                        >
-                          {LANG_LABELS[code].glyph}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : null}
+          <div className="header-actions">
+            <Link
+              href="/settings"
+              className={`header-icon-link desktop-settings ${isPrimaryLinkActive('Settings') ? 'is-active' : ''}`}
+              aria-label="Settings"
+              aria-current={isPrimaryLinkActive('Settings') ? 'page' : undefined}
+            >
+              <Settings className="h-4 w-4" />
+            </Link>
+            <span className="desktop-theme-toggle"><ThemeToggle /></span>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className="header-icon-link mobile-menu-button"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="primary-mobile-menu"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
 
-          <button
-            ref={menuButtonRef}
-            type="button"
-            className="btn sm:hidden"
-            aria-haspopup="true"
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-header-menu"
-            onClick={toggleMobileMenu}
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            <span className="sr-only">Toggle menu</span>
-          </button>
-
-          {mobileMenuOpen ? (
-            <div
-              ref={menuPanelRef}
-              id="mobile-header-menu"
-              className="sm:hidden absolute right-0 top-full mt-2 w-52 rounded-2xl border border-black/10 dark:border-white/10 bg-white/95 dark:bg-neutral-900/95 shadow-xl p-3 flex flex-col gap-2 z-50"
-            >
-              <Link
-                href="/presenter"
-                className="btn w-full justify-start gap-2"
-                onClick={closeMobileMenu}
-              >
-                <MonitorPlay className="w-5 h-5" />
-                <span>Presenter</span>
-              </Link>
-
-              {/* Language selector on mobile */}
-              <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
-                <div className="px-1 pb-1 text-sm opacity-70">{UI.language}</div>
-              <div className="grid grid-cols-5 gap-1">
-                {(['te','hi','ta','en','he'] as const).map(code => (
-                  <button
-                    key={code}
-                    className={`btn ${lang===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''}`}
-                    onClick={() => { setLang(code); closeMobileMenu() }}
-                    title={LANG_LABELS[code].name}
-                  >
-                    {LANG_LABELS[code].glyph}
-                  </button>
-                ))}
-              </div>
-
-              <div className="border-t border-black/10 dark:border-white/10 pt-2 mt-1" />
-              <div className="flex justify-start">
+          {mobileMenuOpen && (
+            <div ref={menuPanelRef} id="primary-mobile-menu" className="site-menu mobile-nav-panel">
+              <nav className="mobile-primary-nav" aria-label="Mobile navigation">
+                {primaryLinks.map(({ name, href, icon: Icon, available }) =>
+                  available ? (
+                    <Link
+                      key={name}
+                      href={href}
+                      className={`mobile-nav-link ${isPrimaryLinkActive(name) ? 'is-active' : ''}`}
+                      aria-current={isPrimaryLinkActive(name) ? 'page' : undefined}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {name}
+                    </Link>
+                  ) : (
+                    <span key={name} className="mobile-nav-link is-coming-soon" aria-disabled="true">
+                      <Icon className="h-4 w-4" />
+                      {name}
+                      <span className="mobile-coming-soon">Soon</span>
+                    </span>
+                  ),
+                )}
+              </nav>
+              <div className="mobile-settings">
+                <span className="settings-title">Appearance</span>
                 <ThemeToggle />
+                <Link
+                  href="/settings"
+                  className={`mobile-settings-button ${isPrimaryLinkActive('Settings') ? 'is-active' : ''}`}
+                  aria-current={isPrimaryLinkActive('Settings') ? 'page' : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Settings className="h-4 w-4" />
+                  Settings
+                </Link>
               </div>
-
-              {/* Zoom slider (mobile menu, chapter pages only) */}
-              {showZoom && (
-                <div className="mt-2">
-                  <ZoomSlider />
-                </div>
-              )}
-
-              {/* Parallel selector (mobile) */}
-              {showZoom && (
-                <div className="mt-2">
-                  <div className="px-1 pb-1 text-sm opacity-70">Parallel</div>
-                  <div className="grid grid-cols-5 gap-1">
-                    {(['te','hi','ta','en','he'] as LangCode[]).map(code => (
-                      <button
-                        key={code}
-                        className={`btn ${parallel===code ? 'font-semibold bg-amber-200 text-black dark:bg-amber-300' : ''} ${code===lang ? 'opacity-50 pointer-events-none' : ''}`}
-                        onClick={() => { setParallel(parallel===code ? null : code); closeMobileMenu() }}
-                        title={`Parallel ${code.toUpperCase()}`}
-                      >
-                        {LANG_LABELS[code].glyph}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          ) : null}
-        </nav>
-      </div>
+          )}
+        </div>
+      </header>
 
-      {showBookNav && <MobileBookNav />}
-    </header>
+      {showTanachTools && (
+        <>
+        <div className={`tanach-tools-wrap ${showStudyTools ? 'study-tools-wrap' : ''} ${showPrayerTools ? 'prayer-tools-wrap' : ''}`} ref={toolsWrapRef}>
+          <button
+            type="button"
+            className="tanach-tools-mobile-toggle"
+            aria-label={mobileTanachToolsOpen ? 'Close reading tools' : 'Open reading tools'}
+            aria-expanded={mobileTanachToolsOpen}
+            aria-controls="tanach-reading-tools-rail"
+            onClick={() => {
+              setMobileTanachToolsOpen((open) => !open)
+              setActiveTanachTool(null)
+              setTanachToolPopoverTop(null)
+            }}
+          >
+            {mobileTanachToolsOpen
+              ? <X className="h-5 w-5" />
+              : <MousePointer2 className="h-5 w-5" />}
+          </button>
+          <div
+            id="tanach-reading-tools-rail"
+            className={`tanach-tool-rail ${mobileTanachToolsOpen ? 'is-open' : ''}`}
+            role="toolbar"
+            aria-label={showPrayerTools ? 'Prayer reading tools' : showStudyTools ? 'Study reading tools' : 'Tanach reading tools'}
+          >
+            {showPrayerTools ? (
+              <button
+                type="button"
+                className={`tanach-rail-button ${activeTanachTool === 'search' ? 'is-active' : ''}`}
+                aria-label="Search prayers"
+                aria-expanded={activeTanachTool === 'search'}
+                aria-controls={activeTanachTool === 'search' ? 'tanach-reading-tools' : undefined}
+                data-label="Search"
+                onClick={(event) => toggleTanachTool('search', event)}
+              >
+                <Search className="h-5 w-5" />
+                <span className="tanach-rail-label">Search</span>
+              </button>
+            ) : (
+              <Link href="/search" className="tanach-rail-button" aria-label={UI.search ?? 'Search'} data-label={UI.search ?? 'Search'}>
+                <Search className="h-5 w-5" />
+                <span className="tanach-rail-label">{UI.search ?? 'Search'}</span>
+              </Link>
+            )}
+            {!showStudyTools && !showPrayerTools && (
+              <button
+                type="button"
+                className="tanach-rail-button"
+                aria-label={UI.presenter}
+                data-label={UI.presenter}
+                onClick={() => router.push('/presenter')}
+              >
+                <MonitorPlay className="h-5 w-5" />
+                <span className="tanach-rail-label">{UI.presenter}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className={`tanach-rail-button ${activeTanachTool === 'language' ? 'is-active' : ''}`}
+              aria-label={UI.language}
+              aria-expanded={activeTanachTool === 'language'}
+              aria-controls={activeTanachTool === 'language' ? 'tanach-reading-tools' : undefined}
+              data-label={UI.language}
+              onClick={(event) => toggleTanachTool('language', event)}
+            >
+              <Languages className="h-5 w-5" />
+              <span className="tanach-rail-label">{UI.language}</span>
+            </button>
+            {showZoom && (
+              <>
+                <button
+                  type="button"
+                  className={`tanach-rail-button ${activeTanachTool === 'zoom' ? 'is-active' : ''}`}
+                  aria-label="Zoom"
+                  aria-expanded={activeTanachTool === 'zoom'}
+                  aria-controls={activeTanachTool === 'zoom' ? 'tanach-reading-tools' : undefined}
+                  data-label="Zoom"
+                  onClick={(event) => toggleTanachTool('zoom', event)}
+                >
+                  <ZoomIn className="h-5 w-5" />
+                  <span className="tanach-rail-label">Zoom</span>
+                </button>
+                {showPrayerTools && (
+                  <button
+                    type="button"
+                    className={`tanach-rail-button ${prayerTransliterationMode ? 'is-active' : ''}`}
+                    aria-label={prayerTransliterationMode ? 'Show prayer translation' : 'Show transliteration'}
+                    aria-pressed={prayerTransliterationMode}
+                    disabled={!prayerTransliterationAvailable}
+                    data-label="Trans"
+                    onClick={togglePrayerTransliteration}
+                    title={prayerTransliterationAvailable ? 'Toggle Hebrew-prayer transliteration' : 'Transliteration unavailable for this section'}
+                  >
+                    <Type className="h-5 w-5" />
+                    <span className="tanach-rail-label">Trans</span>
+                  </button>
+                )}
+                {!showStudyTools && !showPrayerTools && (
+                  <button
+                    type="button"
+                    className={`tanach-rail-button ${activeTanachTool === 'parallel' ? 'is-active' : ''}`}
+                    aria-label="Parallel reading"
+                    aria-expanded={activeTanachTool === 'parallel'}
+                    aria-controls={activeTanachTool === 'parallel' ? 'tanach-reading-tools' : undefined}
+                    data-label="Parallel"
+                    onClick={(event) => toggleTanachTool('parallel', event)}
+                  >
+                    <Columns2 className="h-5 w-5" />
+                    <span className="tanach-rail-label">Parallel</span>
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+          {activeTanachTool && (
+            <aside
+              ref={toolsPanelRef}
+              id="tanach-reading-tools"
+              className="tanach-tool-popover"
+              style={tanachToolPopoverTop === null ? undefined : { top: `${tanachToolPopoverTop}px` }}
+              aria-label={showPrayerTools ? 'Prayer reading tool options' : showStudyTools ? 'Study reading tool options' : 'Tanach reading tool options'}
+            >
+              <button
+                type="button"
+                className="tanach-tool-popover-close"
+                aria-label="Close Tanach tool options"
+                onClick={() => {
+                  setActiveTanachTool(null)
+                  setTanachToolPopoverTop(null)
+                }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+              {showPrayerTools && activeTanachTool === 'search' && (
+                <form className="tanach-tool-group prayer-search-form" onSubmit={submitPrayerSearch}>
+                  <label className="tanach-tool-label" htmlFor="prayer-search">Search prayers</label>
+                  <div className="prayer-search-controls">
+                    <input
+                      id="prayer-search"
+                      type="search"
+                      value={prayerSearchValue}
+                      onChange={(event) => setPrayerSearchValue(event.target.value)}
+                      placeholder="Search prayer text"
+                    />
+                    <button type="submit">Search</button>
+                  </div>
+                </form>
+              )}
+              {activeTanachTool === 'language' && (
+                <div className="tanach-tool-group">
+                  <span className="tanach-tool-label">{UI.language}</span>
+                  <LanguageButtons
+                    lang={showPrayerTools ? prayerToolLanguage : showStudyTools ? studyToolLanguage : lang}
+                    onSelect={(code) => {
+                      if (showPrayerTools && !prayerLanguageAvailable(code)) {
+                        return
+                      }
+                      if (showStudyTools && !studyLanguageAvailable(code)) {
+                        setStudyLanguageNotice(`${LANG_LABELS[code].name} is not available for this study book yet.`)
+                        return
+                      }
+                      setStudyLanguageNotice('')
+                      setLang(code)
+                    }}
+                    compact
+                    isAvailable={showPrayerTools ? prayerLanguageAvailable : showStudyTools ? studyLanguageAvailable : undefined}
+                    disableUnavailable={showPrayerTools}
+                  />
+                  {showStudyTools && studyLanguageNotice && (
+                    <p className="study-tool-language-notice" role="status">{studyLanguageNotice}</p>
+                  )}
+                </div>
+              )}
+              {activeTanachTool === 'zoom' && <ZoomSlider />}
+              {!showStudyTools && !showPrayerTools && activeTanachTool === 'parallel' && (
+                <ParallelSelector lang={lang} parallel={parallel} setParallel={setParallel} />
+              )}
+            </aside>
+          )}
+        </div>
+        {showBookNav && <div className="tanach-chapter-nav desktop-book-nav"><BookChapterNav /></div>}
+        {showBookNav && <MobileBookNav />}
+        {showStudyTools && <StudyNavigation />}
+        {showPrayerTools && <PrayerNavigation />}
+        </>
+      )}
+    </>
+  )
+}
+
+function LanguageButtons({
+  lang,
+  onSelect,
+  compact = false,
+  isAvailable,
+  disableUnavailable = false,
+}: {
+  lang: LangCode
+  onSelect: (code: LangCode) => void
+  compact?: boolean
+  isAvailable?: (code: LangCode) => boolean
+  disableUnavailable?: boolean
+}) {
+  return (
+    <div className={`language-buttons ${compact ? 'is-compact' : ''}`}>
+      {(['te', 'hi', 'ta', 'en', 'he'] as const).map((code) => (
+        <button
+          key={code}
+          type="button"
+          className={`language-button ${lang === code ? 'is-selected' : ''} ${isAvailable && !isAvailable(code) ? 'is-unavailable' : ''}`}
+          onClick={() => onSelect(code)}
+          disabled={disableUnavailable && isAvailable ? !isAvailable(code) : undefined}
+          aria-disabled={isAvailable ? !isAvailable(code) : undefined}
+          title={isAvailable && !isAvailable(code) ? `${LANG_LABELS[code].name} unavailable for this content` : LANG_LABELS[code].name}
+          aria-label={LANG_LABELS[code].name}
+          aria-pressed={lang === code}
+        >
+          {LANG_LABELS[code].glyph}
+        </button>
+      ))}
+    </div>
   )
 }
 
 function ZoomSlider() {
   const { level, setLevel } = useZoom()
-  // 5 steps mapped to 0,25,50,75,100%
-  const percents = [0, 25, 50, 75, 100]
-  const idx = Math.max(0, Math.min(4, level + 2))
-  const percent = percents[idx]
-
-  const inc = () => setLevel(level + 1)
-  const dec = () => setLevel(level - 1)
+  const percent = [0, 25, 50, 75, 100][Math.max(0, Math.min(4, level + 2))]
 
   return (
-    <div className="space-y-2">
-      <div className="text-sm opacity-70 mb-1 text-center">Zoom</div>
-      <div className="flex items-center justify-center gap-2">
+    <div className="tanach-tool-group zoom-tools">
+      <span className="tanach-tool-label">Zoom</span>
+      <div className="zoom-tool-controls">
         <button
           type="button"
-          className={`btn btn-chip ${level <= -2 ? 'opacity-50 pointer-events-none' : ''}`}
-          onClick={dec}
+          className="tanach-tool-icon"
+          onClick={() => setLevel(level - 1)}
+          disabled={level <= -2}
           aria-label="Zoom out"
         >
-          <Minus className="w-4 h-4" />
+          <Minus className="h-3.5 w-3.5" />
         </button>
-        <div className="min-w-[64px] text-center font-semibold select-none">{percent}%</div>
+        <span className="zoom-value">{percent}%</span>
         <button
           type="button"
-          className={`btn btn-chip ${level >= 2 ? 'opacity-50 pointer-events-none' : ''}`}
-          onClick={inc}
+          className="tanach-tool-icon"
+          onClick={() => setLevel(level + 1)}
+          disabled={level >= 2}
           aria-label="Zoom in"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
   )
 }
 
+function ParallelSelector({
+  lang,
+  parallel,
+  setParallel,
+}: {
+  lang: LangCode
+  parallel: LangCode | null
+  setParallel: (code: LangCode | null) => void
+}) {
+  return (
+    <div className="tanach-tool-group parallel-tools">
+      <span className="tanach-tool-label">Parallel</span>
+      <select
+        className="parallel-select"
+        value={parallel ?? ''}
+        onChange={(event) =>
+          setParallel(event.target.value ? (event.target.value as LangCode) : null)
+        }
+        aria-label="Parallel language"
+      >
+        <option value="">Off</option>
+        {(['te', 'hi', 'ta', 'en', 'he'] as const)
+          .filter((code) => code !== lang)
+          .map((code) => (
+            <option key={code} value={code}>
+              {LANG_LABELS[code].name}
+            </option>
+          ))}
+      </select>
+    </div>
+  )
+}

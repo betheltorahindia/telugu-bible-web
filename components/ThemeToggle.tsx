@@ -1,14 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { Moon, Sun } from 'lucide-react'
 
-const THEMES = ['light', 'dark', 'rain'] as const
+const THEMES = ['dark', 'light'] as const
 type ThemeName = (typeof THEMES)[number]
-
-const THEME_ICONS: Record<ThemeName, string> = {
-  light: '☀️',
-  dark: '🌙',
-  rain: '💧',
-}
 
 function isTheme(value: string | null): value is ThemeName {
   return value !== null && (THEMES as readonly string[]).includes(value)
@@ -20,34 +15,35 @@ export default function ThemeToggle() {
   const applyTheme = (next: ThemeName, persist = true) => {
     setTheme(next)
     if (persist && typeof window !== 'undefined') {
-      localStorage.setItem('theme', next)
+      localStorage.setItem('theme-v2', next)
     }
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', next)
+      document.documentElement.classList.toggle('dark', next === 'dark')
     }
   }
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const saved = localStorage.getItem('theme')
+    const saved = localStorage.getItem('theme-v2')
     const initial: ThemeName = isTheme(saved) ? saved : 'light'
     applyTheme(initial, false)
   }, [])
 
   const toggle = () => {
-    const currentIndex = THEMES.indexOf(theme)
-    const nextTheme = THEMES[(currentIndex + 1) % THEMES.length]
-    applyTheme(nextTheme)
+    applyTheme(theme === 'dark' ? 'light' : 'dark')
   }
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      className="btn"
-      aria-label={`Theme toggle (current: ${theme})`}
-      title="Switch theme"
+      className="theme-toggle"
+      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
     >
-      {THEME_ICONS[theme]}
+      {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      <span className="sr-only">{theme === 'dark' ? 'Light theme' : 'Dark theme'}</span>
     </button>
   )
 }

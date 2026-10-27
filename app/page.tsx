@@ -1,131 +1,163 @@
-// app/page.tsx
 import Link from 'next/link'
-import { HOME_SECTIONS, BOOK_NAMES, getLocalizedBookName } from '../lib/data/books'
-import Footer from '../components/footer'
+import { ArrowUpRight, BookOpen, CalendarDays, Heart, Quote, Sparkles, Users } from 'lucide-react'
+import { getDailyQuote } from '../lib/api/dailyQuote'
+import HomeNavigationCarousel from '../components/HomeNavigationCarousel'
 import InstallFAB from '../components/InstallFAB'
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import { getBibleServer } from '../lib/bibleServer'
-import SocialEntryCard from '../components/SocialEntryCard'
-
-// ✅ Weekly Parasha teaser
+import BethelChat from '../components/BethelChat'
 import ParashaTeaser from '../components/ParashaTeaser'
-import { getLangFromCookie } from '../lib/bibleServer'
-import { uiStrings } from '../lib/i18n'
 
-// ✅ Home page SEO metadata
 export const metadata = {
-  title: 'Home',
+  title: 'BETHEL TORAH INDIA',
   description:
-    'Telugu Tanakh / పరిశుద్ధ గ్రంథం – Read the Holy Bible (Tanach) in Telugu: Torah (ఆదికాండము–ద్వితీయోపదేశకాండము), ప్రవక్తలు, కీర్తనలు, వారాంత Parasha & Haftarah పఠనాలు.',
-  keywords: [
-    'Telugu Bible',
-    'Telugu Tanakh',
-    'పరిశుద్ధ గ్రంథం',
-    'Holy Bible',
-    'Tanach',
-    'Torah',
-    'Parasha',
-    'Haftarah',
-    'Bethel Torah India',
-    'Bethel',
-    'Bethel India',
-    'Bible Telugu',
-    'Beth-El Torah India',
-    'Beth-El',
-    'Bethel films',
-    'Bethel India films',
-    'Jewish Bible Telugu',
-    'Bible',
-    'Old Testament',
-    'Telugu Bible',
-    'Telugu Jewish Bible',
-    'Telugu Old Testament',
-    'Telugu Scriptures',
-    'Telugu Torah',
-    'Telugu Neviim',
-    'Telugu Ketuvim',
-    'Telugu Parasha',
-    'Telugu Haftarah',
-    'Telugu Bible App',
-    'బైబిల్',
-    'హోలీ బైబిల్',
-    'బైబిల్ స్టడీ',
-    'బైబిల్ తెలుగు',
-    'బేతేల్',
-    'బేతేల్ తోరా ఇండియా',
-    'ఆదికాండము',
-    'నిర్గమకాండము',
-    'లేవీయకాండము',
-    'సంఖ్యాకాండము',
-    'ద్వితీయోపదేశకాండము',
-    'యెహోషువ',
-    'న్యాయాధిపతులు',
-    'రూతు',
-    'సమూయేలు',
-    'రాజులు',
-    'దినవృత్తాంతములు',
-    'ఎజ్రా',
-    'నెహెమ్యా',
-    'ఏస్తేరు',
-    'యోబు',
-    'కీర్తనలు',
-    'సామెతలు',
-    'ప్రసంగి',
-    'పరమగీతము',
-    'యెషయా',
-    'యిర్మీయా',
-    'విలాపవాక్యములు',
-    'యెహెజ్కేలు',
-    'దానియేలు',
-    'హోషేయ',
-    'యోవేలు',
-    'ఆమోసు',
-    'ఓబద్యా',
-    'యోనా',
-    'మీకా',
-    'నాహూము',
-    'హబక్కూకు',
-    'జెఫన్యా',
-    'హగ్గయి',
-    'జెకర్యా',
-    'మలాకీ',
-  ],
+    'A growing home for Torah learning, community, stories and useful tools from Bethel Torah India.',
   alternates: { canonical: '/' },
 }
 
-export default async function Home() {
-  const bible = await getBibleServer()
-  const lang = getLangFromCookie()
-  const UI = uiStrings(lang)
-  return (
-    <div className="space-y-8 pb-12">
-      {/* Weekly Parasha / Haftarah teaser */}
-      <SocialEntryCard />
-      <ParashaTeaser />
+const letters = Array.from('BETHEL')
+const HEBREW_WEEKDAYS = [
+  'Yom Rishon',
+  'Yom Sheni',
+  'Yom Shlishi',
+  'Yom Revi’i',
+  'Yom Chamishi',
+  'Yom Shishi',
+  'Yom Shabbat',
+]
 
-      {/* --- Sections of books --- */}
-      {HOME_SECTIONS.map((sec) => (
-        <section key={sec.key} id={sec.label}>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-semibold">{UI.divisions[sec.key as keyof typeof UI.divisions]}</h2>
+function formatHebrewDate(date: Date, options: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat('en-u-ca-hebrew', { ...options, timeZone: 'UTC' }).format(date)
+}
+
+export default async function Home() {
+  const quote = await getDailyQuote()
+  const today = new Date()
+  const date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()))
+  const englishDate = new Intl.DateTimeFormat('en-IN', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date)
+  const hebrewDate = `${HEBREW_WEEKDAYS[date.getUTCDay()]}, ${formatHebrewDate(date, {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })}`
+  return (
+    <div className="community-home">
+      <section className="home-hero" aria-labelledby="home-title">
+        <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
+        <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
+        <div className="hero-glow" aria-hidden="true" />
+
+        <div className="hero-date-panels" aria-label="Today’s dates">
+          <div className="hero-date-card">
+            <span className="hero-date-label">Gregorian calendar</span>
+            <strong>{englishDate}</strong>
           </div>
-          <div className="card">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-              {sec.order.map((bnum) => {
-                const bname = getLocalizedBookName(bnum, lang, (bible as any)?.books?.find((b:any)=>b.bnumber===bnum)?.bname)
-                return (
-                  <Link key={bnum} href={`/book/${bnum}`} className="btn btn-book">
-                    {bname ?? BOOK_NAMES[bnum] ?? `Book ${bnum}`}
-                  </Link>
-                )
-              })}
+          <div className="hero-date-card hero-hebrew-date">
+            <span className="hero-date-label">Hebrew calendar</span>
+            <strong>{hebrewDate}</strong>
           </div>
         </div>
-      </section>
-      ))}
 
-      <Footer />
+        <div className="hero-content">
+          <h1 id="home-title" className="hero-wordmark">
+            <span className="hero-letters" aria-hidden="true">
+              {letters.map((letter, index) => (
+                <span key={`${letter}-${index}`} style={{ animationDelay: `${index * 90}ms` }}>
+                  {letter}
+                </span>
+              ))}
+            </span>
+            <span className="sr-only">BETHEL TORAH INDIA</span>
+            <span className="hero-title-bottom" aria-hidden="true">TORAH INDIA</span>
+          </h1>
+          <HomeNavigationCarousel />
+        </div>
+      </section>
+
+      <section className="daily-quote-card" aria-label="Daily Jewish wisdom">
+        <Quote className="daily-quote-mark" aria-hidden="true" />
+        <blockquote>{quote.text}</blockquote>
+        <p className="daily-quote-author">{quote.author}</p>
+      </section>
+
+      <section className="home-readings" aria-labelledby="home-readings-title">
+        <div className="home-readings-heading">
+          <div>
+            <p className="home-kicker"><CalendarDays className="h-3.5 w-3.5" /> THIS WEEK IN TORAH</p>
+            <h2 id="home-readings-title">Weekly Torah readings</h2>
+          </div>
+          <Link href="/tanach" className="home-readings-calendar">
+            Explore Tanach <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </div>
+        <div className="home-reading-grid home-reading-grid-tanach">
+          <ParashaTeaser />
+        </div>
+      </section>
+
+      <section id="discover" className="home-discover" aria-labelledby="discover-title">
+        <div className="home-section-heading">
+          <div>
+            <p className="home-kicker"><Sparkles className="h-3.5 w-3.5" /> YOUR PLACE TO BEGIN</p>
+            <h2 id="discover-title">Explore what matters to you.</h2>
+          </div>
+          <p>One home for learning, connection and the things we build together.</p>
+        </div>
+
+        <div className="home-feature-grid">
+          <Link href="/tanach" className="home-feature-card home-feature-tanach">
+            <span className="feature-icon"><BookOpen className="h-5 w-5" /></span>
+            <span className="feature-index">01 / SCRIPTURE</span>
+            <span className="feature-title">The Tanach</span>
+            <span className="feature-description">
+              Read the Telugu scriptures, weekly Parashiyot and Torah readings.
+            </span>
+            <span className="feature-link">Explore Tanach <ArrowUpRight className="h-4 w-4" /></span>
+          </Link>
+          <Link href="/social" className="home-feature-card home-feature-community">
+            <span className="feature-icon"><Users className="h-5 w-5" /></span>
+            <span className="feature-index">02 / COMMUNITY</span>
+            <span className="feature-title">Connect & share</span>
+            <span className="feature-description">
+              Step into the community space and see what is happening.
+            </span>
+            <span className="feature-link">Visit community <ArrowUpRight className="h-4 w-4" /></span>
+          </Link>
+          <Link href="/calendar" className="home-feature-card home-feature-growing">
+            <span className="feature-icon"><CalendarDays className="h-5 w-5" /></span>
+            <span className="feature-index">03 / CALENDAR</span>
+            <span className="feature-title">Dates &amp; readings</span>
+            <span className="feature-description">
+              Explore English and Hebrew dates, holidays and Torah readings.
+            </span>
+            <span className="feature-link">Open calendar <ArrowUpRight className="h-4 w-4" /></span>
+          </Link>
+          <Link id="prayers" href="/prayers" className="home-feature-card home-feature-coming-soon">
+            <span className="feature-icon"><Heart className="h-5 w-5" /></span>
+            <span className="feature-index">04 / PRAYER</span>
+            <span className="feature-title">Prayers</span>
+            <span className="feature-description">Explore daily prayers, Telugu translations, and Hebrew-prayer transliterations.</span>
+            <span className="feature-link">Open prayers <ArrowUpRight className="h-4 w-4" /></span>
+          </Link>
+          <Link id="wisdom" href="/study" className="home-feature-card home-feature-growing">
+            <span className="feature-icon"><Sparkles className="h-5 w-5" /></span>
+            <span className="feature-index">05 / STUDY</span>
+            <span className="feature-title">Study</span>
+            <span className="feature-description">Explore Noahide teachings and classic ethical works in English and Telugu.</span>
+            <span className="feature-link">Explore Study <ArrowUpRight className="h-4 w-4" /></span>
+          </Link>
+        </div>
+      </section>
+
+      <footer className="home-footer">
+        <span>BETHEL TORAH INDIA</span>
+        <span>A community in the making.</span>
+      </footer>
+      <BethelChat />
       <InstallFAB />
     </div>
   )

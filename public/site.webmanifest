@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Bethel Torah India | Telugu",
+  "short_name": "Bethel Torah",
+  "description": "Read the Holy Bible / Tanakh in Telugu and explore the Bethel Torah India community.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/android-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

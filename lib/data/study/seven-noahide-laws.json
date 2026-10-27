@@ -1,0 +1,130 @@
+{
+  "title": {
+    "en": "The Seven Divine Commandments to Be Observed Universally",
+    "te": "విశ్వవ్యాప్తంగా పాటించవలసిన 7 దైవీక ఆజ్ఞలు",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  "laws": [
+    {
+      "number": 1,
+      "positive": {
+        "en": "Remain faithful to the One God.",
+        "te": "ఏకైక దేవునికి నమ్మకంగా ఉందాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not worship what is unknown.",
+        "te": "తెలియనిదానిని పూజింపకూడదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 2,
+      "positive": {
+        "en": "Honor God.",
+        "te": "దేవుని గౌరవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not blaspheme.",
+        "te": "దేవ దూషణ చెయ్యరాదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 3,
+      "positive": {
+        "en": "Respect the property of others.",
+        "te": "పరుల ఆస్తిని గౌరవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not steal.",
+        "te": "దొంగతనం చెయరాదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 4,
+      "positive": {
+        "en": "Respect human life.",
+        "te": "మానవ జాతిని గౌరవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not murder.",
+        "te": "నరహత్య చెయరాదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 5,
+      "positive": {
+        "en": "Honor the unity of the family.",
+        "te": "కుటుంబ ఐక్యతను గౌరవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not commit adultery.",
+        "te": "వ్యభిచారం చేయరాదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 6,
+      "positive": {
+        "en": "Respect all living creatures.",
+        "te": "అన్నీ జీవులను గౌరవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not eat flesh taken from a living animal.",
+        "te": "బ్రతికున్న జీవియొక్క చీల్చబడిన మాంసం తినరాదు",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    },
+    {
+      "number": 7,
+      "positive": {
+        "en": "Live according to divine and civic laws.",
+        "te": "దైవీక మరియు సామాజిక చట్టాలు ప్రకారం జీవిద్దాం",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      },
+      "negative": {
+        "en": "Do not permit corruption or injustice.",
+        "te": "అవినీటి మరియు ఆక్రమాన్ని అనుమతించవొద్దు.",
+        "ta": "",
+        "hi": "",
+        "he": ""
+      }
+    }
+  ]
+}

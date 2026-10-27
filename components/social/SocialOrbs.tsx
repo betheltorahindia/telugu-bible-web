@@ -51,7 +51,7 @@ export function SocialOrbs() {
           rel="noreferrer noopener"
           aria-label={item.label}
           title={item.label}
-          className="group relative grid h-16 w-16 place-items-center rounded-2xl sm:h-[74px] sm:w-[74px]"
+          className={`social-orb-link group relative grid h-16 w-16 place-items-center rounded-2xl sm:h-[74px] sm:w-[74px] social-orb-${item.key}`}
           style={{
             transformStyle: "preserve-3d",
             animation: `sw-float 5s ease-in-out ${i * 0.5}s infinite`,
@@ -62,18 +62,10 @@ export function SocialOrbs() {
             style={{ background: item.glow }}
           />
           <span
-            className="absolute inset-0 rounded-2xl border transition-all duration-500 group-hover:-translate-y-1"
-            style={{
-              borderColor: "oklch(1 0 0 / 14%)",
-              background:
-                "linear-gradient(155deg, oklch(1 0 0 / 14%), oklch(1 0 0 / 3%) 55%, oklch(1 0 0 / 9%))",
-              boxShadow:
-                "inset 0 1px 0 oklch(1 0 0 / 25%), 0 20px 34px -20px oklch(0 0 0 / 90%)",
-              backdropFilter: "blur(14px)",
-            }}
+            className="social-orb-surface absolute inset-0 rounded-2xl border transition-all duration-500 group-hover:-translate-y-1"
           />
           <span
-            className="relative transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110"
+            className={`social-orb-icon relative transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-110 social-orb-icon-${item.key}`}
             style={{ color: item.glow, filter: "drop-shadow(0 6px 10px oklch(0 0 0 / 55%))" }}
           >
             {item.icon}

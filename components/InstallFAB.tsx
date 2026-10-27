@@ -83,14 +83,10 @@ export default function InstallFAB() {
         onClick={clickInstall}
         aria-label="Install app"
         title="ఇన్స్టాల్"
-        className="
-          lg:hidden fixed bottom-5 right-5 z-50
-          w-14 h-14 rounded-full bg-red-600 text-white
-          shadow-lg shadow-red-600/40 flex items-center justify-center
-          active:scale-95 transition
-        "
+        className="install-app-button"
       >
         <Download className="w-6 h-6" />
+        <span>Install app</span>
       </button>
 
       {iosFallback && showIosHint && (

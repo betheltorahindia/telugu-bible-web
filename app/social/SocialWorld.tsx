@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { ChevronDown, ExternalLink, Home, ListVideo, Play, Youtube } from 'lucide-react'
+import { ChevronDown, ExternalLink, ListVideo, Play, Youtube } from 'lucide-react'
 import { Coverflow } from '../../components/social/Coverflow'
 import { SocialOrbs } from '../../components/social/SocialOrbs'
 import { YOUTUBE, type SpotifyShow, type YouTubeVideo } from '../../lib/social/social-data'
@@ -17,23 +16,7 @@ export default function SocialWorld({
   return (
     <div className="social-world sw-grain overflow-x-hidden pb-24">
       <Aurora />
-
-      <header className="relative z-10 mx-auto flex max-w-6xl items-center px-5 pt-6 sm:pt-8">
-        <Link href="/" className="sw-btn-ghost !px-4 !py-2.5 text-sm">
-          <Home className="h-4 w-4" />
-          Home
-        </Link>
-      </header>
-
-      <section className="relative z-10 mx-auto flex max-w-6xl flex-col items-center px-5 pt-10 pb-6 sm:pt-16">
-        <div className="sw-halo" aria-hidden />
-        <h1 className="sw-gold-text sw-rise text-center text-3xl font-semibold sm:text-5xl">
-          Explore Teachings &amp; Podcasts
-        </h1>
-        <p className="sw-rise mt-4 max-w-xl text-center text-sm leading-relaxed opacity-65">
-          Watch the newest videos and listen to every podcast episode — all in one place.
-        </p>
-      </section>
+      <h1 className="sr-only">Bethel Torah India Social</h1>
 
       <YouTubeSection videos={videos} />
       <SpotifySection shows={shows} />
@@ -68,21 +51,27 @@ function Aurora() {
 
 function SectionTitle({ kicker, title }: { kicker: string; title: string }) {
   return (
-    <div className="sw-rise relative z-10 mx-auto mb-10 max-w-3xl px-5 text-center">
-      <p className="text-[11px] uppercase tracking-[0.4em] opacity-55">{kicker}</p>
-      <h2 className="sw-gold-text mt-3 text-2xl font-semibold sm:text-4xl">{title}</h2>
-      <div
-        className="mx-auto mt-5 h-px w-40"
-        style={{ background: 'linear-gradient(90deg, transparent, var(--sw-gold), transparent)' }}
-      />
+    <div className="sw-section-title">
+      <p>{kicker}</p>
+      <h2>{title}</h2>
     </div>
   )
 }
 
 function YouTubeSection({ videos }: { videos: YouTubeVideo[] }) {
   return (
-    <section className="relative z-10 mx-auto max-w-6xl pt-10 sm:pt-16">
-      <SectionTitle kicker="Now streaming" title="BethEl Torah India YouTube Channel" />
+    <section className="sw-media-section relative z-10 mx-auto max-w-6xl">
+      <div className="sw-section-header">
+        <SectionTitle kicker="NOW STREAMING" title="Latest teachings" />
+        <div className="sw-section-links">
+          <a href={YOUTUBE.channelUrl} target="_blank" rel="noreferrer noopener" className="sw-btn sw-btn-hover text-sm">
+            <Youtube className="h-4 w-4" /> YouTube channel <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+          <a href={YOUTUBE.playlistsUrl} target="_blank" rel="noreferrer noopener" className="sw-btn-ghost text-sm">
+            <ListVideo className="h-4 w-4" /> Playlists
+          </a>
+        </div>
+      </div>
 
       {videos.length === 0 ? (
         <Empty message="Videos are taking a moment to appear. Please refresh shortly." />
@@ -96,27 +85,6 @@ function YouTubeSection({ videos }: { videos: YouTubeVideo[] }) {
           render={(v, active) => <VideoCard video={v} active={active} />}
         />
       )}
-
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-4 px-5">
-        <a
-          href={YOUTUBE.channelUrl}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="sw-btn sw-btn-hover text-sm"
-        >
-          <Youtube className="h-5 w-5" />
-          Visit Channel
-        </a>
-        <a
-          href={YOUTUBE.playlistsUrl}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="sw-btn-ghost text-sm"
-        >
-          <ListVideo className="h-5 w-5" />
-          View Playlists
-        </a>
-      </div>
     </section>
   )
 }
@@ -132,9 +100,9 @@ function VideoCard({ video, active }: { video: YouTubeVideo; active: boolean }) 
       }}
       className="group block h-full w-full overflow-hidden rounded-2xl"
       style={{
-        border: '1px solid rgba(255,255,255,0.14)',
-        boxShadow: '0 30px 60px -30px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.18)',
-        background: '#221f31',
+        border: '1px solid var(--sw-card-border)',
+        boxShadow: 'var(--sw-card-shadow)',
+        background: 'var(--sw-deep)',
       }}
     >
       <div className="relative h-full w-full">
@@ -148,7 +116,7 @@ function VideoCard({ video, active }: { video: YouTubeVideo; active: boolean }) 
         />
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 35%, rgba(16,15,24,0.88))' }}
+          style={{ background: 'linear-gradient(180deg, transparent 35%, var(--sw-image-shade))' }}
         />
         {video.duration ? (
           <span className="absolute right-3 top-3 rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium tracking-wide">
@@ -179,8 +147,10 @@ function SpotifySection({ shows }: { shows: SpotifyShow[] }) {
   const latest = shows.slice(0, 10)
 
   return (
-    <section className="relative z-10 mx-auto max-w-6xl pt-24 sm:pt-32">
-      <SectionTitle kicker="Listen anywhere" title="BethEl Torah India Spotify Podcasts" />
+    <section className="sw-media-section relative z-10 mx-auto max-w-6xl">
+      <div className="sw-section-header">
+        <SectionTitle kicker="LISTEN ANYWHERE" title="Podcasts" />
+      </div>
 
       {shows.length === 0 ? (
         <Empty message="Podcasts are taking a moment to appear. Please refresh shortly." />
@@ -195,7 +165,7 @@ function SpotifySection({ shows }: { shows: SpotifyShow[] }) {
         />
       )}
 
-      <div className="mt-8 flex flex-col items-center gap-5 px-5">
+      <div className="sw-podcast-actions">
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -228,8 +198,8 @@ function SpotifySection({ shows }: { shows: SpotifyShow[] }) {
                     rel="noreferrer noopener"
                     className="group flex items-center gap-4 rounded-2xl p-3 transition-all duration-300 hover:-translate-y-0.5"
                     style={{
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'var(--sw-list-row)',
+                      border: '1px solid var(--sw-card-border)',
                     }}
                   >
                     <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-black/40">
@@ -272,9 +242,9 @@ function ShowCard({ show, active }: { show: SpotifyShow; active: boolean }) {
       }}
       className="group block h-full w-full overflow-hidden rounded-3xl"
       style={{
-        border: '1px solid rgba(255,255,255,0.14)',
-        boxShadow: '0 30px 60px -30px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.18)',
-        background: '#221f31',
+        border: '1px solid var(--sw-card-border)',
+        boxShadow: 'var(--sw-card-shadow)',
+        background: 'var(--sw-deep)',
       }}
     >
       <div className="relative h-full w-full">
@@ -293,7 +263,7 @@ function ShowCard({ show, active }: { show: SpotifyShow; active: boolean }) {
         )}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(16,15,24,0.92))' }}
+          style={{ background: 'linear-gradient(180deg, transparent 35%, var(--sw-image-shade))' }}
         />
         <span
           className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full transition-transform duration-500 group-hover:scale-110"

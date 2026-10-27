@@ -1,8 +1,8 @@
 ﻿import '../styles/globals.css'
 import Header from '../components/Header'
+import LaunchAnimation from '../components/LaunchAnimation'
 import { SupabaseProvider } from '../components/providers/SupabaseProvider'
 import { QueryProvider } from '../components/providers/QueryProvider'
-import { Noto_Sans_Telugu, Noto_Sans_Tamil, Tiro_Devanagari_Hindi, Frank_Ruhl_Libre } from 'next/font/google'
 import type { ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -16,7 +16,7 @@ import type { LangCode } from '../lib/lang'
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://betheltelugubible.org/'),
   title: {
-    default: 'Telugu Tanakh - Bethel Torah India',
+    default: 'BETHEL TORAH INDIA',
     template: '%s - Bethel Torah India',
   },
   description:
@@ -49,86 +49,67 @@ export const metadata = {
     images: ['/og-image.png'],
   },
   alternates: { canonical: '/' },
-  icons: {
-    icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
-    apple: [{ url: '/apple-icon-180x180.png', sizes: '180x180', type: 'image/png' }],
-  },
 }
 
 export const viewport = {
-  themeColor: '#000000',
+  themeColor: '#ffffff',
 }
-
-const notoTelugu = Noto_Sans_Telugu({
-  subsets: ['telugu'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-})
-
-const notoTamil = Noto_Sans_Tamil({
-  subsets: ['tamil'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-})
-
-const tiroHindi = Tiro_Devanagari_Hindi({
-  subsets: ['devanagari'],
-  weight: ['400'],
-  display: 'swap',
-})
-
-const frankHebrew = Frank_Ruhl_Libre({
-  subsets: ['hebrew'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-})
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const initialSession: Session | null = null
   const lang: LangCode = getLangFromCookie()
 
-  // Fonts: Telugu + English keep current (Telugu font class).
-  // Hindi/Tamil use Noto Sans; Hebrew uses Frank Ruhl Libre globally.
-  const fontClass =
-    lang === 'hi' ? tiroHindi.className :
-    lang === 'ta' ? notoTamil.className :
-    lang === 'he' ? frankHebrew.className :
-    notoTelugu.className
-
   return (
-    <html lang={lang} className={fontClass}>
+    <html lang={lang} data-theme="light" suppressHydrationWarning>
       <head>
-        {/* Apple icons (optional but fine to keep) */}
-        <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png" />
-        <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png" />
-        <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png" />
-        <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png" />
-        <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png" />
-        <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png" />
-        <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png" />
-        <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png" />
-
-        {/* Android / Favicons */}
-        <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        {/* Generic shortcut icon (optional) */}
-        <link rel="shortcut icon" href="/favicon.ico" />
-
-        {/* Web App Manifest (critical for install) */}
-        <link rel="manifest" href="/manifest.json" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              const root = document.documentElement;
+              const saved = localStorage.getItem('theme-v2');
+              if (saved === 'light' || saved === 'dark') {
+                root.setAttribute('data-theme', saved);
+                root.classList.toggle('dark', saved === 'dark');
+              }
+            })();`,
+          }}
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-icon-180x180.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link
+          rel="icon"
+          href="/favicon.ico"
+        />
+        <link
+          rel="manifest"
+          href="/site.webmanifest"
+        />
 
         {/* Windows tiles (optional) */}
         <meta name="google-site-verification" content="Qch3vbS6pWUtPJ887_ypRFKjFxfUas7mDoSkUy6A-4Q" />
         <meta name="msapplication-TileColor" content="#ffffff" />
-        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
+        <meta
+          name="msapplication-TileImage"
+          content="/android-icon-192x192.png"
+        />
       </head>
       <body>
+        <LaunchAnimation />
         <SupabaseProvider initialSession={initialSession}>
           <QueryProvider>
             <LanguageProvider initialLang={lang}>

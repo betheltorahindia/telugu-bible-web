@@ -7,13 +7,6 @@ const isProd = process.env.NODE_ENV === 'production'
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  webpack(config, { dev }) {
-    if (dev) {
-      // Avoid eval-based source maps so CSP stays strict during local dev
-      config.devtool = 'source-map'
-    }
-    return config
-  },
 }
 
 const withPWA = withPWAInit({
@@ -22,13 +15,13 @@ const withPWA = withPWAInit({
   register: true,
   skipWaiting: true,
   cacheStartUrl: true,
-  swSrc: 'service-worker.js',
   buildExcludes: [
     /middleware-manifest\.json$/,
     /_next\/static\/chunks\/app\/search\//,
     /_next\/static\/chunks\/906-/,
   ],
   workboxOptions: {
+    swSrc: 'service-worker.js',
     maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
   },
 })

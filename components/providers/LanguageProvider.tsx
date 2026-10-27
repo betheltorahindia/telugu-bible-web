@@ -25,6 +25,7 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    document.documentElement.lang = lang
     try {
       window.localStorage.setItem('lang', lang)
       // cookie for server components
@@ -87,4 +88,3 @@ export function useBible() {
 
   return data
 }
-

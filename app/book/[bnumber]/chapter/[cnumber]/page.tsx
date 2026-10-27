@@ -1,7 +1,6 @@
 "use client"
 
-import Link from 'next/link'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useBible } from '../../../../../components/providers/LanguageProvider'
 import { useLanguage } from '../../../../../components/providers/LanguageProvider'
 import { uiStrings } from '../../../../../lib/i18n'
@@ -11,11 +10,9 @@ import { useBibleFor } from '../../../../../components/hooks/useBibleFor'
 import { getLocalizedBookName } from '../../../../../lib/data/books'
 import { PARASHIYOT, aliyahStartSet, aliyahId } from '../../../../../lib/data/parashiyot'
 import { useEffect, useMemo } from 'react'
-import { ChevronLeft } from 'lucide-react'
 
 export default function ChapterPage() {
   const params = useParams<{ bnumber: string, cnumber: string }>()
-  const search = useSearchParams()
   const bible = useBible()
   const { lang } = useLanguage()
   const UI = uiStrings(lang)
@@ -27,18 +24,8 @@ export default function ChapterPage() {
   const b = parseInt(params.bnumber)
   const c = parseInt(params.cnumber)
 
-  const mode = search?.get('mode') || null
-  const cat  = search?.get('cat')  || null
-
   const book = (bible as any)?.books?.find((x: any) => x.bnumber === b)
   const chapter = book?.chapters?.find((x: any) => x.cnumber === c)
-
-  let backHref = `/book/${b}`
-  if (mode === 'parashot') {
-    backHref = `/book/${b}?mode=parashot`
-  } else if (mode === 'categories') {
-    backHref = cat ? `/book/${b}?mode=categories&cat=${encodeURIComponent(cat)}` : `/book/${b}?mode=categories`
-  }
 
   const aliyahNumMap = useMemo(() => {
     const m = new Map<string, number>()
@@ -62,21 +49,6 @@ export default function ChapterPage() {
 
   return (
     <div className="space-y-4 relative">
-      {/* Back button at top-left, under header */}
-      <Link
-        href={backHref}
-        title="Back"
-        className="
-          fixed top-25 left-4 z-50
-          w-9 h-9 rounded-full
-          bg-black text-white dark:bg-white dark:text-black
-          flex items-center justify-center shadow-md
-          active:scale-95 transition
-        "
-      >
-        <ChevronLeft className="w-5 h-5" />
-      </Link>
-
       {/* Chapter title */}
       <h1 className="text-xl font-semibold text-center">
         {getLocalizedBookName(b, lang, book.bname)} {c}
@@ -96,7 +68,7 @@ export default function ChapterPage() {
             <div key={id} id={id} className="card">
               <div className={`flex items-start gap-3 ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
                 <span className="badge">{v.vnumber}</span>
-                <div className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined}>
+                <div lang={lang} className={`leading-relaxed ${lang === 'he' ? 'text-right' : ''}`} dir={lang === 'he' ? 'rtl' : undefined}>
                   <span style={{ fontSize: fontAdjust }}>{v.text}</span>
                   {isAliyahStart && (
                     <span className={`${lang === 'he' ? 'mr-2' : 'ml-2'} badge-aliyah`}>
@@ -122,7 +94,7 @@ export default function ChapterPage() {
               <div key={`${id}-parallel`} className="card card-parallel">
                 <div className={`flex items-start gap-3 ${pIsHebrew ? 'flex-row-reverse' : ''}`}>
                   <span className="badge">{v.vnumber}</span>
-                  <div className={`leading-relaxed ${pIsHebrew ? 'text-right' : ''}`} dir={pIsHebrew ? 'rtl' : undefined}>
+                  <div lang={parallel} className={`leading-relaxed ${pIsHebrew ? 'text-right' : ''}`} dir={pIsHebrew ? 'rtl' : undefined}>
                     <span style={{ fontSize: pFont }}>{pText}</span>
                     {isAliyahStart && (
                       <span className={`${pIsHebrew ? 'mr-2' : 'ml-2'} badge-aliyah`}>

@@ -1,0 +1,722 @@
+[
+  {
+    "number": 1,
+    "en": "The belief in the One True G-d",
+    "te": "ఏకైక దేవుని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 2,
+    "en": "The obligation to recognize and believe in the One G-d",
+    "te": "ఏకైక దేవుని గుర్తించి విశ్వసించే భాద్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 3,
+    "en": "The obligation for a person to obey what he is commanded by G-d",
+    "te": "దేవుని చేత ఆజ్ఞాపించబడినదానికి కట్టుబడి ఉండవలసిన భాద్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 4,
+    "en": "The belief and knowledge of Creation Ex-Nihilo",
+    "te": "(ఎక్స్-నిహిలో) శూన్యం నుండి సృష్టి సృజించబడనది అని తెలుసుకొని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 5,
+    "en": "The belief and knowledge of Divine Providence",
+    "te": "దైవానుగ్రహమును (చిత్తమును) గ్రహించి విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 6,
+    "en": "The obligation to fear G-d",
+    "te": "దేవునికి భయపడుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 7,
+    "en": "Contemplation of G-d",
+    "te": "దేవుని గూర్చి ధ్యానించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 8,
+    "en": "Belief in the existence of the Creator, who is perfect in every manner of existence and is the Primary Cause of all that exists.",
+    "te": "సమస్త జీవనికి ప్రాధానకారణభూతుడు మరియు సృష్టినందు ప్రతీ విధంగా సంపూర్ణుడైన సృష్టికర్త యొక్క ఉనికినందు నమ్మికయుంచుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 9,
+    "en": "The belief in Gd's absolute and unparalleled unity.",
+    "te": "దేవుని యొక్క సాటిలేని సంపూర్ణమైన ఐక్యతను విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 10,
+    "en": "The belief in Gd's non-corporeality, nor that He will be affected by any physical occurrences, such as movement, or rest, or dwelling.",
+    "te": "దేవుడు శరీరుడు కాడని మరియు ఎటువంటి భౌతిక సంగటనలుకు  – కదలిక, విశ్రమించుట, నివసించుట వంటి వాటికి ప్రభావితుడు కాడని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 11,
+    "en": "The belief in Gd's eternity.",
+    "te": "దేవుని యొక్క నిత్యత్వాన్ని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 12,
+    "en": "The imperative to worship Gd exclusively and no foreign false gods.",
+    "te": "అన్య దేవతలను కాకుండా దేవునిని మాత్రము అవశ్యముగా ఆరాధించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 13,
+    "en": "The belief that Gd communicates with man through prophecy.",
+    "te": "ప్రవచనం ద్వారా దేవుడు మనిషితో సంభాషిస్తారు అని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 14,
+    "en": "The belief in the primacy of the prophecy of Moses our teacher.",
+    "te": "మన భోదకుడైన మోషే గారి ప్రవచనం (అన్నీ ప్రవచనాలు కన్నా) ప్రాముఖ్యమైనదని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 15,
+    "en": "The belief in the divine origin of the Torah.",
+    "te": "తోరా యొక్క దైవీక మూలమును విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 16,
+    "en": "The belief in the immutability of the Torah.",
+    "te": "తోరా ఎన్నటికీ మారనిదని విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 17,
+    "en": "The belief in Gd's omniscience and providence.",
+    "te": "దేవుని సర్వజ్ఞత (అన్నీ ఏరిగియున్నారు అని) మరియు అనుగ్రహం నందు విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 18,
+    "en": "The belief in divine reward and retribution.",
+    "te": "దైవీక బహుమానం మరియు దండన యందు విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 19,
+    "en": "The belief in the arrival of the Messiah and the messianic era.",
+    "te": "మాషియాఖ్ కాలమునందు మరియు మాషియాఖ్ రాకడనందు విశ్వసించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 20,
+    "en": "The belief in the resurrection of the dead.",
+    "te": "మృతుల పునరుత్థానంపై నమ్మికయుంచుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 21,
+    "en": "The prohibition of serving idols, either instead of or in combination with G-d.",
+    "te": "దేవునికి బదులుగా లేదా దేవునితో కలిపి విగ్రహాలను సేవించరాదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 22,
+    "en": "The prohibition of making, owning, or selling an idol.",
+    "te": "విగ్రహాన్ని తయారు చేయుట, కలిగియుండుట (సొంతం చేసుకొనుట) మరియు అమ్ముట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 23,
+    "en": "One may not swear in a name of an idol.",
+    "te": "విగ్రహము యొక్క నామమునందు ప్రమాణము చెయ్యరాదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 24,
+    "en": "The prohibition of making up a new religion",
+    "te": "క్రొత్త మతాన్ని స్థాపించుట నిషిద్ధం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 25,
+    "en": "The prohibition of adding a Jewish commandment which is purely spiritual.",
+    "te": "పూర్తిగా ఆధ్యాత్మికమైన యూదా ఆజ్ఞను (నోవాహీయఆజ్ఞలకు) జోడించుట నిషిద్ధం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 26,
+    "en": "The prohibition of following the idolatrous customs of those who serve idols. Soothsaying, divination, sorcery and necromancy are included in this prohibition.",
+    "te": "విగ్రహాలనుపూజించే వారి ఆచారాలను అనుసరించుట నిషిద్ధం. సోదెచెప్పుట, శకునంచెప్పుట, క్షుద్రవిద్యలు మరియు ప్రేతవిద్య (ప్రేతాత్మలతో మాట్లాడి భవిష్యత్తును చెప్పడం) కూడానిషిద్ధం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 27,
+    "en": "Noahide Torah Study",
+    "te": "నోవాహీయ తోరా అధ్యయనం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 28,
+    "en": "The obligation for a person to pray to G-d. (At the very least, this applies in times of need.)",
+    "te": "ప్రతీ వ్యక్తిపై ఉన్నదేవునికి ప్రార్ధించవలసిన భాద్యత. (కనీసం అవసర సమయాలలో).",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 29,
+    "en": "Good Deeds and Proper Charity",
+    "te": "మంచి క్రియలు మరియు ధర్మకార్యములు (చారిటీ) చేయవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 30,
+    "en": "To return lost objects to the proper owners",
+    "te": "పోగొట్టుకున్న వస్తువులను సరైన యజమానికి చేర్చవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 31,
+    "en": "To look for the proper owners",
+    "te": "సరియైన యజమానిని వెదకవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 32,
+    "en": "To honor and old person or a Sage",
+    "te": "వృద్ధులను మరియు పండితులను ఘనపరచవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 33,
+    "en": "To give a tithing for charity",
+    "te": "చారిటీ నిమిత్తం దశమ భాగము తీయవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 34,
+    "en": "Send a mother bird before taking it’s young",
+    "te": "పక్షి పిల్లలను తీసుకొనునప్పుడు వాటి తల్లిని తోలివేయవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 35,
+    "en": "Obligation to escort guests",
+    "te": "అతిధులను సాగనంపవలసిన భాధ్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 36,
+    "en": "Forbidden to embarrass one’s parents",
+    "te": "ఒకని తలిదండ్రులను అవమానించకూడదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 37,
+    "en": "Effort to dress up in a modest way",
+    "te": "నమ్రతతో (నిరాడంబరముగా) వస్త్రాధారణ చేయుటకు ప్రయత్నించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 38,
+    "en": "Inspire others to understand and observe the divine laws",
+    "te": "దైవ ఆజ్ఞలను అర్ధం చేసుకొనుటకు ఇతరులను ప్రోత్సాహించవలెను/ప్రేరేపించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 39,
+    "en": "Parents are obligated to educate their children in general and in particular in the Divine Laws",
+    "te": "తల్లిదండ్రులు తమ పిల్లలకి దైవీక ఆజ్ఞలను సాధారణ రీతిలో మరియు ప్రత్యేక రీతిలోను భోధించ భద్దులైయున్నారు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 40,
+    "en": "To give charity",
+    "te": "ధర్మ క్రియలు చేయవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 41,
+    "en": "Return to G-d",
+    "te": "దేవునివైపు తిరగవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 42,
+    "en": "Joy",
+    "te": "సంతోషించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 43,
+    "en": "Honoring One’s Father and Mother",
+    "te": "తల్లిదండ్రులను గౌరవించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 44,
+    "en": "Not to Deceive Others",
+    "te": "ఇతరులను మోసంచెయరాదు/వంచించరాదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 45,
+    "en": "To Honor G-d",
+    "te": "దేవుని ఘనపరచవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 46,
+    "en": "To use one’s words wisely",
+    "te": "ఒకని మాటలు తెలివిగా ఉపయోగించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 47,
+    "en": "To use one’s speech in a positive constructive way.",
+    "te": "ఒకని మాటలు సానుకూల సంభావిత (మంచిని భావించి) రీతిలో ఉండవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 48,
+    "en": "The obligation to respect G-d’s Name.",
+    "te": "దేవుని నామాన్ని గౌరవించే భాద్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 49,
+    "en": "The prohibition of cursing G-d (Heaven forbid).",
+    "te": "దేవదూషన చెయరాదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 50,
+    "en": "It is forbidden to swear in vain (as in taking a vain oath, or swearing to a false promise or statement).",
+    "te": "వ్యర్ధముగా ప్రమాణం చెయ్యరాదు (వ్యర్ధమైన ఒట్టుపెట్టుకొనుట లేదా తప్పుడు వాగ్ధానాలు మరియు మాటలనుబట్టి ప్రామాణం చెయ్యరాదు).",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 51,
+    "en": "Which vows may be annulled, and the justifications and methods for doing so.",
+    "te": "ఎలాంటి ప్రమాణాలు రద్దు చేయబడవచ్చును మరియు రద్దుచేయుటకు గల సమర్ధనలు మరియు పద్దతులు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 52,
+    "en": "The prohibition of murder; abortion; euthanasia; causing mortal injury, and partners in murder.",
+    "te": "నరహత్య, గర్భస్రావం, అనాయాసమరణము (వ్యాధి నయం అవుతుందనే ఆశలేనప్పుడు ప్రాణం తీయడం), ప్రాణాంతక గాయం చేయుట; హత్యలోపాలు పంచుకోవడం నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 53,
+    "en": "The prohibition of suicide.",
+    "te": "ఆత్మ హత్య నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 54,
+    "en": "When it is permitted to sacrifice one’s life for one of the Seven Noahide Commandments.",
+    "te": "నోవాహీయ ఏడు ఆజ్ఞలలో ఒకదాని కొరకు ఎప్పుడు ఒక వ్యక్తి ప్రాణత్యాగం చేయవచ్చును.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 55,
+    "en": "The laws of a pursuer and self defense.",
+    "te": "తరిమేవాడు మరియు ఆత్మరక్షణ గూర్చిన చట్టాలు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 56,
+    "en": "The laws of intentional and unintentional killing, and killing through negligence or under duress.",
+    "te": "ఉద్దేశపూర్వీక మరియు అనుకోకుండా చేసిన హత్య, నిర్లక్ష్యం మరియు ఒత్తిడివలన చేసిన హత్యను గూర్చిన ఆజ్ఞలు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 57,
+    "en": "The prohibition of causing personal injury or damage.",
+    "te": "వ్యక్తిగత హాని లేదా నష్టం కలిగించుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 58,
+    "en": "The prohibition of endangering oneself or another.",
+    "te": "తనకు తాను లేక ఇతరులకు అపాయం కలిగించుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 59,
+    "en": "The obligation to save a person’s life.",
+    "te": "ఒక వ్యక్తి ప్రాణాలను రక్షించాల్సిన బాధ్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 60,
+    "en": "The prohibitions of embarrassing another person; evil gossip, and tale-bearing.",
+    "te": "ఇతరులను అవమానించడం, చెడు పుకారులు మరియు కొండెములు చెప్పుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 61,
+    "en": "The laws of reproductive sterilization and contraception.",
+    "te": "పునరుత్పత్తి, ఉప్పెసీ మరియు గర్భనిరోధకం గూర్చిన విధులు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 62,
+    "en": "The Responsibility of Human Dominion Over the Animal Kingdom",
+    "te": "జంతువులపై మానవుని యొక్క అధికార భాద్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 63,
+    "en": "The Prohibition of Eating Meat that was Removed from a Living Animal",
+    "te": "బ్రతికున్న జీవి యొక్క చీల్చబడిన మాంసమును తినుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 64,
+    "en": "The prohibition applies to land mammals and birds.",
+    "te": "ఈ ఆజ్ఞ జంతువులకు మరియు పక్షులకు కూడా వర్తిస్తుంది.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 65,
+    "en": "The prohibition of separating meat from an animal that is living or in the process of dying.",
+    "te": "బ్రతికున్న జంతువు లేక ఇంకా పూర్తిగా చావలేని జంతువుయొక్క మాంసం చీల్చుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 66,
+    "en": "Consuming such meat before or after the animal’s death.",
+    "te": "ఆ విధంగా చీల్చబడిన మాంసమును జంతువు బ్రతికున్న లేక చనిపోయినా తినుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 67,
+    "en": "Deriving benefit from meat separated from a living animal.",
+    "te": "బ్రతికున్న జీవినుండి చీల్చబడిన మాంసమునుండి ఎటువంటి ప్రయోజనం పొందరాదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 68,
+    "en": "Restrictions on causing suffering to a living creature.",
+    "te": "ప్రాణులకు భాద కలిగించకుండునట్లు నివారణలు/నియమములు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 69,
+    "en": "The prohibition of mating different species of animals.",
+    "te": "వేరువేరు జాతుల జంతువులను కలవనీయకూడదు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 70,
+    "en": "The prohibition of grafting different species of fruit trees.",
+    "te": "వేరు వేరు జాతుల ఫలమిచ్చు చెట్లను కలుపుట నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 71,
+    "en": "The Prohibition of Forbidden Sexual Relations",
+    "te": "అనుమతిలేని లైంగిక సంబంధాలు నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 72,
+    "en": "Defining the Boundaries of Intimacy",
+    "te": "సాన్నిహిత్య పరిమితులు/హద్దులు నిర్దారించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 73,
+    "en": "Categories of forbidden sexual partners and sexual acts.",
+    "te": "నిషేధించబడిన లైంగిక సంబంధాలు మరియు లైంగిక క్రియలు యొక్క వర్గాలు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 74,
+    "en": "The prohibitions of homosexual and bestial relations.",
+    "te": "స్వలింగ మరియు జంతు శయనం యొక్క నిషేధాలు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 75,
+    "en": "The prohibition of relations with other men’s wives.",
+    "te": "ఇతరుల భార్యాలతో అక్రమ సంబంధం నిషిద్ధం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 76,
+    "en": "Partners with whom there can be no status of marriage.",
+    "te": "వివహాయం చేసుకొనకూడని వారితో సంబంధం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 77,
+    "en": "Precepts related to marriage, fornication, and divorce.",
+    "te": "వివాహం, వ్యబిచారం మరియు విడాకుల గూర్చిన ఆజ్ఞలు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 78,
+    "en": "Precepts related to spilling semen and contraception.",
+    "te": "వీర్యస్ఖలనం మరియు గర్బనిరోధన గూర్చిన విధులు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 79,
+    "en": "Guarding against forbidden relations, and following ways of modesty.",
+    "te": "అక్రమ సంబంధాలు నుండి కాపాడుకొనుట (అరికట్టుట) మరియు నమ్రతగలిగిన మార్గములు అనుసరించుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 80,
+    "en": "Prohibitions related to being alone with a forbidden partner.",
+    "te": "భాగస్వామిగా నిషేడించబడినవారితో ఒంటరిగా ఉండుటను గూర్చిన విధులు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 81,
+    "en": "The Obligation for Laws and Courts",
+    "te": "చట్టాలు మరియు న్యాయవ్యవస్థను స్థాపించాల్సిన బాధ్యత.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 82,
+    "en": "The Foundation of a Peaceful and Just Society",
+    "te": "సమాధానకరమైన మరియు న్యాయమైన సమాజమునాకు పునాది వేయుట.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 83,
+    "en": "The ruling power must institute oversight over the courts to be sure that only proper and expert judges are appointed, and that the judges do not act corruptly or unrighteously. The ruling power also has the authority to institute a structure of “appeals” or “referral” courts.",
+    "te": "న్యాయస్థానం పర్యవేక్షించి సరియైన సామర్ధ్యం గలిగి అవినీతి మరియు అన్యాయం చేయని న్యాయాధిపతులను నియమించేందుకు అధికారులు ఏర్పాటు చేయవలెను. పాలించే అధికారులకు న్యాయస్థానంపై ఫిర్యాదు లేదా విచారణ చేసేందుకు కూడా అధికారం ఉంది.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 84,
+    "en": "Every individual must abide by a properly rendered legal decision he has received. It is forbidden for an individual to carry out judgments and punishments against others (vigilante justice). One must pursue a legal case within the legal system that has jurisdiction over the matter.",
+    "te": "ప్రతి వ్యక్తి తాను స్వీకరించిన సరియైన చట్టపరమైన నిరీనాయాలకు కట్టుబడి ఉండాలి. ఒక వ్యక్తి (సొంతంగా) ఇతరులకు విరోధముగా న్యాయ నిర్ణయాలు తీర్పులు మరియు శిక్షలు అమలుచేయుట నిషిద్దం. చట్టపర విషయమును దానికి సంబందించిన న్యాయస్థానంలో నిర్వహించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 85,
+    "en": "Standard types of evidence are admissible in Noahide courts.",
+    "te": "నోవాహీయ న్యాయస్థానంలో ప్రామాణిక సాక్ష్యాలు అంగీకరించబడును.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 86,
+    "en": "Anyone who is known to transgress any of the Noahide Commandments is not to be considered as a reliable witness in capital cases.",
+    "te": "నోవాహీయ ఏడు ఆజ్ఞలలో ఒకదానిని ఉళ్లగించిన వాడు ప్రధాన వ్యాజ్యములో (క్యాపిటల్ కేసెస్) నమ్మదగిన సాక్షిగా పరిగణించబడడు.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 87,
+    "en": "All judges must deliver righteous judgments, and opposing claimants must be treated equally in all ways.",
+    "te": "న్యాయాదిపతులందరు దర్మబద్ధమైన తీర్పులు తీర్చవలెను మరియు అన్నీ విధాలుగా వ్యతిరేకంగా వాదించే వారికి కూడా సమానంగా పరిగణించవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 88,
+    "en": "Bribing a judge is forbidden, and judges may not take bribes.",
+    "te": "న్యాయాధిపతులకు లంచం ఇవ్వడం మరియు వారు లంచం తీసుకోవడం నిషిద్దం.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 89,
+    "en": "In civil cases, one should seek arbitration, mediation or other means of finding an amicable settlement or compromise.",
+    "te": "సాంగీక (సామాజిక) వ్యాజ్యములో పంచాయతి, మధ్యవర్తిత్వం ద్వారా పరిష్కారం లేదా రాజీ చేయుటకు మార్గం వెదకవలెను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  },
+  {
+    "number": 90,
+    "en": "If the majority of the society is not G-d fearing and does not observe all of the Seven Noahide Commandments, a court may only use capital punishment as a decree of the government to protect the society from very dangerous criminals, such as murderers.",
+    "te": "సమాజంలోని ఎక్కువ శాతం మంది దేవునికి భయపడనట్లయితే మరియు నోవాహీయ ఏడు ఆజ్ఞలను పూర్తిగా పాటించనట్లయితే, సమాజాన్ని చాలా ప్రమాదకరమైన నేరస్థులు, హత్యకారులు వంటి వారు నుండి రక్షించడానికిన్యాయస్థానం మృతదండనను ప్రభుత్వ నిర్ణయంగా ఉపయోగించవలేను.",
+    "ta": "",
+    "hi": "",
+    "he": ""
+  }
+]

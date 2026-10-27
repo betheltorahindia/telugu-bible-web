@@ -7,20 +7,28 @@
    ============================================================ */
 
 .social-world {
-  --sw-void: #171522;
-  --sw-deep: #221f31;
-  --sw-ink: #100f18;
-  --sw-gold: #e8bd5c;
-  --sw-gold-soft: #f3d894;
-  --sw-gold-deep: #b8863a;
-  --sw-text: #f6f2ea;
-  --sw-muted: #bdb6ab;
-  --sw-line: rgba(232, 189, 92, 0.26);
+  --sw-void: #0d0d0f;
+  --sw-deep: #171719;
+  --sw-ink: #070708;
+  --sw-gold: #d6b774;
+  --sw-gold-soft: #f2dfb4;
+  --sw-gold-deep: #94733e;
+  --sw-text: #f5f2ed;
+  --sw-muted: #aaa6a0;
+  --sw-line: rgba(214, 183, 116, 0.26);
+  --sw-card-border: rgba(255, 255, 255, 0.14);
+  --sw-card-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --sw-list-row: rgba(255, 255, 255, 0.04);
+  --sw-image-shade: rgba(10, 10, 12, 0.91);
+  --sw-orb-surface: linear-gradient(155deg, rgba(255,255,255,.14), rgba(255,255,255,.03) 55%, rgba(255,255,255,.09));
+  --sw-orb-border: rgba(255,255,255,.14);
+  --sw-orb-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 20px 34px -20px rgba(0,0,0,.9);
 
+  position: relative;
   color: var(--sw-text);
   background:
-    radial-gradient(120% 80% at 50% -10%, rgba(122, 90, 40, 0.35), transparent 60%),
-    radial-gradient(90% 70% at 100% 100%, rgba(60, 55, 120, 0.45), transparent 65%),
+    radial-gradient(120% 80% at 50% -10%, rgba(122, 90, 40, 0.25), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgba(115, 96, 150, 0.16), transparent 65%),
     linear-gradient(180deg, var(--sw-ink), var(--sw-void) 45%, var(--sw-ink));
 
   /* full-bleed: escape the app's <main class="container mt-20"> wrapper
@@ -30,6 +38,30 @@
   margin-right: calc(50% - 50vw);
   margin-top: -5rem; /* cancels the layout's mt-20 */
   min-height: 100vh;
+}
+
+[data-theme="light"] .social-world {
+  --sw-void: #f5f3ef;
+  --sw-deep: #fff;
+  --sw-ink: #fbfaf8;
+  --sw-gold: #8a6b35;
+  --sw-gold-soft: #705321;
+  --sw-gold-deep: #a98445;
+  --sw-text: #211f1b;
+  --sw-muted: #68645e;
+  --sw-line: rgba(132, 101, 49, 0.25);
+  --sw-card-border: rgba(42, 35, 24, 0.14);
+  --sw-card-shadow: 0 24px 55px -32px rgba(55, 44, 25, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --sw-list-row: rgba(255, 255, 255, 0.73);
+  --sw-image-shade: rgba(10, 10, 12, 0.88);
+  --sw-orb-surface: linear-gradient(155deg, rgba(255,255,255,.96), rgba(244,241,234,.85) 55%, rgba(255,255,255,.92));
+  --sw-orb-border: rgba(60,49,31,.16);
+  --sw-orb-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 20px 34px -20px rgba(72,55,27,.3);
+
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(207, 176, 119, 0.2), transparent 60%),
+    radial-gradient(90% 70% at 100% 100%, rgba(142, 130, 173, 0.1), transparent 65%),
+    linear-gradient(180deg, var(--sw-ink), var(--sw-void) 55%, var(--sw-ink));
 }
 
 /* 100vw includes the browser's vertical scrollbar, which otherwise creates
@@ -70,6 +102,134 @@ body:has(.social-world)::-webkit-scrollbar {
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
+.social-world .social-orb-surface {
+  border-color: var(--sw-orb-border);
+  background: var(--sw-orb-surface);
+  box-shadow: var(--sw-orb-shadow);
+  backdrop-filter: blur(14px);
+}
+
+.social-world .sw-media-section {
+  width: min(100%, 1120px);
+  padding: 48px 28px 12px;
+}
+
+.social-world .sw-section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 22px;
+  margin: 0 0 22px;
+}
+
+.social-world .sw-section-title p {
+  margin: 0 0 8px;
+  color: var(--sw-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
+.social-world .sw-section-title h2 {
+  margin: 0;
+  background: linear-gradient(100deg, var(--sw-gold-deep), var(--sw-gold-soft) 45%, var(--sw-gold));
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(1.45rem, 3.4vw, 2.15rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+
+.social-world .sw-section-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.social-world .sw-section-links .sw-btn,
+.social-world .sw-section-links .sw-btn-ghost {
+  padding: 0.7rem 1rem;
+  font-size: 0.76rem;
+}
+
+.sw-carousel {
+  width: 100%;
+}
+
+.sw-carousel-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 5px max(18px, calc((100vw - 1060px) / 2)) 20px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--sw-gold-deep) transparent;
+  scrollbar-width: thin;
+}
+
+.sw-carousel-track:focus-visible {
+  outline: 2px solid var(--sw-gold);
+  outline-offset: 3px;
+}
+
+.sw-carousel-track::-webkit-scrollbar { height: 5px; }
+.sw-carousel-track::-webkit-scrollbar-thumb { border-radius: 999px; background: var(--sw-gold-deep); }
+
+.sw-carousel-card {
+  flex: 0 0 auto;
+  overflow: hidden;
+  border-radius: 20px;
+  scroll-snap-align: center;
+}
+
+.sw-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 6px;
+}
+
+.sw-carousel-arrow {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--sw-card-border);
+  border-radius: 12px;
+  background: var(--sw-list-row);
+  color: var(--sw-text);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.sw-carousel-arrow:hover:not(:disabled) {
+  border-color: var(--sw-gold);
+  background: color-mix(in srgb, var(--sw-gold) 12%, transparent);
+}
+
+.sw-carousel-arrow:disabled { opacity: 0.36; cursor: not-allowed; }
+.sw-carousel-count { min-width: 56px; color: var(--sw-muted); font-size: 0.72rem; text-align: center; }
+
+.social-world .sw-podcast-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin: 26px auto 0;
+  padding: 0 28px;
+}
+
+.social-world .sw-podcast-actions > div { width: 100%; }
+
+[data-theme="light"] .social-world .sw-glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(249, 247, 242, 0.91));
+  border-color: rgba(67, 54, 31, 0.13);
+  box-shadow: 0 24px 60px -24px rgba(70, 56, 32, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 .social-world .sw-gold-text {
   background: linear-gradient(
     100deg,
@@ -83,6 +243,10 @@ body:has(.social-world)::-webkit-scrollbar {
   background-clip: text;
   color: transparent;
   animation: sw-shimmer 7s linear infinite;
+}
+
+[data-theme="light"] .social-world .sw-gold-text {
+  background-image: linear-gradient(100deg, #705321, #9a783e 45%, #705321 70%, #9a783e);
 }
 
 /* ---------- animations ---------- */
@@ -203,6 +367,14 @@ body:has(.social-world)::-webkit-scrollbar {
   cursor: pointer;
   text-decoration: none;
 }
+
+[data-theme="light"] .social-world .sw-btn-ghost {
+  color: var(--sw-text);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(239, 235, 226, 0.88));
+  border-color: var(--sw-line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 16px 34px -22px rgba(70, 56, 32, 0.3);
+}
+
 .social-world .sw-btn-ghost:hover {
   transform: translateY(-3px);
   border-color: var(--sw-gold);
@@ -267,4 +439,123 @@ body:has(.social-world)::-webkit-scrollbar {
   .social-world .sw-gold-text {
     animation: none;
   }
+
+  [data-theme="light"] .social-world .sw-scroll {
+    scrollbar-color: var(--sw-gold-deep) transparent;
+  }
+
+  @media (max-width: 700px) {
+    .social-world .sw-media-section { padding: 34px 0 8px; }
+    .social-world .sw-section-header { align-items: flex-start; flex-direction: column; gap: 14px; padding: 0 20px; }
+    .social-world .sw-section-links { justify-content: flex-start; }
+    .social-world .sw-section-links .sw-btn,
+    .social-world .sw-section-links .sw-btn-ghost { padding: 0.65rem 0.78rem; }
+    .sw-carousel-track { padding-right: 8vw; padding-left: 8vw; }
+    .social-world .sw-podcast-actions { padding: 0 18px; }
+  }
+}
+
+html[data-theme] .social-world .sw-btn {
+  border: 1px solid transparent !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+  font-weight: 750 !important;
+  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease !important;
+}
+
+html[data-theme="dark"] .social-world .sw-btn {
+  background: linear-gradient(135deg, #f3d990, #d0a84e) !important;
+  color: #21190c !important;
+}
+
+html[data-theme="light"] .social-world .sw-btn {
+  background: linear-gradient(135deg, #a6222c, #78151e) !important;
+  color: #fff !important;
+}
+
+html[data-theme] .social-world .sw-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 9px 22px rgba(0, 0, 0, 0.24) !important;
+  transform: translateY(-2px);
+}
+
+html[data-theme="dark"] .social-world .sw-btn-ghost {
+  border: 1px solid rgba(230, 199, 133, 0.6) !important;
+  background: linear-gradient(145deg, #242321, #171615) !important;
+  color: #f4e6c7 !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.06), 0 5px 14px rgba(0, 0, 0, 0.24) !important;
+}
+
+html[data-theme="light"] .social-world .sw-btn-ghost {
+  border: 1px solid rgba(112, 80, 39, 0.32) !important;
+  background: linear-gradient(145deg, #fff, #f2eee6) !important;
+  color: #34291a !important;
+  box-shadow: inset 0 1px #fff, 0 5px 14px rgba(74, 56, 29, 0.12) !important;
+}
+
+html[data-theme] .social-world .social-orb-surface {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.16), rgba(128, 98, 50, 0.08)) !important;
+  border-color: var(--sw-orb-border) !important;
+  box-shadow: var(--sw-orb-shadow) !important;
+}
+
+.social-world .social-orb-link.social-orb-instagram .social-orb-surface {
+  border-color: #e1306c !important;
+  background: linear-gradient(135deg, #833ab4 4%, #fd1d1d 55%, #fcb045 100%) !important;
+}
+
+html[data-theme] .social-world .social-orb-icon-instagram {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent !important;
+  color: #fff !important;
+  filter: drop-shadow(0 4px 9px rgba(225, 48, 108, 0.3)) !important;
+}
+
+html[data-theme] .social-world .social-orb-icon-instagram svg {
+  width: 27px;
+  height: 27px;
+  color: #fff !important;
+  stroke: #fff !important;
+}
+
+.social-world .social-orb-link.social-orb-facebook .social-orb-surface {
+  border-color: #1877f2 !important;
+  background: #1877f2 !important;
+}
+
+.social-world .social-orb-link.social-orb-whatsapp .social-orb-surface {
+  border-color: #25d366 !important;
+  border-radius: 50% !important;
+  background: #25d366 !important;
+}
+
+html[data-theme] .social-world .social-orb-icon-facebook {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent !important;
+  color: #fff !important;
+  filter: drop-shadow(0 4px 9px rgba(24, 119, 242, 0.32)) !important;
+}
+
+html[data-theme] .social-world .social-orb-icon-whatsapp {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent !important;
+  color: #fff !important;
+  filter: drop-shadow(0 4px 9px rgba(37, 211, 102, 0.3)) !important;
+}
+
+html[data-theme] .social-world .social-orb-icon-facebook svg,
+html[data-theme] .social-world .social-orb-icon-whatsapp svg {
+  color: inherit !important;
+  fill: currentColor !important;
 }

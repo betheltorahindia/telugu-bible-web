@@ -1,6 +1,7 @@
 // app/sitemap.ts
 import type { MetadataRoute } from 'next'
 import te from '../data/te.json' assert { type: 'json' }
+import { prayers } from '../lib/data/prayers'
 
 // Public site URL (no trailing slash). Set this in Vercel > Settings > Environment Variables.
 const SITE =
@@ -40,7 +41,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${SITE}/prayers`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   )
+
+  for (const prayer of prayers) {
+    entries.push({
+      url: `${SITE}/prayers/${prayer.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })
+    for (const section of prayer.sections) {
+      entries.push({
+        url: `${SITE}/prayers/${prayer.slug}/${section.slug}`,
+        lastModified: now,
+        changeFrequency: 'monthly',
+        priority: 0.6,
+      })
+    }
+  }
 
   // Books + Chapters from your bundled JSON
   const books: any[] = (te as any).books ?? []
