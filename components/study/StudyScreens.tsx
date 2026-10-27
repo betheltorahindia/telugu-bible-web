@@ -1,9 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { ArrowLeft, ArrowUpRight, BookOpen, ChevronRight, Languages, Sparkles } from 'lucide-react'
-import { LANG_LABELS, type LangCode } from '../../lib/lang'
+import { ArrowLeft, ArrowUpRight, BookOpen, ChevronRight, Sparkles } from 'lucide-react'
+import type { LangCode } from '../../lib/lang'
 import { useZoom } from '../providers/ZoomProvider'
 import {
   getStudyBook,
@@ -15,8 +14,6 @@ import {
   type StudyLanguageText,
 } from '../../lib/data/study/books'
 import { useLanguage } from '../providers/LanguageProvider'
-
-const LANGUAGES: LangCode[] = ['en', 'te', 'ta', 'hi', 'he']
 
 function StudyPage({ children }: { children: React.ReactNode }) {
   const { level } = useZoom()
@@ -32,83 +29,14 @@ function StudyPage({ children }: { children: React.ReactNode }) {
 }
 
 function useStudyLanguage(book?: StudyBook) {
-  const { lang, setLang } = useLanguage()
+  const { lang } = useLanguage()
   const isAvailable = (language: LangCode) =>
     book
       ? hasStudyTranslation(book, language)
       : studyBooks.some((studyBook) => hasStudyTranslation(studyBook, language))
   const selectedLanguageAvailable = isAvailable(lang)
   const contentLanguage = selectedLanguageAvailable ? lang : 'te'
-  const [notice, setNotice] = useState('')
-
-  const chooseLanguage = (language: LangCode) => {
-    if (!isAvailable(language)) {
-      setNotice(`${LANG_LABELS[language].name} is not available for this book yet.`)
-      return
-    }
-    setLang(language)
-    setNotice('')
-  }
-
-  return {
-    lang,
-    contentLanguage,
-    chooseLanguage,
-    notice:
-      notice ||
-      (!selectedLanguageAvailable
-        ? `${LANG_LABELS[lang].name} is not available for this book yet. Showing Telugu instead.`
-        : ''),
-    isAvailable,
-  }
-}
-
-function LanguagePicker({
-  book,
-  selectedLanguage,
-  notice,
-  onSelect,
-  isAvailable,
-}: {
-  book?: StudyBook
-  selectedLanguage: LangCode
-  notice: string
-  onSelect: (language: LangCode) => void
-  isAvailable?: (language: LangCode) => boolean
-}) {
-  return (
-    <div className="study-language-panel">
-      <div className="study-language-heading">
-        <Languages aria-hidden="true" size={17} />
-        <span>Read in</span>
-      </div>
-      <div className="study-language-options" role="group" aria-label="Study language">
-        {LANGUAGES.map((language) => {
-          const available = isAvailable
-            ? isAvailable(language)
-            : book
-              ? hasStudyTranslation(book, language)
-              : false
-          return (
-            <button
-              key={language}
-              type="button"
-              className={`study-language-option ${selectedLanguage === language ? 'is-selected' : ''} ${!available ? 'is-unavailable' : ''}`}
-              aria-pressed={selectedLanguage === language}
-              aria-disabled={!available}
-              title={available ? LANG_LABELS[language].name : `${LANG_LABELS[language].name} unavailable`}
-              onClick={() => onSelect(language)}
-            >
-              <span className="study-language-glyph">{LANG_LABELS[language].glyph}</span>
-              <span>{LANG_LABELS[language].name}</span>
-              {!available && <span className="study-language-soon">Soon</span>}
-            </button>
-          )
-        })}
-      </div>
-      {notice && <p className="study-language-notice" role="status">{notice}</p>}
-    </div>
-  )
+  return { contentLanguage }
 }
 
 function translated(value: StudyLanguageText, language: LangCode) {
@@ -150,20 +78,12 @@ function StudyHeader({
 }
 
 export function StudyLandingScreen() {
-  const { contentLanguage, chooseLanguage, notice, isAvailable } = useStudyLanguage()
-
   return (
     <StudyPage>
       <StudyHeader
         title="Study"
         subtitle="అధ్యయనం"
         description="Explore foundational Noahide teachings and classic Jewish ethical works, with English and Telugu reading options."
-      />
-      <LanguagePicker
-        selectedLanguage={contentLanguage}
-        notice={notice}
-        onSelect={chooseLanguage}
-        isAvailable={isAvailable}
       />
       <div className="study-book-grid">
         {studyBooks.map((book, index) => (
@@ -249,7 +169,7 @@ function StudyChapterGrid({ slug, chapters }: { slug: string; chapters: StudyCha
 
 export function StudyBookScreen({ slug }: { slug: string }) {
   const book = getStudyBook(slug)
-  const { contentLanguage, chooseLanguage, notice } = useStudyLanguage(book)
+  const { contentLanguage } = useStudyLanguage(book)
   if (!book) return <StudyNotFound />
 
   return (
@@ -261,7 +181,6 @@ export function StudyBookScreen({ slug }: { slug: string }) {
         description={book.description}
         backHref="/study"
       />
-      <LanguagePicker book={book} selectedLanguage={contentLanguage} notice={notice} onSelect={chooseLanguage} />
       {book.kind === 'chapters' ? (
         <StudyChapterGrid slug={book.slug} chapters={book.chapters} />
       ) : book.kind === 'seven-laws' ? (
@@ -287,7 +206,7 @@ export function StudyChapterScreen({ slug, chapterNumber }: { slug: string; chap
     book?.kind === 'chapters'
       ? book.chapters.find((item) => item.number === chapterNumber)
       : undefined
-  const { contentLanguage, chooseLanguage, notice } = useStudyLanguage(book)
+  const { contentLanguage } = useStudyLanguage(book)
   if (!book || !chapter) return <StudyNotFound />
 
   return (
@@ -298,7 +217,6 @@ export function StudyChapterScreen({ slug, chapterNumber }: { slug: string; chap
         subtitleLanguage={book.subtitleLanguage}
         backHref={`/study/${book.slug}`}
       />
-      <LanguagePicker book={book} selectedLanguage={contentLanguage} notice={notice} onSelect={chooseLanguage} />
       <StudyList entries={chapter.items} language={contentLanguage} />
       {book.source && (
         <a className="study-source-link" href={book.source.href} target="_blank" rel="noreferrer">

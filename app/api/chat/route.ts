@@ -82,7 +82,28 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error(`Gemini chat request failed with status ${response.status}`)
-      return NextResponse.json({ error: 'The online guide is temporarily unavailable.' }, { status: 502 })
+      if (response.status === 401 || response.status === 403) {
+        return NextResponse.json(
+          { error: 'Gemini rejected the API key or its project permissions. Verify the key and Generative Language API access, then redeploy this Preview.' },
+          { status: 502 },
+        )
+      }
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: 'Gemini quota or rate limit was reached. Check the project quota and billing, then try again later.' },
+          { status: 502 },
+        )
+      }
+      if (response.status === 400) {
+        return NextResponse.json(
+          { error: 'Gemini rejected the request. Check that the selected model is available to this API key.' },
+          { status: 502 },
+        )
+      }
+      return NextResponse.json(
+        { error: 'Gemini is temporarily unavailable. Please try again later.' },
+        { status: 502 },
+      )
     }
 
     const result = await response.json() as {

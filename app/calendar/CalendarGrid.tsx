@@ -4,7 +4,15 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import type { CalendarDay } from '../../lib/calendar/hebcal'
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const WEEKDAYS = [
+  ['Sunday', 'Sun'],
+  ['Monday', 'Mon'],
+  ['Tuesday', 'Tue'],
+  ['Wednesday', 'Wed'],
+  ['Thursday', 'Thu'],
+  ['Friday', 'Fri'],
+  ['Saturday', 'Sat'],
+]
 
 function prettyDate(date: string) {
   const parsed = new Date(`${date}T00:00:00Z`)
@@ -17,14 +25,16 @@ function prettyDate(date: string) {
   }).format(parsed)
 }
 
-function hebrewDateWithNumerals(date: string) {
+function englishHebrewDate(date: string) {
   const parsed = new Date(`${date}T00:00:00Z`)
-  return new Intl.DateTimeFormat('en-u-ca-hebrew', {
+  const parts = new Intl.DateTimeFormat('en-u-ca-hebrew', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric',
     timeZone: 'UTC',
-  }).format(parsed)
+  }).formatToParts(parsed)
+  const month = parts.find((part) => part.type === 'month')?.value
+  const day = parts.find((part) => part.type === 'day')?.value
+  return month && day ? `${month} ${day}` : ''
 }
 
 function zodiacForRoshChodesh(title: string) {
@@ -62,8 +72,11 @@ export default function CalendarGrid({
       <p className="calendar-scroll-hint">Swipe horizontally to see every day of the week</p>
       <div className="calendar-grid-scroll" role="region" aria-label="Calendar dates" tabIndex={0}>
         <div className="calendar-grid">
-          {WEEKDAYS.map((weekday) => (
-            <div key={weekday} className="calendar-weekday">{weekday}</div>
+          {WEEKDAYS.map(([weekday, shortWeekday]) => (
+            <div key={weekday} className="calendar-weekday">
+              <span className="calendar-weekday-long">{weekday}</span>
+              <span className="calendar-weekday-short">{shortWeekday}</span>
+            </div>
           ))}
           {days.map((day) => {
             const holidays = day.events.filter(
@@ -75,6 +88,7 @@ export default function CalendarGrid({
             )
             const roshChodesh = day.events.find((event) => event.category === 'roshchodesh')
             const zodiac = roshChodesh ? zodiacForRoshChodesh(roshChodesh.title) : undefined
+            const hebrewDate = day.hebrewDate ? englishHebrewDate(day.date) : ''
             const classes = [
               'calendar-day',
               !day.isCurrentMonth && 'is-outside',
@@ -91,7 +105,7 @@ export default function CalendarGrid({
                   type="button"
                   className="calendar-date-select"
                   onClick={() => setSelectedDate(day.date)}
-                  aria-label={`${prettyDate(day.date)}${day.hebrewDate ? `, Hebrew date ${day.hebrewDate}` : ''}${day.events.length ? `, ${day.events.map((event) => event.title).join(', ')}` : ''}`}
+                  aria-label={`${prettyDate(day.date)}${hebrewDate ? `, Hebrew date ${hebrewDate}` : ''}${day.events.length ? `, ${day.events.map((event) => event.title).join(', ')}` : ''}`}
                   aria-pressed={selectedDate === day.date}
                 >
                   <span className="calendar-date-row">
@@ -108,8 +122,7 @@ export default function CalendarGrid({
                     {day.isToday && <span className="calendar-today-chip">Today</span>}
                   </span>
                 </button>
-                <span className="calendar-hebrew-date">{day.hebrewDate || '\u00a0'}</span>
-                <span className="calendar-hebrew-numerals">{day.hebrewDate ? hebrewDateWithNumerals(day.date) : '\u00a0'}</span>
+                <span className="calendar-hebrew-date">{hebrewDate || '\u00a0'}</span>
                 <span className="calendar-event-list">
                   {holidays.slice(0, 2).map((event) => (
                     <button
@@ -155,9 +168,7 @@ export default function CalendarGrid({
             <div className="calendar-detail-date">
               <span>{prettyDate(selectedDay.date)}</span>
               {selectedDay.hebrewDate && (
-                <strong>
-                  {selectedDay.hebrewDate} · {hebrewDateWithNumerals(selectedDay.date)}
-                </strong>
+                <strong>{englishHebrewDate(selectedDay.date)}</strong>
               )}
             </div>
             <div className="calendar-detail-events">

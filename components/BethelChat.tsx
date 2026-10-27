@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import Link from 'next/link'
-import { MessageCircle, Send, X } from 'lucide-react'
+import { Bot, MessageCircle, Send, X } from 'lucide-react'
 
 type ChatMessage = {
   from: 'assistant' | 'visitor'
@@ -153,12 +153,13 @@ export default function BethelChat() {
         throw new Error(result.error || 'The online guide is unavailable right now.')
       }
       setMessages((current) => [...current, { from: 'assistant', text: answer }])
-    } catch {
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : 'The online guide could not connect.'
       setMessages((current) => [
         ...current,
         {
           from: 'assistant',
-          text: `${getAnswer(text).text} The online guide could not connect. Please check your connection or try again later.`,
+          text: `I could not get an online answer: ${reason} Please try again after checking the site’s online guide configuration.`,
         },
       ])
     } finally {
@@ -176,7 +177,7 @@ export default function BethelChat() {
               <strong>Chat with Bethel</strong>
               <small>
                 {connectionChecked && onlineAvailable
-                ? 'Online Torah & app guide'
+                ? 'Online answers enabled'
                 : !browserOnline
                   ? 'Offline app guide · come online for more answers'
                   : connectionChecked
@@ -230,7 +231,7 @@ export default function BethelChat() {
         aria-label={open ? 'Close Chat with Bethel' : 'Chat with Bethel'}
         onClick={() => setOpen((value) => !value)}
       >
-        {open ? <X className="h-5 w-5" /> : <MessageCircle className="h-5 w-5" />}
+        {open ? <X className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
         <span>{open ? 'Close chat' : 'Chat with Bethel'}</span>
       </button>
     </div>

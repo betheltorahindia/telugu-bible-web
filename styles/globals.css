@@ -5215,3 +5215,104 @@ html[data-theme] .launch-wordmark {
   .home-reading-topline { font-size: 0.52rem; }
   .home-reading-hebrew { font-size: 1.25rem; }
 }
+
+.calendar-weekday-short { display: none; }
+
+.bethel-chat-toggle,
+:root[data-theme="light"] .bethel-chat-toggle {
+  border-color: #ff7b83 !important;
+  background: linear-gradient(135deg, #ed2632, #a90812) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 24px rgba(165, 8, 18, 0.3), 0 0 18px rgba(229, 9, 20, 0.16) !important;
+}
+
+@media (max-width: 1050px) {
+  .tanach-tools-wrap {
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .tanach-tools-mobile-toggle {
+    box-sizing: border-box;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .launch-screen {
+    min-height: 100svh;
+    min-height: 100dvh;
+    padding: 20px 16px;
+  }
+
+  .launch-light-beam {
+    top: 8%;
+    width: min(76vw, 390px);
+    height: 58%;
+  }
+
+  html[data-theme] .launch-gate {
+    top: 6%;
+    width: min(72vw, 320px);
+    height: min(46svh, 370px);
+  }
+
+  .launch-stairway {
+    bottom: 8%;
+    width: min(82vw, 410px);
+    gap: 5px;
+  }
+
+  .launch-stairway span { height: 6px; }
+
+  html[data-theme] .launch-wordmark {
+    max-width: 100%;
+    margin-top: 0;
+    transform: translateY(11svh);
+  }
+
+  html[data-theme] .launch-title {
+    max-width: calc(100vw - 28px);
+    font-size: clamp(0.78rem, 4vw, 1.08rem);
+    letter-spacing: clamp(0.035em, 0.65vw, 0.1em);
+    text-indent: 0;
+  }
+
+  .launch-tagline {
+    font-size: clamp(0.64rem, 2.8vw, 0.75rem);
+    text-align: center;
+  }
+
+  .launch-progress { margin-top: 17px; }
+
+  .calendar-weekday { font-size: 0.65rem; }
+  .calendar-weekday-long { display: none; }
+  .calendar-weekday-short { display: inline; }
+  .calendar-day { min-height: clamp(68px, calc((100dvh - 390px) / 6), 86px); padding: 4px 3px; }
+  .calendar-day-number { font-size: 1rem; }
+  .calendar-hebrew-date {
+    min-height: 18px;
+    font-size: clamp(0.43rem, 1.75vw, 0.54rem);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+
+@media (max-height: 640px) and (max-width: 760px) {
+  html[data-theme] .launch-gate {
+    top: 5%;
+    height: min(40svh, 270px);
+  }
+
+  html[data-theme] .launch-wordmark { transform: translateY(9svh); }
+}

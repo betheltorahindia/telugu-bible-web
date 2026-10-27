@@ -109,8 +109,9 @@ function VideoCard({ video, active }: { video: YouTubeVideo; active: boolean }) 
         <RemoteThumbnail
           src={video.thumbnail}
           fallbackSources={[
-            `https://i.ytimg.com/vi/${video.id}/sddefault.jpg`,
             `https://i.ytimg.com/vi/${video.id}/maxresdefault.jpg`,
+            `https://i.ytimg.com/vi/${video.id}/sddefault.jpg`,
+            `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`,
           ]}
           alt={video.title}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.07]"
@@ -204,7 +205,7 @@ function SpotifySection({ shows }: { shows: SpotifyShow[] }) {
                       border: '1px solid var(--sw-card-border)',
                     }}
                   >
-                    <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-black/40">
+                    <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-black/40">
                       <RemoteThumbnail
                         src={show.thumbnail}
                         alt=""
@@ -311,9 +312,19 @@ function RemoteThumbnail({
     <img
       src={currentSource}
       alt={alt}
-      loading="lazy"
+      loading="eager"
+      decoding="async"
       referrerPolicy="no-referrer"
       className={className}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        backgroundColor: '#171719',
+      }}
       onError={() => setSourceIndex((index) => index + 1)}
     />
   )
