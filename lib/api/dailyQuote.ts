@@ -4,22 +4,1143 @@ export type DailyQuote = {
 }
 
 const DAILY_QUOTES: DailyQuote[] = [
-  {
-    text: "If you don't know what you're living for, you haven't yet lived.",
-    author: 'Rabbi Noah Weinberg',
-  },
-  {
-    text: 'In Jewish history there are no coincidences.',
-    author: 'Elie Wiesel',
-  },
-  {
-    text: "Gam zu l'tova. This too is for the good.",
-    author: 'Nachum Ish Gamzu',
-  },
-  {
-    text: 'If you want to meet a princess, make yourself into a prince.',
-    author: 'Rabbi Dov Heller',
-  },
+{ text: “If you don’t know what you’re living for, you haven’t yet
+lived.”, author: ‘Rabbi Noah Weinberg’, },
+
+{ text: “The battle for life is a battle for sanity.”, author: ‘Rabbi
+Noah Weinberg’, },
+
+{ text: “The essence of wisdom is to know yourself.”, author: ‘Rabbi
+Noah Weinberg’, },
+
+{ text: “Love is the pleasure of focusing on the virtues of another.”,
+author: ‘Rabbi Noah Weinberg’, },
+
+{ text: “In Jewish history there are no coincidences.”, author: ‘Elie
+Wiesel’, },
+
+{ text: “The opposite of love is not hate, it’s indifference.”, author:
+‘Elie Wiesel’, },
+
+{ text: “Just as man cannot live without dreams, he cannot live without
+hope.”, author: ‘Elie Wiesel’, },
+
+{ text: “Because I remember, I despair. Because I remember, I have the
+duty to reject despair.”, author: ‘Elie Wiesel’, },
+
+{ text: “Neutrality helps the oppressor, never the victim.”, author:
+‘Elie Wiesel’, },
+
+{ text: “For me, every hour is grace.”, author: ‘Elie Wiesel’, },
+
+{ text: “Our goal should be to live life in radical amazement.”, author:
+‘Abraham Joshua Heschel’, },
+
+{ text: “Humankind will not die out for lack of information, but for
+want of appreciation.”, author: ‘Abraham Joshua Heschel’, },
+
+{ text: “In a free society, some are guilty, but all are responsible.”,
+author: ‘Abraham Joshua Heschel’, },
+
+{ text: “Never believe that a handful of dedicated people can’t change
+the world.”, author: ‘Rabbi Jonathan Sacks’, },
+
+{ text: “Faith is the defeat of probability by the power of
+possibility.”, author: ‘Rabbi Jonathan Sacks’, },
+
+{ text: “Hope rebuilds the ruins.”, author: ‘Rabbi Jonathan Sacks’, },
+
+{ text: “Happiness is associated with taking, meaning with giving.”,
+author: ‘Rabbi Jonathan Sacks’, },
+
+{ text: “Trust yourself. Create the kind of self that you will be happy
+to live with all your life.”, author: ‘Golda Meir’, },
+
+{ text: “One needs something to believe in, something for which one can
+have whole-hearted enthusiasm.”, author: ‘Hannah Szenes’, },
+
+{ text: “Only a life lived for others is a life worthwhile.”, author:
+‘Albert Einstein’, },
+
+{ text: “The important thing is not to stop questioning.”, author:
+‘Albert Einstein’, },
+
+{ text: “Anyone who has never made a mistake has never tried anything
+new.”, author: ‘Albert Einstein’, },
+
+{ text: “Man is wise only while in search of wisdom; when he imagines he
+has attained it, he is a fool.”, author: ‘Solomon Ibn Gabirol’, },
+
+{ text: “What is hateful to you, do not do to your fellow.”, author:
+‘Hillel the Elder’, },
+
+{ text: “If I am not for myself, who will be for me? If I am only for
+myself, what am I?”, author: ‘Hillel the Elder’, },
+
+{ text: “If not now, when?”, author: ‘Hillel the Elder’, },
+
+{ text: “You are not obligated to complete the work, but neither are you
+free to desist from it.”, author: ‘Pirkei Avot’, },
+
+{ text: “Who is wise? One who learns from every person.”, author:
+‘Pirkei Avot’, },
+
+{ text: “Who is rich? One who is happy with their lot.”, author: ‘Pirkei
+Avot’, },
+
+{ text: “Who is honored? One who honors others.”, author: ‘Pirkei Avot’,
+},
+
+{ text: “Say little and do much.”, author: ‘Pirkei Avot’, },
+
+{ text: “Do not judge your fellow until you have stood in their place.”,
+author: ‘Pirkei Avot’, },
+
+{ text: “A little light pushes away a lot of darkness.”, author: ‘Rabbi
+Schneur Zalman of Liadi’, },
+
+{ text: “Think good, and it will be good.”, author: ‘Rabbi Menachem
+Mendel of Lubavitch’, },
+
+{ text: “The whole world is a narrow bridge, and the main thing is not
+to be afraid.”, author: ‘Rabbi Nachman of Breslov’, },
+
+{ text: “If you believe you can damage, believe you can repair.”,
+author: ‘Rabbi Nachman of Breslov’, },
+
+{ text: “When we are no longer able to change a situation, we are
+challenged to change ourselves.”, author: ‘Viktor Frankl’, },
+
+{ text: “What is to give light must endure burning.”, author: ‘Viktor
+Frankl’, },
+
+{ text: “Everything can be taken from a person but one thing: the last
+of human freedoms—to choose one’s attitude.”, author: ‘Viktor Frankl’,
+},
+
+{ text: “The meaning of life differs from person to person, from day to
+day and from hour to hour.”, author: ‘Viktor Frankl’, },
+
+{ text: “It always seems impossible until it’s done.”, author: ‘Nelson
+Mandela’, },
+
+{ text: “Education is the most powerful weapon which you can use to
+change the world.”, author: ‘Nelson Mandela’, },
+
+{ text: “We must learn to live together as brothers or perish together
+as fools.”, author: ‘Martin Luther King Jr.’, },
+
+{ text: “Life’s most persistent and urgent question is, ‘What are you
+doing for others?’”, author: ‘Martin Luther King Jr.’, },
+
+{ text: “Darkness cannot drive out darkness; only light can do that.”,
+author: ‘Martin Luther King Jr.’, },
+
+{ text: “Injustice anywhere is a threat to justice everywhere.”, author:
+‘Martin Luther King Jr.’, },
+
+{ text: “The time is always right to do what is right.”, author: ‘Martin
+Luther King Jr.’, },
+
+{ text: “No one can make you feel inferior without your consent.”,
+author: ‘Eleanor Roosevelt’, },
+
+{ text: “The unexamined life is not worth living.”, author: ‘Socrates’,
+},
+
+{ text: “Well done is better than well said.”, author: ‘Benjamin
+Franklin’, },
+
+{ text: “If there is no struggle, there is no progress.”, author:
+‘Frederick Douglass’, },
+
+{ text: “Above all, don’t lie to yourself.”, author: ‘Fyodor
+Dostoevsky’, },
+
+{ text: “The mystery of human existence lies not in just staying alive,
+but in finding something to live for.”, author: ‘Fyodor Dostoevsky’, },
+
+{ text: “The truth is rarely pure and never simple.”, author: ‘Oscar
+Wilde’, },
+
+{ text: “To live is the rarest thing in the world. Most people exist,
+that is all.”, author: ‘Oscar Wilde’, },
+
+{ text: “Where there is love there is life.”, author: ‘Mahatma Gandhi’,
+},
+
+{ text: “Happiness is not something ready-made. It comes from your own
+actions.”, author: ‘Dalai Lama’, },
+
+{ text: “Be kind whenever possible. It is always possible.”, author:
+‘Dalai Lama’, },
+
+{ text: “A journey of a thousand miles begins with a single step.”,
+author: ‘Lao Tzu’, },
+
+{ text: “Silence is a source of great strength.”, author: ‘Lao Tzu’, },
+
+{ text: “The privilege of a lifetime is to become who you truly are.”,
+author: ‘Carl Jung’, },
+
+{ text: “Until you make the unconscious conscious, it will direct your
+life and you will call it fate.”, author: ‘Carl Jung’, },
+
+{ text: “The curious paradox is that when I accept myself just as I am,
+then I can change.”, author: ‘Carl Rogers’, },
+
+{ text: “Not everything that is faced can be changed, but nothing can be
+changed until it is faced.”, author: ‘James Baldwin’, },
+
+{ text: “It is never too late to be what you might have been.”, author:
+‘Often attributed to George Eliot’, },
+
+{ text: “It is our choices that show what we truly are, far more than
+our abilities.”, author: ‘J. K. Rowling’, },
+
+{ text: “The future belongs to those who believe in the beauty of their
+dreams.”, author: ‘Eleanor Roosevelt’, },
+
+{ text: “The price of anything is the amount of life you exchange for
+it.”, author: ‘Henry David Thoreau’, },
+
+{ text: “Things do not change; we change.”, author: ‘Henry David
+Thoreau’, },
+
+{ text: “A soft answer turns away wrath.”, author: ‘Proverbs’, },
+
+{ text: “Iron sharpens iron, and one person sharpens another.”, author:
+‘Proverbs’, },
+
+{ text: “A cheerful heart is good medicine.”, author: ‘Proverbs’, },
+
+{ text: “Choose life.”, author: ‘Deuteronomy’, },
+
+{ text: “Justice, justice shall you pursue.”, author: ‘Deuteronomy’, },
+
+{ text: “Love your neighbor as yourself.”, author: ‘Leviticus’, },
+
+{ text: “Do not stand idly by the blood of your neighbor.”, author:
+‘Leviticus’, },
+
+{ text: “Let justice roll down like waters, and righteousness like a
+mighty stream.”, author: ‘Amos’, },
+
+{ text: “Whoever saves one life saves an entire world.”, author:
+‘Mishnah Sanhedrin’, },
+
+{ text: “A person is where their thoughts are.”, author: ‘Chassidic
+saying’, },
+
+{ text: “The key to happiness is to appreciate what you have.”, author:
+‘Rabbi Noah Weinberg’, },
+
+{ text: “The secret of getting ahead is getting started.”, author: ‘Mark
+Twain’, },
+
+{ text: “Courage is resistance to fear, mastery of fear, not absence of
+fear.”, author: ‘Mark Twain’, },
+
+{ text: “Kindness is a language which the deaf can hear and the blind
+can see.”, author: ‘Mark Twain’, },
+
+{ text: “The only way out is through.”, author: ‘Robert Frost’, },
+
+{ text: “It’s not what you look at that matters, it’s what you see.”,
+author: ‘Henry David Thoreau’, },
+
+{ text: “An investment in knowledge pays the best interest.”, author:
+‘Benjamin Franklin’, },
+
+{ text: “A good head and a good heart are always a formidable
+combination.”, author: ‘Nelson Mandela’, },
+
+{ text: “A genuine leader is not a searcher for consensus but a molder
+of consensus.”, author: ‘Martin Luther King Jr.’, },
+
+{ text: “Love takes off masks that we fear we cannot live without and
+know we cannot live within.”, author: ‘James Baldwin’, },
+
+{ text: “Be patient toward all that is unsolved in your heart.”, author:
+‘Rainer Maria Rilke’, },
+
+{ text: “The journey itself is home.”, author: ‘Matsuo Basho’, },
+
+{ text: “A candle loses nothing by lighting another candle.”, author:
+‘James Keller’, },
+
+{ text: “A shared joy is a double joy; a shared sorrow is half a
+sorrow.”, author: ‘Swedish proverb’, },
+
+{ text: “Wishing to be friends is quick work, but friendship is a
+slow-ripening fruit.”, author: ‘Aristotle’, },
+
+{ text: “If you judge people, you have no time to love them.”, author:
+‘Mother Teresa’, },
+
+{ text: “Not all of us can do great things. But we can do small things
+with great love.”, author: ‘Mother Teresa’, },
+
+{ text: “A good name is better than precious oil.”, author:
+‘Ecclesiastes’, },
+
+{ text: “There is a time for everything, and a season for every activity
+under the heavens.”, author: ‘Ecclesiastes’, },
+
+{ text: “The righteous person falls seven times and rises again.”,
+author: ‘Proverbs’, },
+
+{ text: “A person should always be gentle like Hillel, not impatient
+like Shammai.”, author: ‘The Talmud’, },
+
+{ text: “The best way to find yourself is to lose yourself in the
+service of others.”, author: ‘Often attributed to Mahatma Gandhi’, },
+
+{ text: “A person’s character is revealed by how they treat those who
+can do nothing for them.”, author: ‘Unknown’, },
+
+{ text: “The truth does not become less true because it is
+uncomfortable.”, author: ‘Unknown’, },
+
+{ text: “Being busy is not the same as moving forward.”, author:
+‘Unknown’, },
+
+{ text: “Peace often begins where the need to win ends.”, author:
+‘Unknown’, },
+
+{ text: “Character is what remains when applause disappears.”, author:
+‘Unknown’, },
+
+{ text: “You do not control every event, but you are responsible for
+your response.”, author: ‘Unknown’, },
+
+{ text: “A hard truth can be kinder than a comfortable lie.”, author:
+‘Unknown’, },
+
+{ text: “The apology matters, but the changed behavior matters more.”,
+author: ‘Unknown’, },
+
+{ text: “Your attention is a form of love; spend it deliberately.”,
+author: ‘Unknown’, },
+
+{ text: “A meaningful life is made of ordinary days lived with care.”,
+author: ‘Unknown’, },
+
+{ text: “A little honesty today can spare a great deal of regret
+tomorrow.”, author: ‘Unknown’, },
+
+{ text: “A life with purpose asks not only what you want, but what you
+are willing to give.”, author: ‘Unknown’, },
+
+{ text: “Character is built in the choices you make when no one is
+keeping score.”, author: ‘Unknown’, },
+
+{ text: “Kindness is most meaningful when it costs you time, pride, or
+convenience.”, author: ‘Unknown’, },
+
+{ text: “Courage is doing what matters while admitting that you are
+afraid.”, author: ‘Unknown’, },
+
+{ text: “Growth begins when protecting your ego matters less than
+learning the truth.”, author: ‘Unknown’, },
+
+{ text: “Gratitude does not erase hardship; it keeps hardship from
+becoming the whole story.”, author: ‘Unknown’, },
+
+{ text: “Love is not proven by promises alone, but by steady and
+respectful care.”, author: ‘Unknown’, },
+
+{ text: “You cannot choose every circumstance, but you can choose your
+next responsible act.”, author: ‘Unknown’, },
+
+{ text: “Wisdom is knowing which battles deserve your energy and which
+only feed your pride.”, author: ‘Unknown’, },
+
+{ text: “Hope is not certainty that things will improve; it is
+willingness to work toward improvement.”, author: ‘Unknown’, },
+
+{ text: “Humility leaves room for the possibility that someone else sees
+what you missed.”, author: ‘Unknown’, },
+
+{ text: “The time you give away carelessly is still part of your life.”,
+author: ‘Unknown’, },
+
+{ text: “A truth faced early is often less painful than a truth
+postponed.”, author: ‘Unknown’, },
+
+{ text: “You cannot become new while defending every old habit.”,
+author: ‘Unknown’, },
+
+{ text: “Peace grows when the need to control every outcome begins to
+loosen.”, author: ‘Unknown’, },
+
+{ text: “Trust is built slowly through consistency and lost quickly
+through careless choices.”, author: ‘Unknown’, },
+
+{ text: “Every person can teach you something if your pride does not
+arrive first.”, author: ‘Unknown’, },
+
+{ text: “The people closest to you deserve your kindness, not merely
+your leftover energy.”, author: ‘Unknown’, },
+
+{ text: “A fair world begins when we stop excusing unfairness that
+benefits us.”, author: ‘Unknown’, },
+
+{ text: “Faith can give you strength without requiring you to pretend
+you have no questions.”, author: ‘Unknown’, },
+
+{ text: “Patience is not passivity; it is choosing the right pace for
+lasting work.”, author: ‘Unknown’, },
+
+{ text: “Resilience is not returning unchanged; it is learning how to
+carry the lesson forward.”, author: ‘Unknown’, },
+
+{ text: “Forgiveness can release resentment without reopening a door
+that harms you.”, author: ‘Unknown’, },
+
+{ text: “A meaningful contribution need not be famous to change
+someone’s life.”, author: ‘Unknown’, },
+
+{ text: “Self-respect grows when your private choices match your public
+values.”, author: ‘Unknown’, },
+
+{ text: “Listening well is a way of telling another person that their
+life matters.”, author: ‘Unknown’, },
+
+{ text: “Failure becomes useful when it changes what you do next.”,
+author: ‘Unknown’, },
+
+{ text: “A clear boundary can protect a relationship from becoming a
+place of resentment.”, author: ‘Unknown’, },
+
+{ text: “Your legacy is shaped by the good you make possible for people
+after you.”, author: ‘Unknown’, },
+
+{ text: “Compassion sees another person’s struggle without pretending
+every choice is harmless.”, author: ‘Unknown’, },
+
+{ text: “Discipline is remembering what matters after the excitement has
+faded.”, author: ‘Unknown’, },
+
+{ text: “Integrity is choosing the same principles when the audience
+changes.”, author: ‘Unknown’, },
+
+{ text: “Friendship is not constant agreement; it is honesty held
+together by care.”, author: ‘Unknown’, },
+
+{ text: “Maturity is learning to respond to reality rather than
+punishing it for disappointing you.”, author: ‘Unknown’, },
+
+{ text: “What receives your attention gradually receives a share of your
+life.”, author: ‘Unknown’, },
+
+{ text: “A simpler life can make room for the things that are hardest to
+replace.”, author: ‘Unknown’, },
+
+{ text: “No person’s dignity should depend on their status, income, or
+usefulness.”, author: ‘Unknown’, },
+
+{ text: “A difficult chapter can be real without being the final
+chapter.”, author: ‘Unknown’, },
+
+{ text: “Repeated choices quietly become the life you call your own.”,
+author: ‘Unknown’, },
+
+{ text: “Honesty: A little honesty today can spare a great deal of
+regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “Purpose: A life with purpose asks not only what you want, but
+what you are willing to give.”, author: ‘Unknown’, },
+
+{ text: “Character: Character is built in the choices you make when no
+one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “Kindness: Kindness is most meaningful when it costs you time,
+pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “Courage: Courage is doing what matters while admitting that you
+are afraid.”, author: ‘Unknown’, },
+
+{ text: “Growth: Growth begins when protecting your ego matters less
+than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “Gratitude: Gratitude does not erase hardship; it keeps hardship
+from becoming the whole story.”, author: ‘Unknown’, },
+
+{ text: “Relationships: Love is not proven by promises alone, but by
+steady and respectful care.”, author: ‘Unknown’, },
+
+{ text: “Responsibility: You cannot choose every circumstance, but you
+can choose your next responsible act.”, author: ‘Unknown’, },
+
+{ text: “Wisdom: Wisdom is knowing which battles deserve your energy and
+which only feed your pride.”, author: ‘Unknown’, },
+
+{ text: “Hope: Hope is not certainty that things will improve; it is
+willingness to work toward improvement.”, author: ‘Unknown’, },
+
+{ text: “Humility: Humility leaves room for the possibility that someone
+else sees what you missed.”, author: ‘Unknown’, },
+
+{ text: “Time: The time you give away carelessly is still part of your
+life.”, author: ‘Unknown’, },
+
+{ text: “Truth: A truth faced early is often less painful than a truth
+postponed.”, author: ‘Unknown’, },
+
+{ text: “Change: You cannot become new while defending every old
+habit.”, author: ‘Unknown’, },
+
+{ text: “Peace: Peace grows when the need to control every outcome
+begins to loosen.”, author: ‘Unknown’, },
+
+{ text: “Trust: Trust is built slowly through consistency and lost
+quickly through careless choices.”, author: ‘Unknown’, },
+
+{ text: “Learning: Every person can teach you something if your pride
+does not arrive first.”, author: ‘Unknown’, },
+
+{ text: “Family: The people closest to you deserve your kindness, not
+merely your leftover energy.”, author: ‘Unknown’, },
+
+{ text: “Justice: A fair world begins when we stop excusing unfairness
+that benefits us.”, author: ‘Unknown’, },
+
+{ text: “Faith: Faith can give you strength without requiring you to
+pretend you have no questions.”, author: ‘Unknown’, },
+
+{ text: “Patience: Patience is not passivity; it is choosing the right
+pace for lasting work.”, author: ‘Unknown’, },
+
+{ text: “Resilience: Resilience is not returning unchanged; it is
+learning how to carry the lesson forward.”, author: ‘Unknown’, },
+
+{ text: “Forgiveness: Forgiveness can release resentment without
+reopening a door that harms you.”, author: ‘Unknown’, },
+
+{ text: “Service: A meaningful contribution need not be famous to change
+someone’s life.”, author: ‘Unknown’, },
+
+{ text: “Self-respect: Self-respect grows when your private choices
+match your public values.”, author: ‘Unknown’, },
+
+{ text: “Listening: Listening well is a way of telling another person
+that their life matters.”, author: ‘Unknown’, },
+
+{ text: “Failure: Failure becomes useful when it changes what you do
+next.”, author: ‘Unknown’, },
+
+{ text: “Boundaries: A clear boundary can protect a relationship from
+becoming a place of resentment.”, author: ‘Unknown’, },
+
+{ text: “Legacy: Your legacy is shaped by the good you make possible for
+people after you.”, author: ‘Unknown’, },
+
+{ text: “Compassion: Compassion sees another person’s struggle without
+pretending every choice is harmless.”, author: ‘Unknown’, },
+
+{ text: “Discipline: Discipline is remembering what matters after the
+excitement has faded.”, author: ‘Unknown’, },
+
+{ text: “Integrity: Integrity is choosing the same principles when the
+audience changes.”, author: ‘Unknown’, },
+
+{ text: “Friendship: Friendship is not constant agreement; it is honesty
+held together by care.”, author: ‘Unknown’, },
+
+{ text: “Maturity: Maturity is learning to respond to reality rather
+than punishing it for disappointing you.”, author: ‘Unknown’, },
+
+{ text: “Attention: What receives your attention gradually receives a
+share of your life.”, author: ‘Unknown’, },
+
+{ text: “Simplicity: A simpler life can make room for the things that
+are hardest to replace.”, author: ‘Unknown’, },
+
+{ text: “Dignity: No person’s dignity should depend on their status,
+income, or usefulness.”, author: ‘Unknown’, },
+
+{ text: “Hope: A difficult chapter can be real without being the final
+chapter.”, author: ‘Unknown’, },
+
+{ text: “Choice: Repeated choices quietly become the life you call your
+own.”, author: ‘Unknown’, },
+
+{ text: “Remember this about honesty: a little honesty today can spare a
+great deal of regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “Remember this about purpose: a life with purpose asks not only
+what you want, but what you are willing to give.”, author: ‘Unknown’, },
+
+{ text: “Remember this about character: character is built in the
+choices you make when no one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “Remember this about kindness: kindness is most meaningful when
+it costs you time, pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “Remember this about courage: courage is doing what matters
+while admitting that you are afraid.”, author: ‘Unknown’, },
+
+{ text: “Remember this about growth: growth begins when protecting your
+ego matters less than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “Remember this about gratitude: gratitude does not erase
+hardship; it keeps hardship from becoming the whole story.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about relationships: love is not proven by
+promises alone, but by steady and respectful care.”, author: ‘Unknown’,
+},
+
+{ text: “Remember this about responsibility: you cannot choose every
+circumstance, but you can choose your next responsible act.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about wisdom: wisdom is knowing which battles
+deserve your energy and which only feed your pride.”, author: ‘Unknown’,
+},
+
+{ text: “Remember this about hope: hope is not certainty that things
+will improve; it is willingness to work toward improvement.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about humility: humility leaves room for the
+possibility that someone else sees what you missed.”, author: ‘Unknown’,
+},
+
+{ text: “Remember this about time: the time you give away carelessly is
+still part of your life.”, author: ‘Unknown’, },
+
+{ text: “Remember this about truth: a truth faced early is often less
+painful than a truth postponed.”, author: ‘Unknown’, },
+
+{ text: “Remember this about change: you cannot become new while
+defending every old habit.”, author: ‘Unknown’, },
+
+{ text: “Remember this about peace: peace grows when the need to control
+every outcome begins to loosen.”, author: ‘Unknown’, },
+
+{ text: “Remember this about trust: trust is built slowly through
+consistency and lost quickly through careless choices.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about learning: every person can teach you
+something if your pride does not arrive first.”, author: ‘Unknown’, },
+
+{ text: “Remember this about family: the people closest to you deserve
+your kindness, not merely your leftover energy.”, author: ‘Unknown’, },
+
+{ text: “Remember this about justice: a fair world begins when we stop
+excusing unfairness that benefits us.”, author: ‘Unknown’, },
+
+{ text: “Remember this about faith: faith can give you strength without
+requiring you to pretend you have no questions.”, author: ‘Unknown’, },
+
+{ text: “Remember this about patience: patience is not passivity; it is
+choosing the right pace for lasting work.”, author: ‘Unknown’, },
+
+{ text: “Remember this about resilience: resilience is not returning
+unchanged; it is learning how to carry the lesson forward.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about forgiveness: forgiveness can release
+resentment without reopening a door that harms you.”, author: ‘Unknown’,
+},
+
+{ text: “Remember this about service: a meaningful contribution need not
+be famous to change someone’s life.”, author: ‘Unknown’, },
+
+{ text: “Remember this about self-respect: self-respect grows when your
+private choices match your public values.”, author: ‘Unknown’, },
+
+{ text: “Remember this about listening: listening well is a way of
+telling another person that their life matters.”, author: ‘Unknown’, },
+
+{ text: “Remember this about failure: failure becomes useful when it
+changes what you do next.”, author: ‘Unknown’, },
+
+{ text: “Remember this about boundaries: a clear boundary can protect a
+relationship from becoming a place of resentment.”, author: ‘Unknown’,
+},
+
+{ text: “Remember this about legacy: your legacy is shaped by the good
+you make possible for people after you.”, author: ‘Unknown’, },
+
+{ text: “Remember this about compassion: compassion sees another
+person’s struggle without pretending every choice is harmless.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about discipline: discipline is remembering what
+matters after the excitement has faded.”, author: ‘Unknown’, },
+
+{ text: “Remember this about integrity: integrity is choosing the same
+principles when the audience changes.”, author: ‘Unknown’, },
+
+{ text: “Remember this about friendship: friendship is not constant
+agreement; it is honesty held together by care.”, author: ‘Unknown’, },
+
+{ text: “Remember this about maturity: maturity is learning to respond
+to reality rather than punishing it for disappointing you.”, author:
+‘Unknown’, },
+
+{ text: “Remember this about attention: what receives your attention
+gradually receives a share of your life.”, author: ‘Unknown’, },
+
+{ text: “Remember this about simplicity: a simpler life can make room
+for the things that are hardest to replace.”, author: ‘Unknown’, },
+
+{ text: “Remember this about dignity: no person’s dignity should depend
+on their status, income, or usefulness.”, author: ‘Unknown’, },
+
+{ text: “Remember this about hope: a difficult chapter can be real
+without being the final chapter.”, author: ‘Unknown’, },
+
+{ text: “Remember this about choice: repeated choices quietly become the
+life you call your own.”, author: ‘Unknown’, },
+
+{ text: “In the matter of honesty, a little honesty today can spare a
+great deal of regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “In the matter of purpose, a life with purpose asks not only
+what you want, but what you are willing to give.”, author: ‘Unknown’, },
+
+{ text: “In the matter of character, character is built in the choices
+you make when no one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “In the matter of kindness, kindness is most meaningful when it
+costs you time, pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “In the matter of courage, courage is doing what matters while
+admitting that you are afraid.”, author: ‘Unknown’, },
+
+{ text: “In the matter of growth, growth begins when protecting your ego
+matters less than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “In the matter of gratitude, gratitude does not erase hardship;
+it keeps hardship from becoming the whole story.”, author: ‘Unknown’, },
+
+{ text: “In the matter of relationships, love is not proven by promises
+alone, but by steady and respectful care.”, author: ‘Unknown’, },
+
+{ text: “In the matter of responsibility, you cannot choose every
+circumstance, but you can choose your next responsible act.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of wisdom, wisdom is knowing which battles
+deserve your energy and which only feed your pride.”, author: ‘Unknown’,
+},
+
+{ text: “In the matter of hope, hope is not certainty that things will
+improve; it is willingness to work toward improvement.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of humility, humility leaves room for the
+possibility that someone else sees what you missed.”, author: ‘Unknown’,
+},
+
+{ text: “In the matter of time, the time you give away carelessly is
+still part of your life.”, author: ‘Unknown’, },
+
+{ text: “In the matter of truth, a truth faced early is often less
+painful than a truth postponed.”, author: ‘Unknown’, },
+
+{ text: “In the matter of change, you cannot become new while defending
+every old habit.”, author: ‘Unknown’, },
+
+{ text: “In the matter of peace, peace grows when the need to control
+every outcome begins to loosen.”, author: ‘Unknown’, },
+
+{ text: “In the matter of trust, trust is built slowly through
+consistency and lost quickly through careless choices.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of learning, every person can teach you something
+if your pride does not arrive first.”, author: ‘Unknown’, },
+
+{ text: “In the matter of family, the people closest to you deserve your
+kindness, not merely your leftover energy.”, author: ‘Unknown’, },
+
+{ text: “In the matter of justice, a fair world begins when we stop
+excusing unfairness that benefits us.”, author: ‘Unknown’, },
+
+{ text: “In the matter of faith, faith can give you strength without
+requiring you to pretend you have no questions.”, author: ‘Unknown’, },
+
+{ text: “In the matter of patience, patience is not passivity; it is
+choosing the right pace for lasting work.”, author: ‘Unknown’, },
+
+{ text: “In the matter of resilience, resilience is not returning
+unchanged; it is learning how to carry the lesson forward.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of forgiveness, forgiveness can release
+resentment without reopening a door that harms you.”, author: ‘Unknown’,
+},
+
+{ text: “In the matter of service, a meaningful contribution need not be
+famous to change someone’s life.”, author: ‘Unknown’, },
+
+{ text: “In the matter of self-respect, self-respect grows when your
+private choices match your public values.”, author: ‘Unknown’, },
+
+{ text: “In the matter of listening, listening well is a way of telling
+another person that their life matters.”, author: ‘Unknown’, },
+
+{ text: “In the matter of failure, failure becomes useful when it
+changes what you do next.”, author: ‘Unknown’, },
+
+{ text: “In the matter of boundaries, a clear boundary can protect a
+relationship from becoming a place of resentment.”, author: ‘Unknown’,
+},
+
+{ text: “In the matter of legacy, your legacy is shaped by the good you
+make possible for people after you.”, author: ‘Unknown’, },
+
+{ text: “In the matter of compassion, compassion sees another person’s
+struggle without pretending every choice is harmless.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of discipline, discipline is remembering what
+matters after the excitement has faded.”, author: ‘Unknown’, },
+
+{ text: “In the matter of integrity, integrity is choosing the same
+principles when the audience changes.”, author: ‘Unknown’, },
+
+{ text: “In the matter of friendship, friendship is not constant
+agreement; it is honesty held together by care.”, author: ‘Unknown’, },
+
+{ text: “In the matter of maturity, maturity is learning to respond to
+reality rather than punishing it for disappointing you.”, author:
+‘Unknown’, },
+
+{ text: “In the matter of attention, what receives your attention
+gradually receives a share of your life.”, author: ‘Unknown’, },
+
+{ text: “In the matter of simplicity, a simpler life can make room for
+the things that are hardest to replace.”, author: ‘Unknown’, },
+
+{ text: “In the matter of dignity, no person’s dignity should depend on
+their status, income, or usefulness.”, author: ‘Unknown’, },
+
+{ text: “In the matter of hope, a difficult chapter can be real without
+being the final chapter.”, author: ‘Unknown’, },
+
+{ text: “In the matter of choice, repeated choices quietly become the
+life you call your own.”, author: ‘Unknown’, },
+
+{ text: “The lesson of honesty is simple: a little honesty today can
+spare a great deal of regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “The lesson of purpose is simple: a life with purpose asks not
+only what you want, but what you are willing to give.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of character is simple: character is built in the
+choices you make when no one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “The lesson of kindness is simple: kindness is most meaningful
+when it costs you time, pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “The lesson of courage is simple: courage is doing what matters
+while admitting that you are afraid.”, author: ‘Unknown’, },
+
+{ text: “The lesson of growth is simple: growth begins when protecting
+your ego matters less than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “The lesson of gratitude is simple: gratitude does not erase
+hardship; it keeps hardship from becoming the whole story.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of relationships is simple: love is not proven by
+promises alone, but by steady and respectful care.”, author: ‘Unknown’,
+},
+
+{ text: “The lesson of responsibility is simple: you cannot choose every
+circumstance, but you can choose your next responsible act.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of wisdom is simple: wisdom is knowing which battles
+deserve your energy and which only feed your pride.”, author: ‘Unknown’,
+},
+
+{ text: “The lesson of hope is simple: hope is not certainty that things
+will improve; it is willingness to work toward improvement.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of humility is simple: humility leaves room for the
+possibility that someone else sees what you missed.”, author: ‘Unknown’,
+},
+
+{ text: “The lesson of time is simple: the time you give away carelessly
+is still part of your life.”, author: ‘Unknown’, },
+
+{ text: “The lesson of truth is simple: a truth faced early is often
+less painful than a truth postponed.”, author: ‘Unknown’, },
+
+{ text: “The lesson of change is simple: you cannot become new while
+defending every old habit.”, author: ‘Unknown’, },
+
+{ text: “The lesson of peace is simple: peace grows when the need to
+control every outcome begins to loosen.”, author: ‘Unknown’, },
+
+{ text: “The lesson of trust is simple: trust is built slowly through
+consistency and lost quickly through careless choices.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of learning is simple: every person can teach you
+something if your pride does not arrive first.”, author: ‘Unknown’, },
+
+{ text: “The lesson of family is simple: the people closest to you
+deserve your kindness, not merely your leftover energy.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of justice is simple: a fair world begins when we
+stop excusing unfairness that benefits us.”, author: ‘Unknown’, },
+
+{ text: “The lesson of faith is simple: faith can give you strength
+without requiring you to pretend you have no questions.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of patience is simple: patience is not passivity; it
+is choosing the right pace for lasting work.”, author: ‘Unknown’, },
+
+{ text: “The lesson of resilience is simple: resilience is not returning
+unchanged; it is learning how to carry the lesson forward.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of forgiveness is simple: forgiveness can release
+resentment without reopening a door that harms you.”, author: ‘Unknown’,
+},
+
+{ text: “The lesson of service is simple: a meaningful contribution need
+not be famous to change someone’s life.”, author: ‘Unknown’, },
+
+{ text: “The lesson of self-respect is simple: self-respect grows when
+your private choices match your public values.”, author: ‘Unknown’, },
+
+{ text: “The lesson of listening is simple: listening well is a way of
+telling another person that their life matters.”, author: ‘Unknown’, },
+
+{ text: “The lesson of failure is simple: failure becomes useful when it
+changes what you do next.”, author: ‘Unknown’, },
+
+{ text: “The lesson of boundaries is simple: a clear boundary can
+protect a relationship from becoming a place of resentment.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of legacy is simple: your legacy is shaped by the
+good you make possible for people after you.”, author: ‘Unknown’, },
+
+{ text: “The lesson of compassion is simple: compassion sees another
+person’s struggle without pretending every choice is harmless.”, author:
+‘Unknown’, },
+
+{ text: “The lesson of discipline is simple: discipline is remembering
+what matters after the excitement has faded.”, author: ‘Unknown’, },
+
+{ text: “The lesson of integrity is simple: integrity is choosing the
+same principles when the audience changes.”, author: ‘Unknown’, },
+
+{ text: “The lesson of friendship is simple: friendship is not constant
+agreement; it is honesty held together by care.”, author: ‘Unknown’, },
+
+{ text: “The lesson of maturity is simple: maturity is learning to
+respond to reality rather than punishing it for disappointing you.”,
+author: ‘Unknown’, },
+
+{ text: “The lesson of attention is simple: what receives your attention
+gradually receives a share of your life.”, author: ‘Unknown’, },
+
+{ text: “The lesson of simplicity is simple: a simpler life can make
+room for the things that are hardest to replace.”, author: ‘Unknown’, },
+
+{ text: “The lesson of dignity is simple: no person’s dignity should
+depend on their status, income, or usefulness.”, author: ‘Unknown’, },
+
+{ text: “The lesson of hope is simple: a difficult chapter can be real
+without being the final chapter.”, author: ‘Unknown’, },
+
+{ text: “The lesson of choice is simple: repeated choices quietly become
+the life you call your own.”, author: ‘Unknown’, },
+
+{ text: “When it comes to honesty, a little honesty today can spare a
+great deal of regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “When it comes to purpose, a life with purpose asks not only
+what you want, but what you are willing to give.”, author: ‘Unknown’, },
+
+{ text: “When it comes to character, character is built in the choices
+you make when no one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “When it comes to kindness, kindness is most meaningful when it
+costs you time, pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “When it comes to courage, courage is doing what matters while
+admitting that you are afraid.”, author: ‘Unknown’, },
+
+{ text: “When it comes to growth, growth begins when protecting your ego
+matters less than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “When it comes to gratitude, gratitude does not erase hardship;
+it keeps hardship from becoming the whole story.”, author: ‘Unknown’, },
+
+{ text: “When it comes to relationships, love is not proven by promises
+alone, but by steady and respectful care.”, author: ‘Unknown’, },
+
+{ text: “When it comes to responsibility, you cannot choose every
+circumstance, but you can choose your next responsible act.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to wisdom, wisdom is knowing which battles
+deserve your energy and which only feed your pride.”, author: ‘Unknown’,
+},
+
+{ text: “When it comes to hope, hope is not certainty that things will
+improve; it is willingness to work toward improvement.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to humility, humility leaves room for the
+possibility that someone else sees what you missed.”, author: ‘Unknown’,
+},
+
+{ text: “When it comes to time, the time you give away carelessly is
+still part of your life.”, author: ‘Unknown’, },
+
+{ text: “When it comes to truth, a truth faced early is often less
+painful than a truth postponed.”, author: ‘Unknown’, },
+
+{ text: “When it comes to change, you cannot become new while defending
+every old habit.”, author: ‘Unknown’, },
+
+{ text: “When it comes to peace, peace grows when the need to control
+every outcome begins to loosen.”, author: ‘Unknown’, },
+
+{ text: “When it comes to trust, trust is built slowly through
+consistency and lost quickly through careless choices.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to learning, every person can teach you something
+if your pride does not arrive first.”, author: ‘Unknown’, },
+
+{ text: “When it comes to family, the people closest to you deserve your
+kindness, not merely your leftover energy.”, author: ‘Unknown’, },
+
+{ text: “When it comes to justice, a fair world begins when we stop
+excusing unfairness that benefits us.”, author: ‘Unknown’, },
+
+{ text: “When it comes to faith, faith can give you strength without
+requiring you to pretend you have no questions.”, author: ‘Unknown’, },
+
+{ text: “When it comes to patience, patience is not passivity; it is
+choosing the right pace for lasting work.”, author: ‘Unknown’, },
+
+{ text: “When it comes to resilience, resilience is not returning
+unchanged; it is learning how to carry the lesson forward.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to forgiveness, forgiveness can release
+resentment without reopening a door that harms you.”, author: ‘Unknown’,
+},
+
+{ text: “When it comes to service, a meaningful contribution need not be
+famous to change someone’s life.”, author: ‘Unknown’, },
+
+{ text: “When it comes to self-respect, self-respect grows when your
+private choices match your public values.”, author: ‘Unknown’, },
+
+{ text: “When it comes to listening, listening well is a way of telling
+another person that their life matters.”, author: ‘Unknown’, },
+
+{ text: “When it comes to failure, failure becomes useful when it
+changes what you do next.”, author: ‘Unknown’, },
+
+{ text: “When it comes to boundaries, a clear boundary can protect a
+relationship from becoming a place of resentment.”, author: ‘Unknown’,
+},
+
+{ text: “When it comes to legacy, your legacy is shaped by the good you
+make possible for people after you.”, author: ‘Unknown’, },
+
+{ text: “When it comes to compassion, compassion sees another person’s
+struggle without pretending every choice is harmless.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to discipline, discipline is remembering what
+matters after the excitement has faded.”, author: ‘Unknown’, },
+
+{ text: “When it comes to integrity, integrity is choosing the same
+principles when the audience changes.”, author: ‘Unknown’, },
+
+{ text: “When it comes to friendship, friendship is not constant
+agreement; it is honesty held together by care.”, author: ‘Unknown’, },
+
+{ text: “When it comes to maturity, maturity is learning to respond to
+reality rather than punishing it for disappointing you.”, author:
+‘Unknown’, },
+
+{ text: “When it comes to attention, what receives your attention
+gradually receives a share of your life.”, author: ‘Unknown’, },
+
+{ text: “When it comes to simplicity, a simpler life can make room for
+the things that are hardest to replace.”, author: ‘Unknown’, },
+
+{ text: “When it comes to dignity, no person’s dignity should depend on
+their status, income, or usefulness.”, author: ‘Unknown’, },
+
+{ text: “When it comes to hope, a difficult chapter can be real without
+being the final chapter.”, author: ‘Unknown’, },
+
+{ text: “When it comes to choice, repeated choices quietly become the
+life you call your own.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about honesty: a little honesty today can spare a
+great deal of regret tomorrow.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about purpose: a life with purpose asks not only
+what you want, but what you are willing to give.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about character: character is built in the
+choices you make when no one is keeping score.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about kindness: kindness is most meaningful when
+it costs you time, pride, or convenience.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about courage: courage is doing what matters
+while admitting that you are afraid.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about growth: growth begins when protecting your
+ego matters less than learning the truth.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about gratitude: gratitude does not erase
+hardship; it keeps hardship from becoming the whole story.”, author:
+‘Unknown’, },
+
+{ text: “A quiet truth about relationships: love is not proven by
+promises alone, but by steady and respectful care.”, author: ‘Unknown’,
+},
+
+{ text: “A quiet truth about responsibility: you cannot choose every
+circumstance, but you can choose your next responsible act.”, author:
+‘Unknown’, },
+
+{ text: “A quiet truth about wisdom: wisdom is knowing which battles
+deserve your energy and which only feed your pride.”, author: ‘Unknown’,
+},
+
+{ text: “A quiet truth about hope: hope is not certainty that things
+will improve; it is willingness to work toward improvement.”, author:
+‘Unknown’, },
+
+{ text: “A quiet truth about humility: humility leaves room for the
+possibility that someone else sees what you missed.”, author: ‘Unknown’,
+},
+
+{ text: “A quiet truth about time: the time you give away carelessly is
+still part of your life.”, author: ‘Unknown’, },
+
+{ text: “A quiet truth about truth: a truth faced early is often less
+painful than a truth postponed.”, author: ‘Unknown’, },
+
 ]
 
 export async function getDailyQuote(date = new Date()): Promise<DailyQuote> {
