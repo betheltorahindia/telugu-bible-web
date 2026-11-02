@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { ArrowUpRight, BookOpen, CalendarDays, Heart, Quote, Sparkles, Users } from 'lucide-react'
+import { ArrowUpRight, BookOpen, CalendarDays, Heart, Sparkles, Users } from 'lucide-react'
 import { getDailyQuote } from '../lib/api/dailyQuote'
 import HomeNavigationCarousel from '../components/HomeNavigationCarousel'
+import HeroSpotlight from '../components/HeroSpotlight'
 import InstallFAB from '../components/InstallFAB'
 import BethelChat from '../components/BethelChat'
 import ParashaTeaser from '../components/ParashaTeaser'
@@ -13,7 +14,6 @@ export const metadata = {
   alternates: { canonical: '/' },
 }
 
-const letters = Array.from('BETHEL')
 const HEBREW_WEEKDAYS = [
   'Yom Rishon',
   'Yom Sheni',
@@ -63,25 +63,9 @@ export default async function Home() {
         </div>
 
         <div className="hero-content">
-          <h1 id="home-title" className="hero-wordmark">
-            <span className="hero-letters" aria-hidden="true">
-              {letters.map((letter, index) => (
-                <span key={`${letter}-${index}`} style={{ animationDelay: `${index * 90}ms` }}>
-                  {letter}
-                </span>
-              ))}
-            </span>
-            <span className="sr-only">BETHEL TORAH INDIA</span>
-            <span className="hero-title-bottom" aria-hidden="true">TORAH INDIA</span>
-          </h1>
+          <HeroSpotlight quote={quote.text} author={quote.author} />
           <HomeNavigationCarousel />
         </div>
-      </section>
-
-      <section className="daily-quote-card" aria-label="Daily Jewish wisdom">
-        <Quote className="daily-quote-mark" aria-hidden="true" />
-        <blockquote>{quote.text}</blockquote>
-        <p className="daily-quote-author">{quote.author}</p>
       </section>
 
       <section className="home-readings" aria-labelledby="home-readings-title">

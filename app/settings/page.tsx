@@ -24,8 +24,8 @@ export default function SettingsPage() {
         <div className="settings-card-heading">
           <span className="settings-page-icon"><BellRing className="h-5 w-5" /></span>
           <div>
-            <h2 id="settings-reminders-title">Calendar reminders</h2>
-            <p>Choose whether this device receives reminders about upcoming holidays and readings.</p>
+            <h2 id="settings-reminders-title">Notifications &amp; reminders</h2>
+            <p>Choose which calendar, prayer, and Psalm reminders this device receives.</p>
           </div>
         </div>
         <NotificationToggle />

@@ -5316,3 +5316,129 @@ html[data-theme] .launch-wordmark {
 
   html[data-theme] .launch-wordmark { transform: translateY(9svh); }
 }
+
+.home-hero-spotlight {
+  display: block;
+  width: 100%;
+  min-height: 220px;
+  margin: 0 0 24px;
+  border: 0;
+  border-radius: 22px;
+  padding: 0;
+  background: transparent !important;
+  color: inherit;
+  cursor: pointer;
+}
+
+.home-hero-spotlight:focus-visible {
+  outline: 2px solid #c5a363;
+  outline-offset: 7px;
+}
+
+.home-hero .hero-wordmark { margin: 0; }
+.hero-daily-quote { width: min(100%, 900px); margin: 0 auto; }
+.hero-daily-quote .daily-quote-mark { color: #a48245 !important; }
+
+:root[data-theme="light"] .home-hero .hero-daily-quote blockquote,
+:root[data-theme="light"] .home-hero .hero-daily-quote .daily-quote-author {
+  color: #39352e !important;
+}
+
+:root[data-theme="dark"] .home-hero .hero-daily-quote blockquote,
+:root[data-theme="dark"] .home-hero .hero-daily-quote .daily-quote-author {
+  color: #f3ead7 !important;
+}
+
+@media (max-width: 760px) {
+  .home-hero-spotlight { min-height: 190px; margin-bottom: 20px; }
+  .hero-daily-quote { gap: 8px; border-radius: 16px; padding: 17px 15px; }
+  .hero-daily-quote blockquote { font-size: clamp(0.94rem, 3.8vw, 1.12rem); line-height: 1.55; }
+  .hero-wordmark { margin: 0; }
+
+  .calendar-grid-scroll { padding: 9px 7px 12px; }
+  .calendar-grid { gap: 4px; }
+  .calendar-weekday { min-height: 30px; font-size: 0.62rem; }
+  .calendar-day {
+    min-height: 76px;
+    overflow: hidden;
+    border-radius: 10px;
+    padding: 7px 2px 5px;
+  }
+  .calendar-date-select {
+    display: grid;
+    width: 100%;
+    min-height: 27px;
+    place-items: center;
+    border: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+  .calendar-date-row { position: relative; width: 100%; justify-content: center; }
+  .calendar-day-number { font-size: 0.98rem; line-height: 1.1; }
+  .calendar-date-zodiac {
+    position: absolute;
+    top: -5px;
+    right: 0;
+    font-size: 0.59rem;
+    line-height: 1;
+  }
+  .calendar-today-chip {
+    position: absolute;
+    top: -6px;
+    left: 0;
+    border-radius: 4px;
+    padding: 1px 2px;
+    font-size: 0.4rem;
+    line-height: 1.1;
+  }
+  .calendar-hebrew-date {
+    display: block;
+    min-height: 15px;
+    max-width: 100%;
+    overflow: hidden;
+    margin-top: 5px;
+    font-size: clamp(0.46rem, 1.7vw, 0.56rem);
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .calendar-hebrew-date-full { display: none; }
+  .calendar-hebrew-date-compact { display: inline; }
+  .calendar-event-list { display: none; }
+  .calendar-day.has-events::after {
+    display: block;
+    width: 5px;
+    height: 5px;
+    flex: 0 0 auto;
+    align-self: center;
+    margin-top: 6px;
+    border-radius: 50%;
+    background: #b88d3e;
+    content: "";
+  }
+  :root[data-theme="dark"] .calendar-day.has-events::after { background: #e5bd68; }
+  .calendar-day-detail { align-items: stretch; flex-direction: column; }
+  .calendar-detail-date { gap: 4px; }
+  .calendar-detail-events { justify-content: flex-start; }
+  .calendar-detail-events > span,
+  .calendar-detail-events > a {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+
+:root[data-theme="light"] .calendar-day { border-color: rgba(100, 87, 63, 0.15); }
+:root[data-theme="dark"] .calendar-day { border-color: #383838; }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-spotlight *,
+  .home-hero-spotlight *::before,
+  .home-hero-spotlight *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

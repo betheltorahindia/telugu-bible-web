@@ -37,6 +37,33 @@ function englishHebrewDate(date: string) {
   return month && day ? `${month} ${day}` : ''
 }
 
+function compactHebrewDate(date: string) {
+  const match = englishHebrewDate(date).match(/^(.*)\s+(\d+)$/u)
+  const month = match?.[1]
+  const day = match?.[2]
+  const abbreviations: Record<string, string> = {
+    Tishri: 'Tish',
+    Tishrei: 'Tish',
+    Heshvan: 'Hesh',
+    Cheshvan: 'Chesh',
+    Kislev: 'Kis',
+    Tevet: 'Tev',
+    Shevat: 'Shev',
+    Shvat: 'Shv',
+    Nisan: 'Nis',
+    Iyar: 'Iyar',
+    Sivan: 'Siv',
+    Tammuz: 'Tam',
+    Av: 'Av',
+    Elul: 'Elul',
+    'Adar I': 'Adar I',
+    'Adar II': 'Adar II',
+    Adar: 'Adar',
+  }
+  if (!month || !day) return ''
+  return `${abbreviations[month] ?? month.slice(0, 3)} ${day}`
+}
+
 function zodiacForRoshChodesh(title: string) {
   const month = title.replace(/^Rosh Chodesh\s*/i, '').toLowerCase()
   const signs: [string[], string][] = [
@@ -122,7 +149,12 @@ export default function CalendarGrid({
                     {day.isToday && <span className="calendar-today-chip">Today</span>}
                   </span>
                 </button>
-                <span className="calendar-hebrew-date">{hebrewDate || '\u00a0'}</span>
+                <span className="calendar-hebrew-date" title={hebrewDate || undefined}>
+                  <span className="calendar-hebrew-date-full">{hebrewDate || '\u00a0'}</span>
+                  <span className="calendar-hebrew-date-compact">
+                    {hebrewDate ? compactHebrewDate(day.date) : '\u00a0'}
+                  </span>
+                </span>
                 <span className="calendar-event-list">
                   {holidays.slice(0, 2).map((event) => (
                     <button

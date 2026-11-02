@@ -300,7 +300,9 @@ function RemoteThumbnail({
   fallback: ReactNode
 }) {
   const [sourceIndex, setSourceIndex] = useState(0)
-  const sources = [...new Set([src, ...fallbackSources].filter((source): source is string => Boolean(source)))]
+  const sources = [...new Set([src, ...fallbackSources]
+    .filter((source): source is string => Boolean(source))
+    .map((source) => `/api/social/thumbnail?${new URLSearchParams({ url: source })}`))]
   const currentSource = sources[sourceIndex]
 
   if (!currentSource) {

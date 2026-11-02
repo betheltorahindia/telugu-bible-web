@@ -1,9 +1,11 @@
 import webpush from 'web-push'
+import type { NotificationPreferences } from './preferences'
 
 export type StoredPushSubscription = {
   endpoint: string
   subscription: webpush.PushSubscription
   timezone: string
+  preferences: NotificationPreferences
 }
 
 export function getPushConfig() {

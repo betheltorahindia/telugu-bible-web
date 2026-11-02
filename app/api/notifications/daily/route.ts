@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getHebcalMonth, type CalendarEvent } from '../../../../lib/calendar/hebcal'
 import { YOUTUBE } from '../../../../lib/social/social-data'
+import { sendPushOnce } from '../../../../lib/notifications/delivery'
+import { getNotificationPreferences } from '../../../../lib/notifications/preferences'
 import { configureWebPush, getPushConfig, supabaseHeaders, type StoredPushSubscription } from '../../../../lib/notifications/push'
 
 export const dynamic = 'force-dynamic'
@@ -50,28 +52,19 @@ async function loadSubscriptions(
   const subscriptions: StoredPushSubscription[] = []
   for (let offset = 0; ; offset += 1000) {
     const response = await fetch(
-      `${config.url}/rest/v1/push_subscriptions?select=endpoint,subscription,timezone`,
+      `${config.url}/rest/v1/push_subscriptions?select=endpoint,subscription,timezone,preferences`,
       { headers: { ...supabaseHeaders(config.serviceKey), Range: `${offset}-${offset + 999}` } },
     )
     if (!response.ok) {
       throw new Error(`Push subscription lookup failed with status ${response.status}`)
     }
-    const page = (await response.json()) as StoredPushSubscription[]
-    subscriptions.push(...page)
+    const page = await response.json() as Array<Omit<StoredPushSubscription, 'preferences'> & { preferences?: unknown }>
+    subscriptions.push(...page.map((subscription) => ({
+      ...subscription,
+      preferences: getNotificationPreferences(subscription.preferences),
+    })))
     if (page.length < 1000) return subscriptions
   }
-}
-
-async function removeExpiredSubscription(
-  config: NonNullable<ReturnType<typeof getPushConfig>>,
-  endpoint: string,
-) {
-  const params = new URLSearchParams({ endpoint: `eq.${endpoint}` })
-  const response = await fetch(`${config.url}/rest/v1/push_subscriptions?${params}`, {
-    method: 'DELETE',
-    headers: supabaseHeaders(config.serviceKey),
-  })
-  if (!response.ok) console.error(`Could not remove expired push endpoint: ${response.status}`)
 }
 
 async function sendPush(
@@ -80,22 +73,13 @@ async function sendPush(
   recipients: StoredPushSubscription[],
   payload: Record<string, string>,
 ) {
-  const results = await Promise.allSettled(recipients.map(async ({ endpoint, subscription }) => {
-    try {
-      await push.webpush.sendNotification(subscription, JSON.stringify(payload), { TTL: 60 * 60 * 24 })
-      return true
-    } catch (error) {
-      const statusCode = typeof error === 'object' && error !== null && 'statusCode' in error
-        ? error.statusCode
-        : undefined
-      if (statusCode === 404 || statusCode === 410) {
-        await removeExpiredSubscription(config, endpoint)
-        return false
-      }
-      console.error('Push notification delivery failed.', error)
-      return false
-    }
-  }))
+  const key = payload.tag || payload.title || 'daily-notification'
+  const results = await Promise.allSettled(recipients.map((recipient) =>
+    sendPushOnce(push, config, recipient, key, payload),
+  ))
+  for (const result of results) {
+    if (result.status === 'rejected') console.error('Push notification delivery failed.', result.reason)
+  }
   return results.filter((result) => result.status === 'fulfilled' && result.value).length
 }
 
@@ -247,6 +231,7 @@ export async function GET(request: NextRequest) {
 
   const monthCache = new Map<string, Promise<Awaited<ReturnType<typeof getHebcalMonth>>>>()
   let calendarSent = 0
+  const calendarSubscribers = subscriptions.filter((subscription) => subscription.preferences.calendar)
   for (const reminder of reminders.values()) {
     const [year, month] = reminder.dateKey.split('-').map(Number)
     const monthKey = `${year}-${month}`
@@ -271,7 +256,9 @@ export async function GET(request: NextRequest) {
       month: 'long',
       timeZone: 'UTC',
     }).format(new Date(`${reminder.dateKey}T00:00:00Z`))
-    calendarSent += await sendPush(push, config, reminder.recipients, {
+    const recipients = reminder.recipients.filter((subscription) => subscription.preferences.calendar)
+    if (recipients.length === 0) continue
+    calendarSent += await sendPush(push, config, recipients, {
       title: `${reminder.isToday ? 'Today' : 'Tomorrow'} · ${reminderLabel(events)}`,
       body: `${reminder.isToday ? 'Today is' : 'Tomorrow is'} ${reminderLabel(events)} (${dateLabel}). Tap to explore the calendar.`,
       url: `/calendar?year=${year}&month=${month}`,
@@ -281,7 +268,7 @@ export async function GET(request: NextRequest) {
 
   let liveSent = 0
   try {
-    liveSent = await notifyUpcomingYouTubeLives(config, push, subscriptions)
+    liveSent = await notifyUpcomingYouTubeLives(config, push, calendarSubscribers)
   } catch (error) {
     console.error('Scheduled YouTube live notification check failed.', error)
   }

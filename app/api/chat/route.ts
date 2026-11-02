@@ -4,6 +4,8 @@ import { applyRateLimit } from '../../../lib/utils/rateLimit'
 
 export const dynamic = 'force-dynamic'
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash'
+
 const ChatRequestSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(['user', 'assistant']),
@@ -32,7 +34,10 @@ function isRateLimited(request: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ onlineAvailable: Boolean(process.env.GEMINI_API_KEY) })
+  return NextResponse.json({
+    onlineAvailable: Boolean(process.env.GEMINI_API_KEY),
+    model: GEMINI_MODEL,
+  })
 }
 
 export async function POST(request: NextRequest) {
@@ -60,7 +65,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
       {
         method: 'POST',
         headers: {
@@ -75,33 +80,56 @@ export async function POST(request: NextRequest) {
             temperature: 0.4,
           },
         }),
-        signal: AbortSignal.timeout(20_000),
+        signal: AbortSignal.timeout(45_000),
         cache: 'no-store',
       },
     )
 
     if (!response.ok) {
-      console.error(`Gemini chat request failed with status ${response.status}`)
+      const body = await response.text()
+      let providerError: { error?: { message?: string; status?: string } } = {}
+      try {
+        providerError = JSON.parse(body)
+      } catch {
+        providerError = {}
+      }
+      const providerMessage = providerError.error?.message
+        ?.replaceAll(apiKey, '[redacted]')
+        .replace(/[\u0000-\u001f\u007f]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .slice(0, 240)
+      const providerDetails = [providerError.error?.status, providerMessage].filter(Boolean).join(': ')
+      console.error('Gemini chat request failed.', {
+        model: GEMINI_MODEL,
+        httpStatus: response.status,
+        providerDetails,
+      })
       if (response.status === 401 || response.status === 403) {
         return NextResponse.json(
-          { error: 'Gemini rejected the API key or its project permissions. Verify the key and Generative Language API access, then redeploy this Preview.' },
+          { error: `Gemini rejected the API key or project permissions${providerDetails ? `: ${providerDetails}` : '.'} Verify the key and Generative Language API access.` },
           { status: 502 },
         )
       }
       if (response.status === 429) {
         return NextResponse.json(
-          { error: 'Gemini quota or rate limit was reached. Check the project quota and billing, then try again later.' },
+          { error: `Gemini quota or rate limit was reached${providerDetails ? `: ${providerDetails}` : '.'} Check the project quota and billing.` },
           { status: 502 },
         )
       }
       if (response.status === 400) {
         return NextResponse.json(
-          { error: 'Gemini rejected the request. Check that the selected model is available to this API key.' },
+          { error: `Gemini rejected the request${providerDetails ? `: ${providerDetails}` : '.'} Check model access and request settings.` },
+          { status: 502 },
+        )
+      }
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: `Gemini model “${GEMINI_MODEL}” is unavailable${providerDetails ? `: ${providerDetails}` : '.'} Check the configured model name.` },
           { status: 502 },
         )
       }
       return NextResponse.json(
-        { error: 'Gemini is temporarily unavailable. Please try again later.' },
+        { error: `Gemini is temporarily unavailable (HTTP ${response.status})${providerDetails ? `: ${providerDetails}` : '. Please try again later.'}` },
         { status: 502 },
       )
     }
@@ -122,6 +150,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ answer })
   } catch (error) {
     console.error('Gemini chat request could not be completed.', error)
-    return NextResponse.json({ error: 'The online guide is temporarily unavailable.' }, { status: 502 })
+    const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')
+    return NextResponse.json(
+      { error: timedOut ? 'The request to Gemini timed out. Please try again.' : 'The server could not connect to Gemini. Check the deployment network and try again.' },
+      { status: 502 },
+    )
   }
 }
