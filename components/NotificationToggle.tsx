@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
-import { Bell, BellOff, BookOpenCheck, CalendarDays, Clock3, LoaderCircle } from 'lucide-react'
+import { Bell, BellOff, CalendarDays, LoaderCircle } from 'lucide-react'
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   type NotificationPreferences,
@@ -147,38 +147,11 @@ export default function NotificationToggle() {
       await readJson(response)
       setState('enabled')
       setSaved(true)
-      setMessage('Your reminder preferences are saved for this device.')
+      setMessage('Your calendar notification preference is saved for this device.')
     } catch (error) {
       setState('error')
-      setMessage(error instanceof Error ? error.message : 'Could not save your reminder preferences.')
+      setMessage(error instanceof Error ? error.message : 'Could not save your notification preference.')
     }
-  }
-
-  const updatePreference = <K extends keyof NotificationPreferences>(
-    key: K,
-    value: NotificationPreferences[K],
-  ) => {
-    setPreferences((current) => ({ ...current, [key]: value }))
-    setSaved(false)
-    setMessage('')
-  }
-
-  const updatePrayerTime = (key: keyof NotificationPreferences['prayerTimes'], value: string) => {
-    setPreferences((current) => ({
-      ...current,
-      prayerTimes: { ...current.prayerTimes, [key]: value },
-    }))
-    setSaved(false)
-    setMessage('')
-  }
-
-  const updatePsalmTime = (index: number, value: string) => {
-    setPreferences((current) => ({
-      ...current,
-      psalmTimes: current.psalmTimes.map((time, itemIndex) => itemIndex === index ? value : time) as NotificationPreferences['psalmTimes'],
-    }))
-    setSaved(false)
-    setMessage('')
   }
 
   const isBusy = state === 'busy' || state === 'checking'
@@ -193,8 +166,8 @@ export default function NotificationToggle() {
             {isEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
           </span>
           <span>
-            <strong>Device reminders</strong>
-            <small>Calendar events, daily prayers, and three invitations to read Psalms</small>
+            <strong>Device notifications</strong>
+            <small>Daily calendar and Torah-reading reminders</small>
           </span>
         </div>
         <button
@@ -214,77 +187,24 @@ export default function NotificationToggle() {
         <form className="notification-preferences" onSubmit={savePreferences}>
           <label className="notification-preference-toggle">
             <CalendarDays aria-hidden="true" />
-            <span><strong>Calendar &amp; live events</strong><small>Jewish dates, holidays, Torah readings, and scheduled lives</small></span>
+            <span>
+              <strong>Calendar &amp; live events</strong>
+              <small>Holidays, Torah readings, and scheduled community live streams</small>
+            </span>
             <input
               type="checkbox"
               checked={preferences.calendar}
-              onChange={(event) => updatePreference('calendar', event.target.checked)}
+              onChange={(event) => {
+                setPreferences({ calendar: event.target.checked })
+                setSaved(false)
+                setMessage('')
+              }}
             />
           </label>
-
-          <div className="notification-preference-group">
-            <label className="notification-preference-toggle">
-              <Bell aria-hidden="true" />
-              <span><strong>Daily prayer reminders</strong><small>Four gentle reminders, in this device’s local time</small></span>
-              <input
-                type="checkbox"
-                checked={preferences.prayers}
-                onChange={(event) => updatePreference('prayers', event.target.checked)}
-              />
-            </label>
-            {preferences.prayers && (
-              <div className="notification-time-grid">
-                {([
-                  ['morning', 'Morning'],
-                  ['afternoon', 'Afternoon'],
-                  ['evening', 'Evening'],
-                  ['night', 'Night'],
-                ] as const).map(([key, label]) => (
-                  <label key={key}>
-                    <span>{label}</span>
-                    <input
-                      type="time"
-                      step={900}
-                      value={preferences.prayerTimes[key]}
-                      onChange={(event) => updatePrayerTime(key, event.target.value)}
-                    />
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="notification-preference-group">
-            <label className="notification-preference-toggle">
-              <BookOpenCheck aria-hidden="true" />
-              <span><strong>Psalm reading invitations</strong><small>Three daily reminders to pause for five Psalms</small></span>
-              <input
-                type="checkbox"
-                checked={preferences.psalms}
-                onChange={(event) => updatePreference('psalms', event.target.checked)}
-              />
-            </label>
-            {preferences.psalms && (
-              <div className="notification-time-grid notification-psalm-times">
-                {preferences.psalmTimes.map((time, index) => (
-                  <label key={index}>
-                    <span><Clock3 aria-hidden="true" /> Pause {index + 1}</span>
-                    <input
-                      type="time"
-                      step={900}
-                      value={time}
-                      onChange={(event) => updatePsalmTime(index, event.target.value)}
-                    />
-                  </label>
-                ))}
-              </div>
-            )}
-          </div>
-
           <div className="notification-preference-footer">
-            <small>Times use this device’s local time. Changes take effect after saving.</small>
+            <small>Calendar reminders are checked once daily.</small>
             <button type="submit" disabled={isBusy || saved}>
-              {isBusy ? 'Saving…' : saved ? 'Saved' : 'Save preferences'}
+              {isBusy ? 'Saving…' : saved ? 'Saved' : 'Save preference'}
             </button>
           </div>
         </form>
