@@ -9,15 +9,23 @@ alter table public.push_subscriptions
   add column if not exists timezone text not null default 'UTC';
 
 alter table public.push_subscriptions
-  add column if not exists preferences jsonb not null default '{"calendar":true}'::jsonb;
+  add column if not exists preferences jsonb not null default
+    '{"calendar":true,"prayers":true,"psalms":true,"custom":true}'::jsonb;
 
 alter table public.push_subscriptions
-  alter column preferences set default '{"calendar":true}'::jsonb;
+  alter column preferences set default
+    '{"calendar":true,"prayers":true,"psalms":true,"custom":true}'::jsonb;
 
 update public.push_subscriptions
 set preferences = jsonb_build_object(
   'calendar',
-  coalesce(preferences -> 'calendar', 'true'::jsonb)
+  coalesce(preferences -> 'calendar', 'true'::jsonb),
+  'prayers',
+  coalesce(preferences -> 'prayers', 'true'::jsonb),
+  'psalms',
+  coalesce(preferences -> 'psalms', 'true'::jsonb),
+  'custom',
+  coalesce(preferences -> 'custom', 'true'::jsonb)
 );
 
 alter table public.push_subscriptions enable row level security;

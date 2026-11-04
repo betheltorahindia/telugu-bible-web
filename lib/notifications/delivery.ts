@@ -32,7 +32,7 @@ export async function sendPushOnce(
   config: PushConfig,
   recipient: StoredPushSubscription,
   key: string,
-  payload: Record<string, string>,
+  payload: Record<string, unknown>,
 ) {
   const deliveryKey = deliveryId(recipient.endpoint, key)
   const reserved = await fetch(

@@ -1,6 +1,7 @@
 import afternoon from './afternoon.json'
 import evening from './evening.json'
 import morning from './morning.json'
+import night from './night.json'
 import type { LangCode } from '../../lang'
 
 export type PrayerLanguageText = Record<LangCode, string>
@@ -26,7 +27,7 @@ export type Prayer = {
   sections: PrayerSection[]
 }
 
-export const prayers: Prayer[] = [morning, afternoon, evening]
+export const prayers: Prayer[] = [morning, afternoon, evening, night]
 
 export function getPrayer(slug: string) {
   return prayers.find((prayer) => prayer.slug === slug)

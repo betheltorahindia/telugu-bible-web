@@ -52,6 +52,33 @@ async function readLimitedBody(response: Response) {
   return body
 }
 
+async function fetchAllowedImage(initialUrl: URL) {
+  let url = initialUrl
+  for (let redirectCount = 0; redirectCount <= 3; redirectCount += 1) {
+    const response = await fetch(url, {
+      headers: { Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' },
+      redirect: 'manual',
+      signal: AbortSignal.timeout(10_000),
+      cache: 'force-cache',
+    })
+    if (![301, 302, 303, 307, 308].includes(response.status)) return response
+
+    const location = response.headers.get('location')
+    if (!location || redirectCount === 3) {
+      await response.body?.cancel()
+      throw new Error('Thumbnail provider returned an unsupported redirect.')
+    }
+    const nextUrl = new URL(location, url)
+    if (!isAllowedImageUrl(nextUrl)) {
+      await response.body?.cancel()
+      throw new Error('Thumbnail provider redirected to an unsupported host.')
+    }
+    await response.body?.cancel()
+    url = nextUrl
+  }
+  throw new Error('Thumbnail provider returned too many redirects.')
+}
+
 export async function GET(request: NextRequest) {
   const source = request.nextUrl.searchParams.get('url')
   if (!source || source.length > 2048) {
@@ -69,12 +96,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(imageUrl, {
-      headers: { Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' },
-      redirect: 'error',
-      signal: AbortSignal.timeout(10_000),
-      cache: 'force-cache',
-    })
+    const response = await fetchAllowedImage(imageUrl)
     if (!response.ok) {
       return NextResponse.json({ error: 'The thumbnail provider could not return this image.' }, { status: 502 })
     }

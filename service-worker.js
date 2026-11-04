@@ -17,11 +17,11 @@ precacheAndRoute(self.__WB_MANIFEST || [])
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     try {
+      await caches.delete('pages')
+      const cache = await caches.open('pages-v2')
       const res = await fetch('/warm-urls.json', { cache: 'no-store' })
       if (!res.ok) return
       const urls = await res.json()
-      const cache = await caches.open('pages')
-      // Cache all pages in parallel
       await Promise.allSettled(
         urls.map((u) => cache.add(new Request(u, { cache: 'reload' })))
       )
@@ -31,11 +31,12 @@ self.addEventListener('activate', (event) => {
   })())
 })
 
-// 1) HTML navigation (all pages): Cache-First so refresh works offline
+// 1) Prefer fresh HTML while retaining a cache for offline navigation.
 registerRoute(
   ({ request }) => request.mode === 'navigate',
-  new CacheFirst({
-    cacheName: 'pages',
+  new NetworkFirst({
+    cacheName: 'pages-v2',
+    networkTimeoutSeconds: 5,
     matchOptions: { ignoreVary: true },
   })
 )
@@ -73,6 +74,15 @@ self.addEventListener('push', (event) => {
   const body = typeof payload.body === 'string' ? payload.body : 'There is a new calendar reminder.'
   const url = typeof payload.url === 'string' ? payload.url : '/calendar'
   const image = typeof payload.image === 'string' ? payload.image : undefined
+  const actions = Array.isArray(payload.actions)
+    ? payload.actions
+        .filter((action) =>
+          action &&
+          (action.action === 'open' || action.action === 'done') &&
+          typeof action.title === 'string',
+        )
+        .slice(0, 2)
+    : [{ action: 'open', title: 'Open' }]
 
   event.waitUntil(self.registration.showNotification(title, {
     body,
@@ -81,21 +91,26 @@ self.addEventListener('push', (event) => {
     image,
     tag: typeof payload.tag === 'string' ? payload.tag : 'calendar-reminder',
     data: { url },
+    lang: typeof payload.lang === 'string' ? payload.lang : 'en',
+    dir: 'auto',
     vibrate: [120, 45, 120],
     renotify: false,
-    actions: [{ action: 'open', title: 'Open' }],
+    actions,
   }))
 })
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
+  if (event.action === 'done') return
   const requestedUrl = event.notification.data && event.notification.data.url
-  const targetUrl = new URL(typeof requestedUrl === 'string' ? requestedUrl : '/calendar', self.location.origin)
+  let targetUrl
+  try {
+    targetUrl = new URL(typeof requestedUrl === 'string' ? requestedUrl : '/calendar', self.location.origin)
+  } catch {
+    return
+  }
   const isAppLink = targetUrl.origin === self.location.origin
-  const isTrustedVideoLink = targetUrl.origin === 'https://www.youtube.com' &&
-    targetUrl.pathname === '/watch' &&
-    targetUrl.searchParams.has('v')
-  if (!isAppLink && !isTrustedVideoLink) return
+  if (!isAppLink && targetUrl.protocol !== 'https:') return
 
   event.waitUntil((async () => {
     if (!isAppLink) {

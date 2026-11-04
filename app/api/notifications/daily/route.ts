@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic'
 type CalendarReminder = {
   dateKey: string
   recipients: StoredPushSubscription[]
-  isToday: boolean
 }
 
 type YouTubeSearchResponse = {
@@ -71,9 +70,13 @@ async function sendPush(
   push: NonNullable<ReturnType<typeof configureWebPush>>,
   config: NonNullable<ReturnType<typeof getPushConfig>>,
   recipients: StoredPushSubscription[],
-  payload: Record<string, string>,
+  payload: Record<string, unknown>,
 ) {
-  const key = payload.tag || payload.title || 'daily-notification'
+  const key = typeof payload.tag === 'string'
+    ? payload.tag
+    : typeof payload.title === 'string'
+      ? payload.title
+      : 'daily-notification'
   const results = await Promise.allSettled(recipients.map((recipient) =>
     sendPushOnce(push, config, recipient, key, payload),
   ))
@@ -216,17 +219,10 @@ export async function GET(request: NextRequest) {
   const reminders = new Map<string, CalendarReminder>()
   for (const subscription of subscriptions) {
     const timezone = subscription.timezone || 'UTC'
-    for (const offsetDays of [0, 1]) {
-      const dateKey = getDateKey(timezone, offsetDays)
-      const key = `${dateKey}:${offsetDays === 0 ? 'today' : 'tomorrow'}`
-      const reminder = reminders.get(key) ?? {
-        dateKey,
-        recipients: [],
-        isToday: offsetDays === 0,
-      }
-      reminder.recipients.push(subscription)
-      reminders.set(key, reminder)
-    }
+    const dateKey = getDateKey(timezone, 1)
+    const reminder = reminders.get(dateKey) ?? { dateKey, recipients: [] }
+    reminder.recipients.push(subscription)
+    reminders.set(dateKey, reminder)
   }
 
   const monthCache = new Map<string, Promise<Awaited<ReturnType<typeof getHebcalMonth>>>>()
@@ -259,10 +255,11 @@ export async function GET(request: NextRequest) {
     const recipients = reminder.recipients.filter((subscription) => subscription.preferences.calendar)
     if (recipients.length === 0) continue
     calendarSent += await sendPush(push, config, recipients, {
-      title: `${reminder.isToday ? 'Today' : 'Tomorrow'} · ${reminderLabel(events)}`,
-      body: `${reminder.isToday ? 'Today is' : 'Tomorrow is'} ${reminderLabel(events)} (${dateLabel}). Tap to explore the calendar.`,
+      title: `Tomorrow · ${reminderLabel(events)}`,
+      body: `Tomorrow is ${reminderLabel(events)} (${dateLabel}). Tap to explore the calendar.`,
       url: `/calendar?year=${year}&month=${month}`,
-      tag: `calendar-${reminder.dateKey}-${reminder.isToday ? 'today' : 'tomorrow'}`,
+      tag: `calendar-${reminder.dateKey}-tomorrow`,
+      actions: [{ action: 'open', title: 'Open' }],
     })
   }
 

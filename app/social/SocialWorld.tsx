@@ -314,7 +314,7 @@ function RemoteThumbnail({
     <img
       src={currentSource}
       alt={alt}
-      loading="eager"
+      loading="lazy"
       decoding="async"
       referrerPolicy="no-referrer"
       className={className}

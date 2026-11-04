@@ -25,7 +25,7 @@ export default function SettingsPage() {
           <span className="settings-page-icon"><BellRing className="h-5 w-5" /></span>
           <div>
             <h2 id="settings-reminders-title">Notifications &amp; reminders</h2>
-            <p>Choose whether this device receives daily calendar and Torah-reading notifications.</p>
+            <p>Choose which calendar, prayer, Psalm, and community reminders this device receives.</p>
           </div>
         </div>
         <NotificationToggle />

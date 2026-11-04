@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
-import { Bell, BellOff, CalendarDays, LoaderCircle } from 'lucide-react'
+import { Bell, BellOff, BookOpenCheck, CalendarDays, Heart, LoaderCircle, Sparkles } from 'lucide-react'
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   type NotificationPreferences,
@@ -147,7 +147,7 @@ export default function NotificationToggle() {
       await readJson(response)
       setState('enabled')
       setSaved(true)
-      setMessage('Your calendar notification preference is saved for this device.')
+      setMessage('Your notification preferences are saved for this device.')
     } catch (error) {
       setState('error')
       setMessage(error instanceof Error ? error.message : 'Could not save your notification preference.')
@@ -167,7 +167,7 @@ export default function NotificationToggle() {
           </span>
           <span>
             <strong>Device notifications</strong>
-            <small>Daily calendar and Torah-reading reminders</small>
+            <small>Calendar, prayer, Psalms, and special event reminders</small>
           </span>
         </div>
         <button
@@ -185,26 +185,33 @@ export default function NotificationToggle() {
       </div>
       {isEnabled && (
         <form className="notification-preferences" onSubmit={savePreferences}>
-          <label className="notification-preference-toggle">
-            <CalendarDays aria-hidden="true" />
-            <span>
-              <strong>Calendar &amp; live events</strong>
-              <small>Holidays, Torah readings, and scheduled community live streams</small>
-            </span>
-            <input
-              type="checkbox"
-              checked={preferences.calendar}
-              onChange={(event) => {
-                setPreferences({ calendar: event.target.checked })
-                setSaved(false)
-                setMessage('')
-              }}
-            />
-          </label>
+          {([
+            ['calendar', CalendarDays, 'Calendar & live events', 'The day before holidays and Torah readings, plus scheduled live streams.'],
+            ['prayers', Heart, 'Daily prayer reminders', 'Morning 8:00, afternoon 14:00, evening 18:00, and night 22:00 in local time.'],
+            ['psalms', BookOpenCheck, 'Psalm invitations', 'Three gentle invitations at varied times each day.'],
+            ['custom', Sparkles, 'Special announcements', 'One-time announcements configured by the app team.'],
+          ] as const).map(([key, Icon, title, description]) => (
+            <label className="notification-preference-toggle" key={key}>
+              <Icon aria-hidden="true" />
+              <span>
+                <strong>{title}</strong>
+                <small>{description}</small>
+              </span>
+              <input
+                type="checkbox"
+                checked={preferences[key]}
+                onChange={(event) => {
+                  setPreferences((current) => ({ ...current, [key]: event.target.checked }))
+                  setSaved(false)
+                  setMessage('')
+                }}
+              />
+            </label>
+          ))}
           <div className="notification-preference-footer">
-            <small>Calendar reminders are checked once daily.</small>
+            <small>Times follow this device’s saved time zone. You can change these choices anytime.</small>
             <button type="submit" disabled={isBusy || saved}>
-              {isBusy ? 'Saving…' : saved ? 'Saved' : 'Save preference'}
+              {isBusy ? 'Saving…' : saved ? 'Saved' : 'Save preferences'}
             </button>
           </div>
         </form>

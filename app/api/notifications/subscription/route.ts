@@ -4,6 +4,7 @@ import { getPushConfig, supabaseHeaders } from '../../../../lib/notifications/pu
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   NotificationPreferencesSchema,
+  getNotificationPreferences,
 } from '../../../../lib/notifications/preferences'
 import { applyRateLimit } from '../../../../lib/utils/rateLimit'
 
@@ -75,7 +76,7 @@ export async function GET(request: NextRequest) {
   if (!record) {
     return NextResponse.json({ error: 'This device’s push subscription is not registered. Turn notifications on again.' }, { status: 404 })
   }
-  return NextResponse.json({ preferences: record?.preferences ?? DEFAULT_NOTIFICATION_PREFERENCES })
+  return NextResponse.json({ preferences: getNotificationPreferences(record.preferences) })
 }
 
 export async function POST(request: NextRequest) {

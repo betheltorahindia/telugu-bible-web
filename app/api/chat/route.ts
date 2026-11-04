@@ -5,6 +5,8 @@ import { applyRateLimit } from '../../../lib/utils/rateLimit'
 export const dynamic = 'force-dynamic'
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash'
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || 'gemini-3.6-flash'
+const GEMINI_TIMEOUT_MS = 15_000
 
 const ChatRequestSchema = z.object({
   messages: z.array(z.object({
@@ -37,7 +39,50 @@ export async function GET() {
   return NextResponse.json({
     onlineAvailable: Boolean(process.env.GEMINI_API_KEY),
     model: GEMINI_MODEL,
+    fallbackModel: GEMINI_FALLBACK_MODEL,
   })
+}
+
+async function requestGemini(model: string, apiKey: string, contents: Array<{
+  role: 'user' | 'model'
+  parts: Array<{ text: string }>
+}>) {
+  return fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey,
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+        contents,
+        generationConfig: {
+          maxOutputTokens: 700,
+          temperature: 0.4,
+        },
+      }),
+      signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+      cache: 'no-store',
+    },
+  )
+}
+
+async function providerErrorDetails(response: Response, apiKey: string) {
+  const body = await response.text()
+  let providerError: { error?: { message?: string; status?: string } } = {}
+  try {
+    providerError = JSON.parse(body)
+  } catch {
+    providerError = {}
+  }
+  const providerMessage = providerError.error?.message
+    ?.replaceAll(apiKey, '[redacted]')
+    .replace(/[\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .slice(0, 240)
+  return [providerError.error?.status, providerMessage].filter(Boolean).join(': ')
 }
 
 export async function POST(request: NextRequest) {
@@ -58,49 +103,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Please send a shorter question and try again.' }, { status: 400 })
   }
 
-  const contents = parsed.data.messages.map(({ role, text }) => ({
-    role: role === 'assistant' ? 'model' : 'user',
-    parts: [{ text }],
-  }))
+  const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> =
+    parsed.data.messages.map(({ role, text }) => ({
+      role: role === 'assistant' ? 'model' : 'user',
+      parts: [{ text }],
+    }))
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-          contents,
-          generationConfig: {
-            maxOutputTokens: 700,
-            temperature: 0.4,
-          },
-        }),
-        signal: AbortSignal.timeout(45_000),
-        cache: 'no-store',
-      },
-    )
+    let response = await requestGemini(GEMINI_MODEL, apiKey, contents)
+    let responseModel = GEMINI_MODEL
+
+    if (!response.ok && response.status === 503 && GEMINI_FALLBACK_MODEL !== GEMINI_MODEL) {
+      const primaryDetails = await providerErrorDetails(response, apiKey)
+      console.warn('Primary Gemini model is unavailable; trying the configured fallback model.', {
+        primaryModel: GEMINI_MODEL,
+        fallbackModel: GEMINI_FALLBACK_MODEL,
+        providerDetails: primaryDetails,
+      })
+      response = await requestGemini(GEMINI_FALLBACK_MODEL, apiKey, contents)
+      responseModel = GEMINI_FALLBACK_MODEL
+    }
 
     if (!response.ok) {
-      const body = await response.text()
-      let providerError: { error?: { message?: string; status?: string } } = {}
-      try {
-        providerError = JSON.parse(body)
-      } catch {
-        providerError = {}
-      }
-      const providerMessage = providerError.error?.message
-        ?.replaceAll(apiKey, '[redacted]')
-        .replace(/[\u0000-\u001f\u007f]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .slice(0, 240)
-      const providerDetails = [providerError.error?.status, providerMessage].filter(Boolean).join(': ')
+      const providerDetails = await providerErrorDetails(response, apiKey)
       console.error('Gemini chat request failed.', {
-        model: GEMINI_MODEL,
+        model: responseModel,
         httpStatus: response.status,
         providerDetails,
       })
@@ -124,7 +151,7 @@ export async function POST(request: NextRequest) {
       }
       if (response.status === 404) {
         return NextResponse.json(
-          { error: `Gemini model “${GEMINI_MODEL}” is unavailable${providerDetails ? `: ${providerDetails}` : '.'} Check the configured model name.` },
+          { error: `Gemini model “${responseModel}” is unavailable${providerDetails ? `: ${providerDetails}` : '.'} Check the configured model name.` },
           { status: 502 },
         )
       }
