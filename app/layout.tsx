@@ -10,6 +10,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from '../components/providers/LanguageProvider'
 import { ZoomProvider } from '../components/providers/ZoomProvider'
 import { ParallelProvider } from '../components/providers/ParallelProvider'
+import BethelChat from '../components/BethelChat'
 import { getLangFromCookie } from '../lib/bibleServer'
 import type { LangCode } from '../lib/lang'
 
@@ -123,6 +124,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </LanguageProvider>
           </QueryProvider>
         </SupabaseProvider>
+        <BethelChat />
         <SpeedInsights />
         <Analytics />
       </body>

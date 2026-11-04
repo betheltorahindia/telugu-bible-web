@@ -2,18 +2,19 @@
 
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
-import { Bot, MessageCircle, Send, X } from 'lucide-react'
+import { Send, X } from 'lucide-react'
 
 type ChatMessage = {
   from: 'assistant' | 'visitor'
   text: string
   href?: string
   linkLabel?: string
+  isError?: boolean
 }
 
 const welcomeMessage: ChatMessage = {
   from: 'assistant',
-  text: 'Hello! When online, I can answer questions about Torah, Judaism, Noahide learning, and help you explore this app. If you’re offline, I can still guide you around the app. What would you like to know?',
+  text: 'Hi, I’m Ezra, your friendly guide to this app, Torah, Judaism, and Noahide learning. What can I help you find?',
 }
 
 function getAnswer(question: string): ChatMessage {
@@ -193,32 +194,39 @@ export default function BethelChat() {
   const [open, setOpen] = useState(false)
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage])
-  const [serverConfigured, setServerConfigured] = useState(false)
+  const [guideConfigured, setGuideConfigured] = useState<boolean | null>(null)
   const [browserOnline, setBrowserOnline] = useState(true)
   const [connectionChecked, setConnectionChecked] = useState(false)
   const [sending, setSending] = useState(false)
-  const onlineAvailable = serverConfigured && browserOnline
+  const onlineAvailable = guideConfigured === true && browserOnline
 
   useEffect(() => {
     let active = true
-    const updateConnection = () => setBrowserOnline(navigator.onLine)
+    const checkGuide = () => {
+      fetch('/api/chat', { cache: 'no-store' })
+        .then(async (response) => {
+          if (!response.ok) throw new Error('Could not check online guide.')
+          return response.json() as Promise<{ onlineAvailable?: boolean }>
+        })
+        .then((result) => {
+          if (active) setGuideConfigured(Boolean(result.onlineAvailable))
+        })
+        .catch(() => {
+          if (active) setGuideConfigured(null)
+        })
+        .finally(() => {
+          if (active) setConnectionChecked(true)
+        })
+    }
+    const updateConnection = () => {
+      const online = navigator.onLine
+      setBrowserOnline(online)
+      if (online) checkGuide()
+      else setConnectionChecked(true)
+    }
     updateConnection()
     window.addEventListener('online', updateConnection)
     window.addEventListener('offline', updateConnection)
-    fetch('/api/chat')
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Could not check online guide.')
-        return response.json() as Promise<{ onlineAvailable?: boolean }>
-      })
-      .then((result) => {
-        if (active) setServerConfigured(Boolean(result.onlineAvailable))
-      })
-      .catch(() => {
-        if (active) setServerConfigured(false)
-      })
-      .finally(() => {
-        if (active) setConnectionChecked(true)
-      })
     return () => {
       active = false
       window.removeEventListener('online', updateConnection)
@@ -235,24 +243,30 @@ export default function BethelChat() {
     setMessages(conversation)
     setQuestion('')
 
-    if (!onlineAvailable || !navigator.onLine) {
+    if (!browserOnline || !navigator.onLine || guideConfigured === false) {
       setMessages((current) => [...current, getAnswer(text)])
       return
     }
 
     setSending(true)
     try {
+      let lastError = -1
+      for (let index = conversation.length - 1; index >= 0; index -= 1) {
+        if (conversation[index].isError) {
+          lastError = index
+          break
+        }
+      }
+      const context = (lastError >= 0 ? conversation.slice(lastError + 1) : conversation.slice(1)).slice(-8)
+      while (context[0]?.from === 'assistant') context.shift()
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: conversation
-            .slice(1)
-            .slice(-8)
-            .map((message) => ({
-              role: message.from === 'visitor' ? 'user' : 'assistant',
-              text: message.text,
-            })),
+          messages: context.map((message) => ({
+            role: message.from === 'visitor' ? 'user' : 'assistant',
+            text: message.text,
+          })),
         }),
       })
       const result = await response.json() as { answer?: string; error?: string }
@@ -264,12 +278,14 @@ export default function BethelChat() {
     } catch (error) {
       const reason = error instanceof Error ? error.message : 'The online guide could not connect.'
       setMessages((current) => [
-        ...current,
+        ...current.slice(0, -1),
         {
           from: 'assistant',
-          text: `I could not get an online answer: ${reason} Please try again after checking the site’s online guide configuration.`,
+          isError: true,
+          text: `I couldn’t reach online answers just now: ${reason} Your question is still ready to retry. I can also help you find your way around the app.`,
         },
       ])
+      setQuestion(text)
     } finally {
       setSending(false)
     }
@@ -278,18 +294,20 @@ export default function BethelChat() {
   return (
     <div className="bethel-chat">
       {open && (
-        <section className="bethel-chat-panel" aria-label="Chat with Bethel">
+        <section className="bethel-chat-panel" aria-label="Chat with Ezra">
           <header className="bethel-chat-header">
-            <span className="bethel-chat-mark"><MessageCircle className="h-4 w-4" /></span>
+            <img className="bethel-chat-avatar" src="/ezra.svg" alt="" />
             <span>
-              <strong>Chat with Bethel</strong>
+              <strong>Ezra</strong>
               <small>
                 {connectionChecked && onlineAvailable
                 ? 'Online answers enabled'
                 : !browserOnline
                   ? 'Offline app guide · come online for more answers'
                   : connectionChecked
-                    ? 'App guide · online answers are not configured'
+                    ? guideConfigured === false
+                      ? 'App guide · online answers are not enabled'
+                      : 'App guide · online answers are temporarily unavailable'
                     : 'Checking online guide…'}
               </small>
             </span>
@@ -310,7 +328,7 @@ export default function BethelChat() {
             ))}
           </div>
           <form className="bethel-chat-form" onSubmit={sendMessage}>
-            <label className="sr-only" htmlFor="bethel-chat-question">Ask Bethel</label>
+            <label className="sr-only" htmlFor="bethel-chat-question">Ask Ezra</label>
             <input
               id="bethel-chat-question"
               value={question}
@@ -327,20 +345,31 @@ export default function BethelChat() {
             <p className="bethel-chat-status">
               {!browserOnline
                 ? 'The offline guide can help you navigate the app. Come online for broader Torah, Judaism, and Noahide answers.'
-                : 'The app guide is available. Online answers need to be enabled by the site administrator.'}
+                : guideConfigured === false
+                  ? 'The app guide is available. Online answers are not enabled on this site.'
+                  : 'The app guide is available. Online answers are temporarily unavailable.'}
             </p>
           )}
         </section>
       )}
+      {!open && connectionChecked && !browserOnline && (
+      <div className="bethel-chat-offline-note" role="status" aria-live="polite">
+        <img src="/ezra.svg" alt="" />
+        <span><strong>Ezra here!</strong> You’re offline, but I can still guide you around the app.</span>
+      </div>
+      )}
       <button
-        type="button"
-        className="bethel-chat-toggle"
-        aria-expanded={open}
-        aria-label={open ? 'Close Chat with Bethel' : 'Chat with Bethel'}
-        onClick={() => setOpen((value) => !value)}
+      type="button"
+      className="bethel-chat-toggle"
+      aria-expanded={open}
+      aria-label={open ? 'Close chat with Ezra' : 'Chat with Ezra'}
+      onClick={() => setOpen((value) => !value)}
       >
-        {open ? <X className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
-        <span>{open ? 'Close chat' : 'Chat with Bethel'}</span>
+      <span className="bethel-chat-mascot">
+        <img src="/ezra.svg" alt="" />
+        {open && <span className="bethel-chat-close"><X className="h-4 w-4" /></span>}
+      </span>
+      <span className="bethel-chat-toggle-label">{open ? 'Close Ezra' : 'Chat with Ezra'}</span>
       </button>
     </div>
   )

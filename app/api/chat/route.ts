@@ -24,7 +24,7 @@ const ChatRequestSchema = z.object({
 })
 
 const APP_GUIDE = `Current app map (these paths are part of this deployment):
-- Home: / — weekly Torah reading, featured links, and Chat with Bethel.
+- Home: / — weekly Torah reading, featured links, and Chat with Ezra.
 - Tanach: /tanach — browse the Bible books and chapters at /book/[book] and /book/[book]/chapter/[chapter]. Reading tools include language selection, text size, and parallel reading.
 - Study: /study — study collection, books, chapters, and lessons.
 - Prayers: /prayers — morning, afternoon, evening, and night prayer collections, with sections and language/transliteration options where available.
@@ -35,7 +35,7 @@ const APP_GUIDE = `Current app map (these paths are part of this deployment):
 
 When the user asks how to use or find something in this app, guide them using this map and include the relevant clickable internal link in Markdown, such as [Open the calendar](/calendar). Explain only features listed here; do not invent controls or content. The map is maintained with the application source and is refreshed when the site is redeployed.`
 
-const SYSTEM_INSTRUCTION = `You are Chat with Bethel, a helpful educational guide focused exclusively on:
+const SYSTEM_INSTRUCTION = `You are Ezra, a helpful educational guide for Bethel Torah India focused exclusively on:
 - The Torah, Tanach, and biblical texts
 - Judaism, Jewish history, traditions, holidays, Hebrew terms, and interpretations
 - Noahide laws, Noahide learning, and the Noahide community
@@ -90,6 +90,10 @@ async function requestGemini(model: string, apiKey: string, contents: Array<{
   )
 }
 
+function isTimeout(error: unknown) {
+  return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')
+}
+
 async function providerErrorDetails(response: Response, apiKey: string) {
   const body = await response.text()
   let providerError: { error?: { message?: string; status?: string } } = {}
@@ -124,17 +128,33 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Please send a shorter question and try again.' }, { status: 400 })
   }
 
+  const conversation = parsed.data.messages.slice(-8)
+  while (conversation[0]?.role === 'assistant') conversation.shift()
   const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> =
-    parsed.data.messages.map(({ role, text }) => ({
+    conversation.map(({ role, text }) => ({
       role: role === 'assistant' ? 'model' : 'user',
       parts: [{ text }],
     }))
 
   try {
-    let response = await requestGemini(GEMINI_MODEL, apiKey, contents)
+    let response: Response
     let responseModel = GEMINI_MODEL
+    let fallbackUsed = false
 
-    if (!response.ok && response.status === 503 && GEMINI_FALLBACK_MODEL !== GEMINI_MODEL) {
+    try {
+      response = await requestGemini(GEMINI_MODEL, apiKey, contents)
+    } catch (error) {
+      if (!isTimeout(error) || GEMINI_FALLBACK_MODEL === GEMINI_MODEL) throw error
+      console.warn('Primary Gemini model timed out; trying the configured fallback model.', {
+        primaryModel: GEMINI_MODEL,
+        fallbackModel: GEMINI_FALLBACK_MODEL,
+      })
+      responseModel = GEMINI_FALLBACK_MODEL
+      fallbackUsed = true
+      response = await requestGemini(GEMINI_FALLBACK_MODEL, apiKey, contents)
+    }
+
+    if (!response.ok && response.status === 503 && !fallbackUsed && GEMINI_FALLBACK_MODEL !== GEMINI_MODEL) {
       const primaryDetails = await providerErrorDetails(response, apiKey)
       console.warn('Primary Gemini model is unavailable; trying the configured fallback model.', {
         primaryModel: GEMINI_MODEL,
@@ -143,6 +163,7 @@ export async function POST(request: NextRequest) {
       })
       response = await requestGemini(GEMINI_FALLBACK_MODEL, apiKey, contents)
       responseModel = GEMINI_FALLBACK_MODEL
+      fallbackUsed = true
     }
 
     if (!response.ok) {
@@ -198,10 +219,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ answer })
   } catch (error) {
     console.error('Gemini chat request could not be completed.', error)
-    const timedOut = error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError')
+    const timedOut = isTimeout(error)
     return NextResponse.json(
-      { error: timedOut ? 'The request to Gemini timed out. Please try again.' : 'The server could not connect to Gemini. Check the deployment network and try again.' },
-      { status: 502 },
+      { error: timedOut ? 'The online guide is temporarily taking longer than expected.' : 'The server could not connect to the online guide.' },
+      { status: timedOut ? 504 : 502 },
     )
   }
 }

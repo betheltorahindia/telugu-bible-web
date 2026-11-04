@@ -86,8 +86,8 @@ self.addEventListener('push', (event) => {
 
   event.waitUntil(self.registration.showNotification(title, {
     body,
-    icon: '/android-icon-192x192.png',
-    badge: '/favicon-16x16.png',
+    icon: '/ezra-notification.png',
+    badge: '/ezra-notification.png',
     image,
     tag: typeof payload.tag === 'string' ? payload.tag : 'calendar-reminder',
     data: { url },
