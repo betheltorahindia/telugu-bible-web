@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Bot, MessageCircle, Send, X } from 'lucide-react'
 
@@ -19,12 +19,42 @@ const welcomeMessage: ChatMessage = {
 function getAnswer(question: string): ChatMessage {
   const normalized = question.toLowerCase()
 
+  if (/guide me|what all|what is (in|on) this app|what can i (do|find)|all (the )?(pages|features)|what pages/.test(normalized)) {
+    return {
+      from: 'assistant',
+      text: 'Here’s a quick tour:\n- [Tanach](/tanach) — read the Bible by book and chapter.\n- [Study](/study) — browse study collections and lessons.\n- [Prayers](/prayers) — explore daily prayer collections.\n- [Calendar](/calendar) — see Hebrew dates, holidays, Rosh Chodesh, and Torah readings.\n- [Social](/social) — find community updates, videos, and podcasts.\n- [Search](/search) — look for Scripture and app content.\n- [Settings](/settings) — manage preferences and device notifications.',
+    }
+  }
+  if (/prayer/.test(normalized)) {
+    return {
+      from: 'assistant',
+      text: 'Browse the prayer collections for morning, afternoon, evening, and night. Open a collection to explore its sections and available language or transliteration options.',
+      href: '/prayers',
+      linkLabel: 'Open Prayers',
+    }
+  }
+  if (/settings|notification|reminder|alert/.test(normalized)) {
+    return {
+      from: 'assistant',
+      text: 'Settings contains app preferences and device notification controls. Notifications require browser permission and a supported device.',
+      href: '/settings',
+      linkLabel: 'Open Settings',
+    }
+  }
+  if (/search|find/.test(normalized)) {
+    return {
+      from: 'assistant',
+      text: 'Use Search to look for Scripture passages and app content.',
+      href: '/search',
+      linkLabel: 'Open Search',
+    }
+  }
   if (/tanach|bible|scripture|book|chapter|read|study/.test(normalized)) {
     return {
       from: 'assistant',
-      text: 'Read the Telugu Tanach, browse its books and chapters, or use language, zoom, and parallel-reading tools while reading.',
-      href: '/tanach',
-      linkLabel: 'Open Tanach',
+      text: 'Use Tanach to read Scripture by book and chapter, or Study to browse its study collections. Reading tools include language, text size, and parallel reading.',
+      href: /study/.test(normalized) ? '/study' : '/tanach',
+      linkLabel: /study/.test(normalized) ? 'Open Study' : 'Open Tanach',
     }
   }
   if (/calendar|holiday|rosh|chodesh|date|parasha|reading/.test(normalized)) {
@@ -41,14 +71,6 @@ function getAnswer(question: string): ChatMessage {
       text: 'The Social page has the latest teachings, podcasts, and links to Bethel Torah India’s social profiles.',
       href: '/social',
       linkLabel: 'Visit Social',
-    }
-  }
-  if (/notification|reminder|alert/.test(normalized)) {
-    return {
-      from: 'assistant',
-      text: 'You can manage opt-in calendar reminders for this device in Settings. Notifications require browser permission and a supported device.',
-      href: '/settings',
-      linkLabel: 'Open Settings',
     }
   }
   if (/contact|address|email|leader|ovadia|ravi kumar|where/.test(normalized)) {
@@ -79,6 +101,92 @@ function getAnswer(question: string): ChatMessage {
     from: 'assistant',
     text: 'I can help with Torah, Judaism, Noahide learning, Bethel Torah India, and finding your way around this app. Please ask about one of those topics.',
   }
+}
+
+function renderInline(text: string, keyPrefix: string, closeChat: () => void) {
+  const tokenPattern = /(\[([^\]]+)\]\(([^)\s]+)\)|\*\*(.+?)\*\*|__(.+?)__|(?<!\*)\*([^*\n]+)\*(?!\*)|(?<!_)_([^_\n]+)_(?!_)|`([^`]+)`)/g
+  const parts: ReactNode[] = []
+  let cursor = 0
+  let match: RegExpExecArray | null
+  let tokenIndex = 0
+
+  while ((match = tokenPattern.exec(text)) !== null) {
+    if (match.index > cursor) parts.push(text.slice(cursor, match.index))
+    const key = `${keyPrefix}-${tokenIndex++}`
+    if (match[2] && match[3]) {
+      const href = match[3]
+      if (href.startsWith('/') && !href.startsWith('//')) {
+        parts.push(<Link key={key} href={href} onClick={closeChat}>{match[2]}</Link>)
+      } else if (/^https:\/\//i.test(href)) {
+        parts.push(<a key={key} href={href} target="_blank" rel="noreferrer noopener">{match[2]}</a>)
+      } else {
+        parts.push(match[2])
+      }
+    } else if (match[4] || match[5]) {
+      parts.push(<strong key={key}>{match[4] || match[5]}</strong>)
+    } else if (match[6] || match[7]) {
+      parts.push(<em key={key}>{match[6] || match[7]}</em>)
+    } else if (match[8]) {
+      parts.push(<code key={key}>{match[8]}</code>)
+    }
+    cursor = tokenPattern.lastIndex
+  }
+  if (cursor < text.length) parts.push(text.slice(cursor))
+  return parts
+}
+
+function renderMessage(text: string, closeChat: () => void) {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n')
+  const blocks: ReactNode[] = []
+  let paragraph: string[] = []
+  let listItems: string[] = []
+  let listType: 'ul' | 'ol' | undefined
+
+  const flushParagraph = () => {
+    if (paragraph.length) {
+      blocks.push(<p key={`p-${blocks.length}`}>{renderInline(paragraph.join(' '), `p-${blocks.length}`, closeChat)}</p>)
+      paragraph = []
+    }
+  }
+  const flushList = () => {
+    if (listItems.length && listType) {
+      const List = listType
+      blocks.push(
+        <List key={`list-${blocks.length}`}>
+          {listItems.map((item, index) => (
+            <li key={index}>{renderInline(item, `list-${blocks.length}-${index}`, closeChat)}</li>
+          ))}
+        </List>,
+      )
+      listItems = []
+      listType = undefined
+    }
+  }
+
+  for (const line of lines) {
+    const heading = line.match(/^#{1,3}\s+(.+)$/)
+    const item = line.match(/^\s*(?:(?:[-*])|(?:\d+[.)]))\s+(.+)$/)
+    if (!line.trim()) {
+      flushParagraph()
+      flushList()
+    } else if (heading) {
+      flushParagraph()
+      flushList()
+      blocks.push(<strong className="bethel-chat-subheading" key={`h-${blocks.length}`}>{renderInline(heading[1], `h-${blocks.length}`, closeChat)}</strong>)
+    } else if (item) {
+      flushParagraph()
+      const nextType = /^\s*\d+[.)]/.test(line) ? 'ol' : 'ul'
+      if (listType && listType !== nextType) flushList()
+      listType = nextType
+      listItems.push(item[1])
+    } else {
+      flushList()
+      paragraph.push(line.trim())
+    }
+  }
+  flushParagraph()
+  flushList()
+  return blocks
 }
 
 export default function BethelChat() {
@@ -140,7 +248,7 @@ export default function BethelChat() {
         body: JSON.stringify({
           messages: conversation
             .slice(1)
-            .slice(-10)
+            .slice(-8)
             .map((message) => ({
               role: message.from === 'visitor' ? 'user' : 'assistant',
               text: message.text,
@@ -192,7 +300,7 @@ export default function BethelChat() {
           <div className="bethel-chat-messages" aria-live="polite">
             {messages.map((message, index) => (
               <div className={`bethel-chat-message is-${message.from}`} key={`${message.from}-${index}`}>
-                <p>{message.text}</p>
+                <div className="bethel-chat-message-content">{renderMessage(message.text, () => setOpen(false))}</div>
                 {message.href && (
                   <Link href={message.href} onClick={() => setOpen(false)}>
                     {message.linkLabel}

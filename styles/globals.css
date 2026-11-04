@@ -4496,9 +4496,16 @@ html[data-theme] .launch-wordmark {
   background: rgba(229, 9, 20, 0.12) !important;
 }
 
-.bethel-chat-message p { margin: 0; }
-.bethel-chat-message a { display: inline-block; margin-top: 7px; color: #e7c77f !important; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
-:root[data-theme="light"] .bethel-chat-message a { color: #a50912 !important; }
+.bethel-chat-message-content { display: grid; gap: 7px; }
+.bethel-chat-message-content p { margin: 0; }
+.bethel-chat-message-content ul,
+.bethel-chat-message-content ol { display: grid; gap: 4px; margin: 0; padding-left: 20px; }
+.bethel-chat-message-content strong { font-weight: 750; }
+.bethel-chat-message-content em { font-style: italic; }
+.bethel-chat-message-content code { border-radius: 4px; padding: 1px 4px; background: rgba(127, 127, 127, 0.18); font-family: ui-monospace, monospace; font-size: 0.92em; }
+.bethel-chat-subheading { margin-top: 2px; }
+.bethel-chat-message-content a { color: #e7c77f !important; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+:root[data-theme="light"] .bethel-chat-message-content a { color: #a50912 !important; }
 
 .bethel-chat-form {
   display: flex;
