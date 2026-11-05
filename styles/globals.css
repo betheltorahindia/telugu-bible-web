@@ -4425,7 +4425,7 @@ html[data-theme] .launch-wordmark {
   position: relative;
   display: inline-block;
   flex: 0 0 auto;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ezra-mascot-fallback,
@@ -4437,9 +4437,9 @@ html[data-theme] .launch-wordmark {
   object-fit: contain;
 }
 
-.ezra-mascot-fallback { z-index: 0; }
+.ezra-mascot-fallback { display: block; }
 .ezra-mascot-player { z-index: 1; }
-.ezra-mascot-player > div { width: 100%; height: 100%; overflow: hidden; }
+.ezra-mascot-player > div { width: 100%; height: 100%; overflow: visible; }
 .ezra-mascot-player video,
 .ezra-mascot-player canvas { width: 100%; height: 100%; object-fit: contain; }
 .bethel-chat-toggle:hover { transform: translateY(-2px); }
@@ -4537,7 +4537,7 @@ html[data-theme] .launch-wordmark {
 
 .bethel-chat-header {
   display: flex;
-  min-height: 82px;
+  min-height: 92px;
   align-items: center;
   gap: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
@@ -4547,14 +4547,14 @@ html[data-theme] .launch-wordmark {
 }
 
 .bethel-chat-avatar {
-  width: 56px;
-  height: 56px;
+  width: 68px;
+  height: 68px;
   flex: 0 0 auto;
 }
 
 .bethel-chat-header > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; gap: 3px; }
-.bethel-chat-header strong { font-size: 0.9rem; }
-.bethel-chat-header small { color: rgba(255, 255, 255, 0.86); font-size: 0.7rem; }
+.bethel-chat-header strong { font-size: 0.96rem; letter-spacing: 0.01em; }
+.bethel-chat-header small { color: rgba(255, 255, 255, 0.9); font-size: 0.7rem; }
 .bethel-chat-header button,
 .bethel-chat-form button {
   display: grid;

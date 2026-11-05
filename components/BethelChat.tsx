@@ -304,7 +304,7 @@ export default function BethelChat() {
           <header className="bethel-chat-header">
             <EzraMascot className="bethel-chat-avatar" />
             <span>
-              <strong>Ezra</strong>
+              <strong>Ezra the Helpbot</strong>
               <small>
                 {connectionChecked && onlineAvailable
                 ? 'Online answers enabled'

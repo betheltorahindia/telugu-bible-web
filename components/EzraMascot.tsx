@@ -9,6 +9,7 @@ export default function EzraMascot({ className = '' }: { className?: string }) {
   const [autoPlay, setAutoPlay] = useState(() =>
     typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
+  const [playerFailed, setPlayerFailed] = useState(false)
 
   useEffect(() => {
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -20,13 +21,17 @@ export default function EzraMascot({ className = '' }: { className?: string }) {
 
   return (
     <span className={`ezra-mascot ${className}`} aria-hidden="true">
-      <img className="ezra-mascot-fallback" src="/ezra.png" alt="" />
-      <MaskoPlayer
-        className="ezra-mascot-player"
-        clip={clip}
-        autoPlay={autoPlay}
-        sound={false}
-      />
+      {playerFailed ? (
+        <img className="ezra-mascot-fallback" src="/ezra.png" alt="" />
+      ) : (
+        <MaskoPlayer
+          className="ezra-mascot-player"
+          clip={clip}
+          autoPlay={autoPlay}
+          sound={false}
+          onError={() => setPlayerFailed(true)}
+        />
+      )}
     </span>
   )
 }
