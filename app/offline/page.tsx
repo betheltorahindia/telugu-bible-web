@@ -1,9 +1,9 @@
-import Image from 'next/image'
+import EzraMascot from '../../components/EzraMascot'
 
 export default function OfflinePage() {
   return (
     <div className="offline-page space-y-3 p-4">
-      <Image src="/ezra.svg" alt="Ezra the robot" width={112} height={112} className="offline-page-mascot" />
+      <EzraMascot className="offline-page-mascot" />
       <div>
         <h1 className="text-xl font-semibold">ఆఫ్లైన్‌లో ఉన్నారు</h1>
         <p className="opacity-75">

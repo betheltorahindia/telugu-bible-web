@@ -85,17 +85,12 @@ export default function InstallFAB() {
         title="ఇన్స్టాల్"
         className="install-app-button"
       >
-        <Download className="w-6 h-6" />
-        <span>Install app</span>
+        <Download className="h-5 w-5" />
       </button>
 
       {iosFallback && showIosHint && (
         <div
-          className="
-            fixed bottom-24 right-5 z-50 w-60 text-sm leading-snug
-            rounded-xl bg-white/95 text-gray-900 shadow-lg shadow-red-600/20
-            border border-red-100 p-3
-          "
+          className="install-ios-hint"
           role="status"
           aria-live="polite"
         >

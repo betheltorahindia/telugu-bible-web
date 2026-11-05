@@ -3,7 +3,6 @@ import { ArrowUpRight, BookOpen, CalendarDays, Heart, Sparkles, Users } from 'lu
 import { getDailyQuote } from '../lib/api/dailyQuote'
 import HomeNavigationCarousel from '../components/HomeNavigationCarousel'
 import HeroSpotlight from '../components/HeroSpotlight'
-import InstallFAB from '../components/InstallFAB'
 import ParashaTeaser from '../components/ParashaTeaser'
 
 export const metadata = {
@@ -140,9 +139,6 @@ export default async function Home() {
         <span>BETHEL TORAH INDIA</span>
         <span>A community in the making.</span>
       </footer>
-      <div className="home-floating-actions">
-        <InstallFAB />
-      </div>
     </div>
   )
 }

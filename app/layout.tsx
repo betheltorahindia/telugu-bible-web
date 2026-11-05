@@ -11,6 +11,7 @@ import { LanguageProvider } from '../components/providers/LanguageProvider'
 import { ZoomProvider } from '../components/providers/ZoomProvider'
 import { ParallelProvider } from '../components/providers/ParallelProvider'
 import BethelChat from '../components/BethelChat'
+import InstallFAB from '../components/InstallFAB'
 import { getLangFromCookie } from '../lib/bibleServer'
 import type { LangCode } from '../lib/lang'
 
@@ -125,6 +126,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           </QueryProvider>
         </SupabaseProvider>
         <BethelChat />
+        <InstallFAB />
         <SpeedInsights />
         <Analytics />
       </body>

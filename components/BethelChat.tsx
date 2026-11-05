@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Send, X } from 'lucide-react'
+import EzraMascot from './EzraMascot'
 
 type ChatMessage = {
   from: 'assistant' | 'visitor'
@@ -198,7 +199,12 @@ export default function BethelChat() {
   const [browserOnline, setBrowserOnline] = useState(true)
   const [connectionChecked, setConnectionChecked] = useState(false)
   const [sending, setSending] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const onlineAvailable = guideConfigured === true && browserOnline
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: 'end' })
+  }, [messages, sending])
 
   useEffect(() => {
     let active = true
@@ -296,7 +302,7 @@ export default function BethelChat() {
       {open && (
         <section className="bethel-chat-panel" aria-label="Chat with Ezra">
           <header className="bethel-chat-header">
-            <img className="bethel-chat-avatar" src="/ezra.svg" alt="" />
+            <EzraMascot className="bethel-chat-avatar" />
             <span>
               <strong>Ezra</strong>
               <small>
@@ -326,6 +332,7 @@ export default function BethelChat() {
                 )}
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
           <form className="bethel-chat-form" onSubmit={sendMessage}>
             <label className="sr-only" htmlFor="bethel-chat-question">Ask Ezra</label>
@@ -352,24 +359,20 @@ export default function BethelChat() {
           )}
         </section>
       )}
-      {!open && connectionChecked && !browserOnline && (
-      <div className="bethel-chat-offline-note" role="status" aria-live="polite">
-        <img src="/ezra.svg" alt="" />
-        <span><strong>Ezra here!</strong> You’re offline, but I can still guide you around the app.</span>
-      </div>
+      {connectionChecked && !browserOnline && (
+        <div className="bethel-chat-offline-note" role="status" aria-live="polite">
+          <EzraMascot className="bethel-chat-offline-mascot" />
+          <span><strong>Hi, I’m Ezra.</strong> You’re offline, but I can still help you find your way around the app.</span>
+        </div>
       )}
       <button
-      type="button"
-      className="bethel-chat-toggle"
-      aria-expanded={open}
-      aria-label={open ? 'Close chat with Ezra' : 'Chat with Ezra'}
-      onClick={() => setOpen((value) => !value)}
+        type="button"
+        className="bethel-chat-toggle"
+        aria-expanded={open}
+        aria-label={open ? 'Close chat with Ezra' : 'Open chat with Ezra'}
+        onClick={() => setOpen((value) => !value)}
       >
-      <span className="bethel-chat-mascot">
-        <img src="/ezra.svg" alt="" />
-        {open && <span className="bethel-chat-close"><X className="h-4 w-4" /></span>}
-      </span>
-      <span className="bethel-chat-toggle-label">{open ? 'Close Ezra' : 'Chat with Ezra'}</span>
+        <EzraMascot className="bethel-chat-mascot" />
       </button>
     </div>
   )
