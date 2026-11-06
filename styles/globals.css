@@ -4546,6 +4546,17 @@ html[data-theme] .launch-wordmark {
   color: #fff;
 }
 
+:root[data-theme="light"] .bethel-chat-panel .bethel-chat-header {
+  border-bottom-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(120deg, #287cf0, #1263d8) !important;
+  color: #fff !important;
+}
+
+:root[data-theme="light"] .bethel-chat-panel .bethel-chat-header strong,
+:root[data-theme="light"] .bethel-chat-panel .bethel-chat-header small {
+  color: #fff !important;
+}
+
 .bethel-chat-avatar {
   width: 68px;
   height: 68px;
